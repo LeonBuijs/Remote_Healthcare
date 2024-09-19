@@ -23,7 +23,7 @@ namespace Client
             //todo betere afhandeling verbinding, nu in oneindige loop wanneer er verbonden wordt
 
             // List available devices
-            List<String> bleBikeList = bleBike.ListDevices();
+            List<String> bleBikeList = bleBike.ListDevices();   
             Console.WriteLine("Devices found: ");
             foreach (var name in bleBikeList)
             {
