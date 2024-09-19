@@ -1,6 +1,6 @@
 using System;
 
-namespace FietsDemo
+namespace Client
 {
     public class BikeData
     {
