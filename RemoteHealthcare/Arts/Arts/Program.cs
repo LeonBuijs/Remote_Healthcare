@@ -6,8 +6,13 @@ class Program
 {
     private static TcpClient artsClient;
     private static NetworkStream artsStream;
+    private static DataSender artsSender;
     private static byte[] artsBuffer = new byte[128];
     private static string totalBuffer;
+    
+    //todo ophalen van GUI echter met testen hardcoded
+    private static string username = "Jan12";
+    private static string password = "incorrect";
 
     public static void Main(string[] args)
     {
@@ -27,7 +32,8 @@ class Program
         artsStream = artsClient.GetStream();
         artsStream.BeginRead(artsBuffer, 0, artsBuffer.Length, new AsyncCallback(OnRead), null);
 
-        //todo write methode maken
+        artsSender = new DataSender(artsStream);
+        artsSender.SendLogin(username, password);
     }
 
     /**
