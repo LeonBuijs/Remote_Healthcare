@@ -11,22 +11,22 @@ namespace Server
             Server s = new Server();
         }
         
-        ConnectionHandler connectionHandler;
 
         public Server()
         {
             Console.WriteLine("Starting server...");
-            connectionHandler = new ConnectionHandler(this);
+            // ConnectionHandler connectionHandler = new ConnectionHandler();
+            ConnectionHandler.Start();
         }
 
         void IArtsCallback.OnReceivedMessage(string message, Connection connection)
         {
-            throw new NotImplementedException();
+            //todo requests verwerken en resultaat terugsturen
         }
 
         void IClientCallback.OnReceivedMessage(string message, Connection connection)
         {
-            throw new NotImplementedException();
+            //todo requests verwerken en resultaat terugsturen
         }
     }
 }

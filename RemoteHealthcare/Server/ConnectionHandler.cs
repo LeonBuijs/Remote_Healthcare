@@ -3,14 +3,15 @@ using System.Net.Sockets;
 
 namespace Server;
 
-public class ConnectionHandler
+public static class ConnectionHandler
 {
-    private List<Connection> connections = new List<Connection>();
-    private Server server;
-    public ConnectionHandler(Server server)
+    private static List<Connection> connections = new();
+    
+    private static IClientCallback clientCallback;
+    private static IArtsCallback artsCallback;
+
+    public static void Start()
     {
-        this.server = server;
-        
         Thread ThreadClient = new Thread(OpenConnectionClient);
         ThreadClient.Start();
         
@@ -18,44 +19,65 @@ public class ConnectionHandler
         ThreadArts.Start();
     }
 
-    private void OpenConnectionClient()
+    private static void OpenConnectionClient()
     {
+        Console.WriteLine("Client Connection thread opened");
         TcpListener listener = new TcpListener(IPAddress.Loopback, 6666);
         listener.Start();
         while (true)
         {
             Connection connectionClient = new Connection(listener.AcceptTcpClient());
             connections.Add(connectionClient);
-            Thread ThreadConnection = new Thread(() => HandleConnection(connectionClient));
+            Thread ThreadConnection = new Thread(() => HandleConnectionClient(connectionClient));
             ThreadConnection.Start();
         }
     }
 
-    private void OpenConnectionArts()
+    private static void OpenConnectionArts()
     {
+        Console.WriteLine("Arts Connection thread opened");
         TcpListener listener = new TcpListener(IPAddress.Loopback, 7777);
         listener.Start();
         while (true)
         {
             Connection connectionClient = new Connection(listener.AcceptTcpClient());
             connections.Add(connectionClient);
-            Thread ThreadConnection = new Thread(() => HandleConnection(connectionClient));
+            Thread ThreadConnection = new Thread(() => HandleConnectionArts(connectionClient));
             ThreadConnection.Start();
         }
     }
 
-    private void HandleConnection(Connection connection)
+    private static void HandleConnectionArts(Connection connection)
     {
         Boolean running = true;
         while (running)
         {
             running = CheckConnection(connection);
+            var received = connection.Receive();
+            artsCallback.OnReceivedMessage(received, connection);
+            
+            Console.WriteLine("Arts sent: " + received);
+        }
+
+        connections.Remove(connection);
+    }
+    private static void HandleConnectionClient(Connection connection)
+    {
+        Boolean running = true;
+        while (running)
+        {
+            running = CheckConnection(connection);
+            
+            var received = connection.Receive();
+            clientCallback.OnReceivedMessage(connection.Receive(), connection);
+            
+            Console.WriteLine("Client sent: " + received);
         }
 
         connections.Remove(connection);
     }
 
-    private Boolean CheckConnection(Connection connectionClient)
+    private static bool CheckConnection(Connection connectionClient)
     {
         return connectionClient.stream.Socket.Connected;
     }
