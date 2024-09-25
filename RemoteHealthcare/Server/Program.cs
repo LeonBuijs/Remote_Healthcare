@@ -2,31 +2,26 @@
 using System.Net;
 using System.Net.Sockets;
 
-namespace Server
+namespace Server;
+
+public class Server : IArtsCallback, IClientCallback
 {
-    public class Server : IArtsCallback, IClientCallback
+    public static void Main(string[] args)
     {
-        public static void Main(string[] args)
-        {
-            Server s = new Server();
-        }
-        
+        Console.WriteLine("Starting server...");
+        ConnectionHandler.Start();
+    }
 
-        public Server()
-        {
-            Console.WriteLine("Starting server...");
-            // ConnectionHandler connectionHandler = new ConnectionHandler();
-            ConnectionHandler.Start();
-        }
+    /**
+     * Callbacks voor het verwerken van requests vanuit de Arts en Client(s)
+     */
+    void IArtsCallback.OnReceivedMessage(string message, Connection connection)
+    {
+        //todo requests verwerken en resultaat terugsturen
+    }
 
-        void IArtsCallback.OnReceivedMessage(string message, Connection connection)
-        {
-            //todo requests verwerken en resultaat terugsturen
-        }
-
-        void IClientCallback.OnReceivedMessage(string message, Connection connection)
-        {
-            //todo requests verwerken en resultaat terugsturen
-        }
+    void IClientCallback.OnReceivedMessage(string message, Connection connection)
+    {
+        //todo requests verwerken en resultaat terugsturen
     }
 }
