@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
@@ -5,20 +6,19 @@ namespace Server;
 
 public class Connection
 {
-    private string ip;
-    private int port;
+    private TcpListener listener;
     private TcpClient client;
-    private NetworkStream stream;
+    public NetworkStream stream;
     private byte[] buffer;
 
-    public Connection(string ip, int port)
+    public Connection(TcpClient client)
     {
-        this.ip = ip;
-        this.port = port;
-        client = new TcpClient(this.ip, this.port);
+        this.client = client;
         stream = client.GetStream();
         buffer = new byte[1024];
     }
+
+    
 
     public void Send(string msg)
     {
