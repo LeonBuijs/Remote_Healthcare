@@ -4,55 +4,29 @@ using System.Net.Sockets;
 
 namespace Server
 {
-    class Server
+    public class Server : IArtsCallback, IClientCallback
     {
-        private static List<Connection> connections = new List<Connection>();
         public static void Main(string[] args)
         {
-            Thread ThreadClient = new Thread(OpenConnectionClient);
-            ThreadClient.Start();
-            Thread ThreadArts = new Thread(OpenConnectionArts);
-
+            Server s = new Server();
         }
         
-        private static void OpenConnectionClient()
+        ConnectionHandler connectionHandler;
+
+        public Server()
         {
-            TcpListener listener = new TcpListener(IPAddress.Loopback, 6666);
-            while (true)
-            {
-                Connection connectionClient = new Connection(listener.AcceptTcpClient());
-                connections.Add(connectionClient);
-                Thread ThreadConnection = new Thread(() => HandleConnection(connectionClient));
-                ThreadConnection.Start();
-            }
-        }
-        private static void OpenConnectionArts()
-        {
-            TcpListener listener = new TcpListener(IPAddress.Loopback, 7777);
-            while (true)
-            {
-                Connection connectionClient = new Connection(listener.AcceptTcpClient());
-                connections.Add(connectionClient);
-                Thread ThreadConnection = new Thread(() => HandleConnection(connectionClient));
-                ThreadConnection.Start();
-            }
+            Console.WriteLine("Starting server...");
+            connectionHandler = new ConnectionHandler(this);
         }
 
-        private static void HandleConnection(Connection connection)
+        void IArtsCallback.OnReceivedMessage(string message, Connection connection)
         {
-            Boolean running = true;
-            while (running)
-            {
-                running = CheckConnection(connection);
-            }
-            connections.Remove(connection);
+            throw new NotImplementedException();
         }
 
-        private static Boolean CheckConnection(Connection connectionClient)
+        void IClientCallback.OnReceivedMessage(string message, Connection connection)
         {
-            return connectionClient.stream.Socket.Connected;
-
+            throw new NotImplementedException();
         }
     }
 }
-
