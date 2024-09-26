@@ -6,6 +6,7 @@ namespace Server;
 
 public class Server : IArtsCallback, IClientCallback
 {
+    private List<String> clients = new List<String>();
     public static void Main(string[] args)
     {
         Console.WriteLine("Starting server...");
@@ -24,6 +25,10 @@ public class Server : IArtsCallback, IClientCallback
                 if (CheckLogin(messageParts[1], messageParts[2]))
                 {
                     connection.Send("0 1");
+                    foreach (var client in clients)
+                    {
+                        connection.Send(client);
+                    }
                 }
                 else
                 {
@@ -32,6 +37,7 @@ public class Server : IArtsCallback, IClientCallback
                 break;
             case 1:
                 // TODO: Stuur een startcommando naar de specifieke client
+                
                 break;
             case 2:
                 // TODO: Stuur een stopcommando naar de specifieke client
@@ -58,18 +64,14 @@ public class Server : IArtsCallback, IClientCallback
     void IClientCallback.OnReceivedMessage(string message, Connection connection)
     {
         var messageParts = message.Split(' ');
+        String client = "";
         switch (Int32.Parse(messageParts[0]))
         {
             case 0:
-                // TODO: Sla de gegeven voornaam op
+                // TODO: Sla de gegevens op
+                client += messageParts[1];
                 break;
             case 1:
-                // TODO: Sla de gegeven achternaam op
-                break;
-            case 2:
-                // TODO: Sla de gegeven geboortedatum op
-                break;
-            case 3:
                 // TODO: Sla de fietsdata op en eventueel naar de arts sturen
                 break;
         }

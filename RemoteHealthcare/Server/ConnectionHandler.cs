@@ -8,7 +8,8 @@ namespace Server;
  */
 public static class ConnectionHandler
 {
-    private static List<Connection> connections = new();
+    private static List<Connection> clients = new();
+    private static List<Connection> artsen = new();
 
     private static IClientCallback clientCallback;
     private static IArtsCallback artsCallback;
@@ -34,7 +35,7 @@ public static class ConnectionHandler
         while (true)
         {
             Connection connectionClient = new Connection(listener.AcceptTcpClient());
-            connections.Add(connectionClient);
+            artsen.Add(connectionClient);
             Thread ThreadConnection = new Thread(() => HandleConnectionArts(connectionClient));
             ThreadConnection.Start();
         }
@@ -52,7 +53,7 @@ public static class ConnectionHandler
         while (true)
         {
             Connection connectionClient = new Connection(listener.AcceptTcpClient());
-            connections.Add(connectionClient);
+            clients.Add(connectionClient);
             Thread ThreadConnection = new Thread(() => HandleConnectionClient(connectionClient));
             ThreadConnection.Start();
         }
@@ -73,7 +74,7 @@ public static class ConnectionHandler
             Console.WriteLine("Arts sent: " + received);
         }
 
-        connections.Remove(connection);
+        artsen.Remove(connection);
     }
 
     /**
@@ -92,7 +93,7 @@ public static class ConnectionHandler
             Console.WriteLine("Client sent: " + received);
         }
 
-        connections.Remove(connection);
+        clients.Remove(connection);
     }
 
     /**
@@ -101,5 +102,10 @@ public static class ConnectionHandler
     private static bool CheckConnection(Connection connectionClient)
     {
         return connectionClient.stream.Socket.Connected;
+    }
+
+    public static List<Connection> getClients()
+    {
+        return clients;
     }
 }
