@@ -11,13 +11,13 @@ namespace Client
         private BikeDataSender _bikeDataSender;
         private BikeData _bikeData;
         
-        public ClientApplication(string ipAddress, int port)
+        public ClientApplication(string ipAddress, int port, BikeData bikeData)
         {
             // Verbind met server
             _client = new TcpClient(ipAddress, port);
             _stream = _client.GetStream();
-            
-            _bikeData = new BikeData();
+
+            _bikeData = bikeData;
             _bikeDataSender = new BikeDataSender(_client, _bikeData);
         }
         

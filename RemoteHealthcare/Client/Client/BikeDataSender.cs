@@ -25,7 +25,7 @@ namespace Client
                 string bikeDataMessage = FormatBikeData();
                 SendMessage(bikeDataMessage);
                 
-                await Task.Delay(10000);
+                await Task.Delay(5000);
             }
         }
         
