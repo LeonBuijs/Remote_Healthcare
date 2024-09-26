@@ -18,7 +18,6 @@ public class Server : IArtsCallback, IClientCallback
      */
     void IArtsCallback.OnReceivedMessage(string message, Connection connection)
     {
-        // clients = ConnectionHandler.getClients();
         var messageParts = message.Split(' ');
         ArtsCallbackHandler(connection, messageParts);
     }
