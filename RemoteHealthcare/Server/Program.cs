@@ -6,7 +6,7 @@ namespace Server;
 
 public class Server : IArtsCallback, IClientCallback
 {
-    private List<String> clients = new List<String>();
+    Dictionary<String, Connection> clients = new Dictionary<String, Connection>();
     public static void Main(string[] args)
     {
         Console.WriteLine("Starting server...");
@@ -18,58 +18,19 @@ public class Server : IArtsCallback, IClientCallback
      */
     void IArtsCallback.OnReceivedMessage(string message, Connection connection)
     {
+        // clients = ConnectionHandler.getClients();
         var messageParts = message.Split(' ');
-        switch (Int32.Parse(messageParts[0]))
-        {
-            case 0:
-                if (CheckLogin(messageParts[1], messageParts[2]))
-                {
-                    connection.Send("0 1");
-                    foreach (var client in clients)
-                    {
-                        connection.Send(client);
-                    }
-                }
-                else
-                {
-                    connection.Send("0 0");
-                }
-                break;
-            case 1:
-                // TODO: Stuur een startcommando naar de specifieke client
-                
-                break;
-            case 2:
-                // TODO: Stuur een stopcommando naar de specifieke client
-                break;
-            case 3:
-                // TODO: Stuur een noodstopcommando naar de specifieke client
-                break;
-            case 4:
-                // TODO: Stuur een bericht naar een specifieke client
-                break;
-            case 5:
-                // TODO: Stuur een bericht naar alle clients
-                break;
-            case 6:
-                // TODO: Stuur de weerstand naar een specifieke client
-                break;
-            case 7:
-                // TODO: Stuur de gevraagde data terug naar de arts
-                break;
-            
-        }
+        ArtsCallbackHandler(connection, messageParts);
     }
 
     void IClientCallback.OnReceivedMessage(string message, Connection connection)
     {
         var messageParts = message.Split(' ');
-        String client = "";
         switch (Int32.Parse(messageParts[0]))
         {
             case 0:
-                // TODO: Sla de gegevens op
-                client += messageParts[1];
+                // Sla de gegevens op
+                clients.Add($"{messageParts[1]} {messageParts[2]} {messageParts[3]}", connection);
                 break;
             case 1:
                 // TODO: Sla de fietsdata op en eventueel naar de arts sturen
@@ -77,9 +38,82 @@ public class Server : IArtsCallback, IClientCallback
         }
     }
 
-    private Boolean CheckLogin(string Username, string Password)
+    private Boolean CheckLogin(string username, string password)
     {
         // TODO: Inloggegevens opslaan met encrypt en hier ophalen
-        return (Username == "admin" && Password == "admin");
+        return (username == "admin" && password == "admin");
+    }
+
+    private void SendAllClients(Connection connection)
+    {
+        foreach (var client in clients)
+        {
+            connection.Send($"2 {client.Key}");
+        }
+    }
+
+    private string GetIndexClient(string[] messageParts)
+    {
+        return $"{messageParts[1]} {messageParts[2]} {messageParts[3]}";
+    }
+
+    private void SendCommandToClient(string[] messageParts, string command)
+    {
+        var requestedClientId = GetIndexClient(messageParts);
+        foreach (var client in clients)
+        {
+            if (requestedClientId.Equals(client.Key))
+            {
+                client.Value.Send(command);
+            }
+        }
+    }
+
+    private void ArtsCallbackHandler(Connection connection, string[] messageParts)
+    {
+        switch (Int32.Parse(messageParts[0]))
+        {
+            case 0:
+                if (CheckLogin(messageParts[1], messageParts[2]))
+                {
+                    connection.Send("0 1");
+                    SendAllClients(connection);
+                }
+                else
+                {
+                    connection.Send("0 0");
+                }
+                break;
+            case 1:
+                // Stuur een startcommando naar een specifieke client
+                SendCommandToClient(messageParts, "2");
+                break;
+            case 2:
+                // Stuur een stopcommando naar een specifieke client
+                SendCommandToClient(messageParts, "3");
+                break;
+            case 3:
+                // Stuur een noodstopcommando naar een specifieke client
+                SendCommandToClient(messageParts, "4");
+                break;
+            case 4:
+                // Stuur een bericht naar een specifieke client
+                SendCommandToClient(messageParts, $"0 {messageParts[4]}");
+                break;
+            case 5:
+                // Stuur een bericht naar alle clients
+                connection.Send($"5 {messageParts[1]}");
+                break;
+            case 6:
+                // Stuur de weerstand naar een specifieke client
+                SendCommandToClient(messageParts, $"1 {messageParts[4]}");
+                break;
+            case 7:
+                // TODO: Stuur de gevraagde data terug naar de arts
+                break;
+            case 8:
+                SendAllClients(connection);
+                break;
+        }
     }
 }
