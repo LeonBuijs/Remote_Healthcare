@@ -25,6 +25,6 @@ public class Connection
     {
         var buffer = new byte[1024];
         var bytesRead = stream.Read(buffer, 0, buffer.Length);
-        return BitConverter.ToString(buffer, 0, bytesRead);
+        return Encoding.ASCII.GetString(buffer, 0, bytesRead);
     }
 }
