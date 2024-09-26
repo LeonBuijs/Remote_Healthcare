@@ -93,6 +93,20 @@ namespace Client
             }
 
             Console.Read();
+            
+            // Verbinding maken en Bikedata doorsturen naar server
+            try
+            {
+                string ipAddress = "127.0.0.1";
+                int port = 6666; 
+                
+                ClientApplication clientApp = new ClientApplication(ipAddress, port, bikeData);
+                await clientApp.Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Fout Client Applicatie: " + ex.Message);
+            }
         }
 
 
