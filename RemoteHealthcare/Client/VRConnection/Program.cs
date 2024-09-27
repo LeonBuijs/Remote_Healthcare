@@ -1,5 +1,6 @@
 ﻿using System.Net.Sockets;
 using System.Text;
+using System.Text.Json.Nodes;
 
 class VRConnection
 {
@@ -16,13 +17,31 @@ class VRConnection
 
         // Stap 3
         RecievePacket(stream);
+        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        string ID = jsonObject["data"][0]["id"].ToString();
         
-        // Stap 4 TODO: verder uitwerken
+        // Stap 4
         SendPacket(stream, "{\"id\" : " +
                            "\"tunnel/create\", " +
                            "\"data\" : " +
-                           "{\"session\" : \"c22ad75b-a340-4ac2-9e63-d8cb164b6c5f\",}}");
+                           "{\"session\" : \"" +
+                           ID +
+                           "\",}}");
         
+        RecievePacket(stream);
+        jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        string SessionID = jsonObject["data"]["id"].ToString();
+        
+        // Stap 5
+        SendPacket(stream, "{\"id\" : " +
+                           "\"tunnel/send\", " +
+                           "\"data\" :" +
+                           "{\"dest\" : \"" +
+                           SessionID +
+                           "\", " +
+                           "\"data\" :" +
+                           "{\"id\" : \"scene/reset\", " +
+                           "\"data\" : {}}}}");
         RecievePacket(stream);
     }
 
@@ -38,12 +57,15 @@ class VRConnection
         Console.WriteLine("Bericht verstuurd\n");
     }
 
-    private static void RecievePacket(NetworkStream stream)
+    private static string RecievePacket(NetworkStream stream)
     {
         var buffer = new byte[2048];
         var bytesRead = stream.Read(buffer, 0, buffer.Length);
+
+        int bufferLength = buffer[0];
         Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, bytesRead));
         
         Console.WriteLine("Bericht ontvangen\n");
+        return Encoding.ASCII.GetString(buffer, 0, bytesRead);
     }
 }
