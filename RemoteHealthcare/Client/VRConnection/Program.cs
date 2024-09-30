@@ -28,8 +28,8 @@ class VRConnection
                 "\"data\" :" +
                 "{\"id\" : \"scene/node/add\", " +
                 "\"data\" :" +
-                "{\"name\" : \"test\", " +
-                "\"components\" :" +
+                "{\"name\" : \"test\" " +
+                // "\"components\" :" +
                 // "{\"transform\" : " +
                 // "{\"position\" : [ 0, 0, 0 ], " +
                 // "\"scale\" : 1, " +
