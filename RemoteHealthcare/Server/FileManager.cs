@@ -4,6 +4,8 @@ namespace Server;
  * Klasse voor het uitvoeren en bijhouden van alle FileIO gerelateerde zaken
  * alle files komen in de documents folder te staan
  */
+
+//TODO: bepalen hoe de data opgeslagen wordt: hashen encrypten etc.
 public class FileManager
 {
     //TODO: bestand voor beheren geregistreerde clients
@@ -12,7 +14,7 @@ public class FileManager
     //TODO: bestand voor beheren geregistreerde artsen
     //server stuurt data hiernaar en vergelijkt hashes om te kijken of het geldig is
 
-    //TODO: bestand per geregistreerde client om sessiewaardes op te slaan
+    //TODO: bestand per geregistreerde client om sessie waardes op te slaan
     //per client een mapje maken met alle historische data
 
     private string rootDirectory;
@@ -27,14 +29,16 @@ public class FileManager
 
     /**
      * Methode die controleert of de login van de client geldig is en bestaat in de server
+     * layout nameBirthAndYear = {firstName} {lastName} {birthDate}
+     * e.g. Jan Jannsen 01012000
      */
-    public bool CheckClientLogin(string NameAndBirthYear)
+    public bool CheckClientLogin(string nameAndBirthDate)
     {
         var allClients = ReadAllLines(clientDirectory + "/clientData.txt");
 
         foreach (var client in allClients)
         {
-            if (client == NameAndBirthYear)
+            if (client == nameAndBirthDate)
             {
                 return true;
             }
@@ -64,6 +68,24 @@ public class FileManager
         return false;
     }
 
+    /**
+     * Methode om een nieuwe client aan de server toe te voegen
+     */
+    public void AddNewClient(string firstName, string lastName, string birthdate)
+    {
+        //todo login hashen en/of encrypten
+        WriteToFile(clientDirectory + "/clientData.txt", $"{firstName} {lastName} {birthdate}");
+    }
+
+    /**
+     * Methode om een nieuwe doctor aan de server toe te voegen
+     */
+    public void AddNewDoctor(string username, string password)
+    {
+        //todo login hashen en/of encrypten
+        WriteToFile(clientDirectory + "/doctorData.txt", $"{username} {password}");
+    }
+    
     /**
      * Methode die controleert of alle directories voor de files aangemaakt zijn, zo niet worden ze aangemaakt
      */
