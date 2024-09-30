@@ -4,6 +4,8 @@ using System.Text.Json.Nodes;
 
 class VRConnection
 {
+    private static string SessionID;
+
     public static void Main(string[] args)
     {
         // Stap 1
@@ -12,6 +14,29 @@ class VRConnection
         NetworkStream stream = tcpClient.GetStream();
         Console.WriteLine("Verbonden met de server\n");
 
+        CreateTunnel(stream);
+        
+        SetTime(stream, 0);
+    }
+
+    private static void SetTime(NetworkStream stream, int time)
+    {
+        SendPacket(stream, "{\"id\" : " +
+                           "\"tunnel/send\", " +
+                           "\"data\" :" +
+                           "{\"dest\" : \"" +
+                           SessionID +
+                           "\", " +
+                           "\"data\" :" +
+                           "{\"id\" : \"scene/skybox/settime\", " +
+                           "\"data\" : " +
+                           "{\"time\" : " + time + "}}}}");
+        RecievePacket(stream);
+
+    }
+
+    private static void CreateTunnel(NetworkStream stream)
+    {
         // Stap 2
         SendPacket(stream, "{\"id\" : \"session/list\"}");
 
@@ -30,7 +55,7 @@ class VRConnection
         
         RecievePacket(stream);
         jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
-        string SessionID = jsonObject["data"]["id"].ToString();
+        SessionID = jsonObject["data"]["id"].ToString();
         
         // Stap 5
         SendPacket(stream, "{\"id\" : " +
@@ -42,6 +67,7 @@ class VRConnection
                            "\"data\" :" +
                            "{\"id\" : \"scene/reset\", " +
                            "\"data\" : {}}}}");
+        RecievePacket(stream);
         RecievePacket(stream);
     }
 
