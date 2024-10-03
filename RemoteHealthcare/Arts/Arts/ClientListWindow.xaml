@@ -1,0 +1,30 @@
+<Window x:Class="Arts.ClientListWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Arts"
+        mc:Ignorable="d"
+        Title="MainPage" Height="450" Width="800">
+    <Grid>
+        
+        <StackPanel Margin="10">
+            <Label Content="Selecteer een item:" Margin="0,0,0,10"/>
+            <ListBox Name="ItemList" Margin="0,0,0,10" Height="150" SelectionChanged="ChosenClient">
+                <ListBoxItem Content="Item 1"/>
+                <ListBoxItem Content="Item 2"/>
+                <ListBoxItem Content="Item 3"/>
+                <ListBoxItem Content="Item 4"/>
+                <ListBoxItem Content="Item 5"/>
+                <ListBoxItem Content="Item 6"/>
+                <ListBoxItem Content="Item 7"/>
+                <ListBoxItem Content="Item 8"/>
+                <ListBoxItem Content="Item 9"/>
+                <ListBoxItem Content="Item 10"/>
+                <ListBoxItem Content="Item 11"/>
+                <ListBoxItem Content="Item 12"/>
+            </ListBox>
+        </StackPanel>
+        
+    </Grid>
+</Window>

@@ -1,48 +1,71 @@
 ﻿using System.Net.Sockets;
 using System.Text;
+using System.Windows;
 
 namespace Arts;
 
-class Program
+public partial class Program : Application
 {
     private static TcpClient artsClient;
     private static NetworkStream artsStream;
     private static DataSender artsSender;
     private static byte[] artsBuffer = new byte[128];
     private static string totalBuffer;
-
+    
     //todo ophalen van GUI echter met testen hardcoded
     private static string username = "Jan12";
     private static string password = "incorrect";
 
-    public static void Main(string[] args)
+
+    /**
+     * Methode om een aantal verrichtingen te maken voordat de app is opgestart
+     * Voor nu: Connectie met de server maken.
+     */
+    protected override async void OnStartup(StartupEventArgs e)
     {
+        base.OnStartup(e);
         artsClient = new TcpClient();
         //todo verander de host en poortnummer
-        artsClient.Connect("127.0.0.1", 7777);
+        try
+        {
+            await artsClient.ConnectAsync("127.0.0.1", 7777);
+            //won't come here until it has connection.
+            new Thread(OnConnect).Start(); 
+            artsSender = new DataSender(artsClient.GetStream());
+        }
+        catch (SocketException exception)
+        {
+            //todo try to reconnect/give pop up
+            Console.WriteLine("Can't connect to server");
+        }
         
-        artsSender = new DataSender(artsClient.GetStream());
-        
-        //test verbinding
-        artsSender.SendLogin(username, password);
-        var read = artsClient.GetStream().Read(artsBuffer, 0, artsBuffer.Length);
-        Console.WriteLine(Encoding.ASCII.GetString(artsBuffer), 0, read);
-        //test verbinding
     }
+
+    /**
+     * Methode die het afsluiten van de applicatie afhandelt
+     * Voor de zekerheid sluiten we alle streams en client
+     */
+    protected override void OnExit(ExitEventArgs e)
+    {
+        base.OnExit(e);
+        artsClient?.Close();
+        artsStream?.Close();
+        Environment.Exit(0);
+    }
+
 
     /**
      * Methode om het zoeken naar verbinding te stoppen
      * Gebeurt bij gevonden verbinding en start een listener methode
      */
-    private static void OnConnect(IAsyncResult ar)
+    private static void OnConnect()
     {
-        artsClient.EndConnect(ar);
         Console.WriteLine("Verbonden!");
         artsStream = artsClient.GetStream();
         artsStream.BeginRead(artsBuffer, 0, artsBuffer.Length, new AsyncCallback(OnRead), null);
 
         artsSender = new DataSender(artsStream);
-        artsSender.SendLogin(username, password);
+        // artsSender.SendLogin(username, password);
     }
 
     /**
@@ -51,11 +74,12 @@ class Program
     private static void OnRead(IAsyncResult ar)
     {
         int receivedBytes = artsStream.EndRead(ar);
-        string receivedText = System.Text.Encoding.ASCII.GetString(artsBuffer, 0, receivedBytes);
+        string receivedText = Encoding.ASCII.GetString(artsBuffer, 0, receivedBytes);
         totalBuffer += receivedText;
 
         //todo: pakket opsplitsen
-        //HandleData(packet);
+        string[] packetSplit = receivedText.Split(" ");
+        HandleData(packetSplit);
 
         artsStream.BeginRead(artsBuffer, 0, artsBuffer.Length, new AsyncCallback(OnRead), null);
     }
@@ -76,12 +100,21 @@ class Program
                 string argument = packetData[1];
                 if (argument == "0")
                 {
+                    string title = "Login unsuccesfull";
+                    string content = "Your username and/or password is incorrect, please try again. psst (paasword is incorrect)";
+                    MessageBox.Show(content, title);                 
                     Console.WriteLine("Unknown user or password!");
                     //todo afhandelen geweigerd
                 }
                 else if (argument == "1")
                 {
-                    Console.WriteLine("Logged in!");
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Console.WriteLine("Logged in!");
+                        ClientListWindow clientListWindow = new ClientListWindow();
+                        clientListWindow.Show();
+                    });
+                    
                     //todo afhandelen geaccepteerd
                 }
                 else
@@ -111,5 +144,9 @@ class Program
                 //todo better error handling
                 break;
         }
+    }
+    
+    public static void TryLogin(string username, string password){
+        artsSender.SendLogin(username, password);
     }
 }
