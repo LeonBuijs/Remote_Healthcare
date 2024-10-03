@@ -81,11 +81,16 @@ public class FileManager
      * Methode om sessies van client op te halen
      */
     //todo
-    public List<string> getAllClientSessions(string client)
+    public List<string>? getAllClientSessions(string client)
     {
         List<string> allSessionData = new List<string>();
         
-        string[] allSessions = Directory.GetFiles(sessionDirectory + "/client");
+        string[] allSessions = Directory.GetFiles(sessionDirectory + "/" + client);
+
+        if (allSessions.Length == 0)
+        {
+            return null;
+        }
 
         foreach (var session in allSessions)
         {
