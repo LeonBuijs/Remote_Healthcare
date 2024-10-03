@@ -1,9 +1,10 @@
 ﻿using System.Net.Sockets;
 using System.Text;
+using System.Windows;
 
 namespace Arts;
 
-class Program
+public partial class Program : Application
 {
     private static TcpClient artsClient;
     private static NetworkStream artsStream;
@@ -14,7 +15,7 @@ class Program
     //todo ophalen van GUI echter met testen hardcoded
     private static string username = "Jan12";
     private static string password = "incorrect";
-
+    
     public static void Main(string[] args)
     {
         artsClient = new TcpClient();
