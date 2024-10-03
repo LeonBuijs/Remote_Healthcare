@@ -83,7 +83,7 @@ public class FileManager
     public void AddNewDoctor(string username, string password)
     {
         //todo login hashen en/of encrypten
-        WriteToFile(clientDirectory + "/doctorData.txt", $"{username} {password}");
+        WriteToFile(doctorDirectory + "/doctorData.txt", $"{username} {password}");
     }
     
     /**
