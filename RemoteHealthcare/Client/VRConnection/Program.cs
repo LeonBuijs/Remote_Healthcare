@@ -17,7 +17,7 @@ class VRConnection
 
         CreateTunnel(stream);
         // Werkende methodes:
-        // SetTime(stream, 0);
+        SetTime(stream, 0);
         // CreateNode(stream);
 
         
@@ -99,7 +99,17 @@ class VRConnection
 
         // Stap 3
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
-        string ID = jsonObject["data"][0]["id"].ToString();
+        JsonArray dataArray = (JsonArray)jsonObject["data"];
+
+        string ID = null;
+        foreach (JsonObject session in dataArray)
+        {
+            string user = session["clientinfo"]["user"].ToString();
+            if (user == System.Environment.UserName)
+            {
+                ID = session["id"].ToString();
+            }
+        }
         
         // Stap 4
         SendPacket(stream, "{\"id\" : " +
@@ -139,55 +149,24 @@ class VRConnection
 
     private static string RecievePacket(NetworkStream stream)
     {
-        try
+        // Uitlezen van de lengte
+        var lengthBuffer = new byte[4];
+        int bytesToRead = stream.Read(lengthBuffer, 0, lengthBuffer.Length);
+        
+        int packetLength = BitConverter.ToInt32(lengthBuffer, 0);
+        Console.WriteLine(packetLength);
+        
+        int totalBytesRead = 0;
+        var buffer = new byte[packetLength];
+        var bytesRead = stream.Read(buffer, 0, buffer.Length);
+        totalBytesRead += bytesRead;
+        while (stream.CanRead && totalBytesRead < packetLength)
         {
-            var lengthBuffer = new byte[4];
-            int bytesToRead = stream.Read(lengthBuffer, 0, 4);
-            
-            int packetLength = BitConverter.ToInt32(lengthBuffer, 0);
-            
-            var buffer = new byte[packetLength];
-            var bytesRead = stream.Read(buffer, 0, packetLength);
-            int totalBytesRead = bytesRead;
-
-            while (totalBytesRead != packetLength)
-            {
-                bytesRead = stream.Read(buffer, totalBytesRead, packetLength - totalBytesRead);
-
-                if (bytesRead == 0) // Als er geen bytes meer gelezen worden, stop
-                {
-                    break;
-                }
-
-                totalBytesRead += bytesRead;
-            }
-            
-            if (Encoding.ASCII.GetString(buffer, 0, bytesRead).StartsWith("{"))
-            {
-                Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, bytesRead));
-                Console.WriteLine("Bericht ontvangen\n");
-                return Encoding.ASCII.GetString(buffer, 0, bytesRead);
-
-            }
-
-            if (Encoding.ASCII.GetString(buffer, 0, bytesRead).Length < 1)
-            {
-                Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, bytesRead));
-                Console.WriteLine("Bericht ontvangen\n");
-                return Encoding.ASCII.GetString(buffer, 0, bytesRead);
-            }
-
-            string returnString = Encoding.ASCII.GetString(buffer, 0, bytesRead).Substring(1);
-
-            Console.WriteLine(returnString);
-            Console.WriteLine("Bericht ontvangen\n");
-
-            return returnString;
+            bytesRead = stream.Read(buffer, totalBytesRead, buffer.Length - totalBytesRead);
+            totalBytesRead += bytesRead;
         }
-        catch (IOException e)
-        {
-            Console.WriteLine("Geen reactie...");
-            return "";
-        }
+
+        Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, totalBytesRead));
+        return Encoding.ASCII.GetString(buffer, 0, totalBytesRead);
     }
 }
