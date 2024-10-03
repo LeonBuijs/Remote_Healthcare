@@ -9,52 +9,18 @@ class VRConnection
     public static void Main(string[] args)
     {
         // Stap 1
-        TcpClient tcpClient = new TcpClient();
+        TcpClient tcpClient = new TcpClient();    
         tcpClient.Connect("85.145.62.130", 6666);
         tcpClient.ReceiveTimeout = 10000;
         NetworkStream stream = tcpClient.GetStream();
         Console.WriteLine("Verbonden met de server\n");
 
         CreateTunnel(stream);
+        // Werkende methodes:
         // SetTime(stream, 0);
+        // CreateNode(stream);
+
         
-        
-        SendPacket(stream, "{\"id\" :" +
-                "\"tunnel/send\", " +
-                "\"data\" :" +
-                "{\"dest\" :\"" +
-                SessionID +
-                "\", " +
-                "\"data\" :" +
-                "{\"id\" : \"scene/node/add\", " +
-                "\"data\" :" +
-                "{\"name\" : \"test\" " +
-                // "\"components\" :" +
-                // "{\"transform\" : " +
-                // "{\"position\" : [ 0, 0, 0 ], " +
-                // "\"scale\" : 1, " +
-                // "\"rotation\" : [ 0, 0, 0 ]}," +
-                // "\"model\" : " +
-                // "{\"file\" : \"filename\", " +
-                // "\"cullbackfaces\" : true, " +
-                // "\"animated\" : false, " +
-                // "\"animation\" : \"animationname\"}," +
-                // "\"terrain\" : " +
-                // "{\"smoothnormals\" : true}, " +
-                // "\"panel\" : " +
-                // "{\"size\" : [ 1, 1 ], " +
-                // "\"resolution\" : [ 512, 512 ], " +
-                // "\"background\" : [ 1, 1, 1, 1], " +
-                // "\"castShadow\" : true}, " +
-                // "\"water\" :" +
-                // "{\"size\" : [ 20, 20 ], " +
-                // "\"resolution\" : 0.1}
-                 "}}}}");
-        
-        
-        
-        RecievePacket(stream);
-        RecievePacket(stream);
         
         // SendPacket(stream, "{\"id\" : " +
         //                    "\"tunnel/send\", " +
@@ -71,6 +37,43 @@ class VRConnection
         //                    "\"size\" : 128.0, " +
         //                    "\"color\" : [ 0,0,0,1 ], }}}}");
         // RecievePacket(stream);
+    }
+
+    private static void CreateNode(NetworkStream stream)
+    {
+        SendPacket(stream, "{\"id\" :" +
+                           "\"tunnel/send\", " +
+                           "\"data\" :" +
+                           "{\"dest\" :\"" +
+                           SessionID +
+                           "\", " +
+                           "\"data\" :" +
+                           "{\"id\" : \"scene/node/add\", " +
+                           "\"data\" :" +
+                           "{\"name\" : \"test\" " +
+                           // "\"components\" :" +
+                           // "{\"transform\" : " +
+                           // "{\"position\" : [ 0, 0, 0 ], " +
+                           // "\"scale\" : 1, " +
+                           // "\"rotation\" : [ 0, 0, 0 ]}," +
+                           // "\"model\" : " +
+                           // "{\"file\" : \"filename\", " +
+                           // "\"cullbackfaces\" : true, " +
+                           // "\"animated\" : false, " +
+                           // "\"animation\" : \"animationname\"}," +
+                           // "\"terrain\" : " +
+                           // "{\"smoothnormals\" : true}, " +
+                           // "\"panel\" : " +
+                           // "{\"size\" : [ 1, 1 ], " +
+                           // "\"resolution\" : [ 512, 512 ], " +
+                           // "\"background\" : [ 1, 1, 1, 1], " +
+                           // "\"castShadow\" : true}, " +
+                           // "\"water\" :" +
+                           // "{\"size\" : [ 20, 20 ], " +
+                           // "\"resolution\" : 0.1}
+                           "}}}}");
+        RecievePacket(stream);
+        RecievePacket(stream);
     }
 
     private static void SetTime(NetworkStream stream, int time)
@@ -95,7 +98,6 @@ class VRConnection
         SendPacket(stream, "{\"id\" : \"session/list\"}");
 
         // Stap 3
-        RecievePacket(stream);
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         string ID = jsonObject["data"][0]["id"].ToString();
         
@@ -107,7 +109,6 @@ class VRConnection
                            ID +
                            "\",}}");
         
-        RecievePacket(stream);
         jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         SessionID = jsonObject["data"]["id"].ToString();
         
@@ -121,7 +122,6 @@ class VRConnection
                            "\"data\" :" +
                            "{\"id\" : \"scene/reset\", " +
                            "\"data\" : {}}}}");
-        RecievePacket(stream);
         RecievePacket(stream);
     }
 
@@ -141,11 +141,27 @@ class VRConnection
     {
         try
         {
-            var buffer = new byte[2048];
-            var bytesRead = stream.Read(buffer, 0, buffer.Length);
+            var lengthBuffer = new byte[4];
+            int bytesToRead = stream.Read(lengthBuffer, 0, 4);
+            
+            int packetLength = BitConverter.ToInt32(lengthBuffer, 0);
+            
+            var buffer = new byte[packetLength];
+            var bytesRead = stream.Read(buffer, 0, packetLength);
+            int totalBytesRead = bytesRead;
 
-            int bufferLength = buffer[0];
+            while (totalBytesRead != packetLength)
+            {
+                bytesRead = stream.Read(buffer, totalBytesRead, packetLength - totalBytesRead);
 
+                if (bytesRead == 0) // Als er geen bytes meer gelezen worden, stop
+                {
+                    break;
+                }
+
+                totalBytesRead += bytesRead;
+            }
+            
             if (Encoding.ASCII.GetString(buffer, 0, bytesRead).StartsWith("{"))
             {
                 Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, bytesRead));
