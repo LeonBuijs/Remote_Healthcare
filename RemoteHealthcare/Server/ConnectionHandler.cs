@@ -35,7 +35,7 @@ public class ConnectionHandler
      */
     private void OpenConnectionArts()
     {
-        Console.WriteLine("Arts Connection thread opened");
+        Console.WriteLine("Doctor Connection thread opened");
         TcpListener listener = new TcpListener(IPAddress.Loopback, 7777);
         listener.Start();
         while (true)
