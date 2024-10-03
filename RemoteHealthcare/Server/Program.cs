@@ -3,7 +3,8 @@ namespace Server;
 public class Server : IArtsCallback, IClientCallback
 {
     private FileManager fileManager = new();
-    Dictionary<String, Connection> clients = new();
+    Dictionary<Connection, ClientConnection> clients = new();
+
     public static void Main(string[] args)
     {
         Console.WriteLine("Starting server...");
@@ -16,6 +17,7 @@ public class Server : IArtsCallback, IClientCallback
         ConnectionHandler handler = new ConnectionHandler(this, this);
         handler.Start();
     }
+
     /**
      * Callbacks voor het verwerken van requests vanuit de Arts en Client(s)
      */
@@ -32,9 +34,14 @@ public class Server : IArtsCallback, IClientCallback
         {
             case 0:
                 // Sla de gegevens op
-                clients.Add($"{messageParts[1]} {messageParts[2]} {messageParts[3]}", connection);
+                clients.Add(connection, new ClientConnection($"{messageParts[1]} {messageParts[2]} {messageParts[3]}"));
                 break;
             case 1:
+                if (clients[connection].inSession)
+                {
+                    //TODO data opslaan van specifieke sessie en doorsturen naar doctor
+                }
+
                 // TODO: Sla de fietsdata op en eventueel naar de arts sturen
                 break;
         }
@@ -67,9 +74,9 @@ public class Server : IArtsCallback, IClientCallback
         var requestedClientId = GetIndexClient(messageParts);
         foreach (var client in clients)
         {
-            if (requestedClientId.Equals(client.Key))
+            if (requestedClientId.Equals(client.Value.name))
             {
-                client.Value.Send(command);
+                client.Key.Send(command);
             }
         }
     }
@@ -82,6 +89,7 @@ public class Server : IArtsCallback, IClientCallback
                 if (CheckLogin(messageParts[1], messageParts[2]))
                 {
                     connection.Send("0 1");
+                    //stuurt naar verbinden alle clients naar de arts om te tonen
                     SendAllClients(connection);
                 }
                 else
@@ -92,14 +100,20 @@ public class Server : IArtsCallback, IClientCallback
             case 1:
                 // Stuur een startcommando naar een specifieke client
                 SendCommandToClient(messageParts, "2");
+                //client in lijst in sessie zetten
+                clients[connection].inSession = true;
+                clients[connection].sessionTime = $"{DateTime.Now.Year}-{DateTime.Now.Day}-{DateTime.Now.Month} " +
+                                                  $"{DateTime.Now.Hour}:{DateTime.Now.Minute}";
                 break;
             case 2:
                 // Stuur een stopcommando naar een specifieke client
                 SendCommandToClient(messageParts, "3");
+                clients[connection].inSession = false;
                 break;
             case 3:
                 // Stuur een noodstopcommando naar een specifieke client
                 SendCommandToClient(messageParts, "4");
+                clients[connection].inSession = false;
                 break;
             case 4:
                 // Stuur een bericht naar een specifieke client
@@ -114,10 +128,26 @@ public class Server : IArtsCallback, IClientCallback
                 SendCommandToClient(messageParts, $"1 {messageParts[4]}");
                 break;
             case 7:
-                // TODO: Stuur de gevraagde data terug naar de arts
+                var sessions = fileManager.getAllClientSessions(GetIndexClient(messageParts));
+
+                //geen sessie beschikbaar van client
+                if (sessions == null)
+                {
+                    connection.Send("3 null");
+                }
+
+                foreach (var session in sessions)
+                {
+                    connection.Send($"3 {session}");
+                }
                 break;
             case 8:
                 SendAllClients(connection);
+                break;
+            case 9:
+                fileManager.AddNewClient(GetIndexClient(messageParts));
+                break;
+            case 10: 
                 break;
         }
     }

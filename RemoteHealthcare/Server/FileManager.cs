@@ -71,10 +71,10 @@ public class FileManager
     /**
      * Methode om een nieuwe client aan de server toe te voegen
      */
-    public void AddNewClient(string firstName, string lastName, string birthdate)
+    public void AddNewClient(string index)
     {
         //todo login hashen en/of encrypten
-        WriteToFile(clientDirectory + "/clientData.txt", $"{firstName} {lastName} {birthdate}");
+        WriteToFile(clientDirectory + "/clientData.txt", $"{index}");
     }
 
     /**
@@ -85,7 +85,7 @@ public class FileManager
     {
         List<string> allSessionData = new List<string>();
         
-        string[] allSessions = Directory.GetFiles(sessionDirectory + "/" + client);
+        string[] allSessions = Directory.GetFiles(sessionDirectory + "/" + client + ".txt");
 
         if (allSessions.Length == 0)
         {
@@ -100,10 +100,17 @@ public class FileManager
         return allSessionData;
     }
 
+    /**
+     * Methode voor het omrekenen van data uit het bestand en zet het in een string waarde
+     */
     private string getDataFromSession(string session)
     {
+        var fileContents = File.ReadAllLines(session);
+
+        var split = session.Split("/");
+        var sessionDate = split[split.Length - 1].Replace(".txt", "");
         //TODO file uitlezen en data berekenen
-        return "";
+        return $"{sessionDate} ";
     }
 
     /**
