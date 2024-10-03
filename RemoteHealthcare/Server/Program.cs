@@ -2,7 +2,8 @@ namespace Server;
 
 public class Server : IArtsCallback, IClientCallback
 {
-    Dictionary<String, Connection> clients = new Dictionary<String, Connection>();
+    private FileManager fileManager = new();
+    Dictionary<String, Connection> clients = new();
     public static void Main(string[] args)
     {
         Console.WriteLine("Starting server...");
@@ -39,12 +40,15 @@ public class Server : IArtsCallback, IClientCallback
         }
     }
 
-    private Boolean CheckLogin(string username, string password)
+    private bool CheckLogin(string username, string password)
     {
         // TODO: Inloggegevens opslaan met encrypt en hier ophalen
-        return (username == "admin" && password == "admin");
+        return fileManager.CheckDoctorLogin(username, password);
     }
 
+    /**
+     * Methode om alle online clients op te halen en te versturen
+     */
     private void SendAllClients(Connection connection)
     {
         foreach (var client in clients)

@@ -78,6 +78,30 @@ public class FileManager
     }
 
     /**
+     * Methode om sessies van client op te halen
+     */
+    //todo
+    public List<string> getAllClientSessions(string client)
+    {
+        List<string> allSessionData = new List<string>();
+        
+        string[] allSessions = Directory.GetFiles(sessionDirectory + "/client");
+
+        foreach (var session in allSessions)
+        {
+            allSessionData.Add(getDataFromSession(session));
+        }
+
+        return allSessionData;
+    }
+
+    private string getDataFromSession(string session)
+    {
+        //TODO file uitlezen en data berekenen
+        return "";
+    }
+
+    /**
      * Methode om een nieuwe doctor aan de server toe te voegen
      */
     public void AddNewDoctor(string username, string password)
