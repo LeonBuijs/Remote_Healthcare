@@ -17,10 +17,10 @@ public class FileManager
     //TODO: bestand per geregistreerde client om sessie waardes op te slaan
     //per client een mapje maken met alle historische data
 
-    private string rootDirectory;
-    private string clientDirectory;
-    private string doctorDirectory;
-    private string sessionDirectory;
+    public string rootDirectory { get; set; }
+    public string clientDirectory { get; set; }
+    public string doctorDirectory { get; set; }
+    public string sessionDirectory { get; set; }
 
     public FileManager()
     {
@@ -85,7 +85,7 @@ public class FileManager
     {
         List<string> allSessionData = new List<string>();
         
-        string[] allSessions = Directory.GetFiles(sessionDirectory + "/" + client + ".txt");
+        string[] allSessions = Directory.GetFiles(sessionDirectory + "/" + client);
 
         if (allSessions.Length == 0)
         {

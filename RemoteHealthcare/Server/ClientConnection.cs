@@ -8,4 +8,5 @@ public class ClientConnection(string name)
     public string name { get; set; } = name;
     public bool inSession { get; set; } = false;
     public string sessionTime { get; set; } = "";
+    public string liveData { get; set; } = "";
 }

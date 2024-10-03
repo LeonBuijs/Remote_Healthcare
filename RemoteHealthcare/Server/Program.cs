@@ -3,6 +3,8 @@ namespace Server;
 public class Server : IArtsCallback, IClientCallback
 {
     private FileManager fileManager = new();
+    // TODO: van groot belang om alle dingen met clients te fixen, worden verkeerd aangeroepen bij doctor
+    // TODO: connection veranderen naar String voor index
     Dictionary<Connection, ClientConnection> clients = new();
 
     public static void Main(string[] args)
@@ -24,64 +26,19 @@ public class Server : IArtsCallback, IClientCallback
     void IArtsCallback.OnReceivedMessage(string message, Connection connection)
     {
         var messageParts = message.Split(' ');
-        ArtsCallbackHandler(connection, messageParts);
+        DoctorCallbackHandler(connection, messageParts);
     }
 
     void IClientCallback.OnReceivedMessage(string message, Connection connection)
     {
         var messageParts = message.Split(' ');
-        switch (Int32.Parse(messageParts[0]))
-        {
-            case 0:
-                // Sla de gegevens op
-                clients.Add(connection, new ClientConnection($"{messageParts[1]} {messageParts[2]} {messageParts[3]}"));
-                break;
-            case 1:
-                if (clients[connection].inSession)
-                {
-                    //TODO data opslaan van specifieke sessie en doorsturen naar doctor
-                }
-
-                // TODO: Sla de fietsdata op en eventueel naar de arts sturen
-                break;
-        }
-    }
-
-    private bool CheckLogin(string username, string password)
-    {
-        // TODO: Inloggegevens opslaan met encrypt en hier ophalen
-        return fileManager.CheckDoctorLogin(username, password);
+        ClientCallbackHandler(connection, messageParts);
     }
 
     /**
-     * Methode om alle online clients op te halen en te versturen
+     * Methode om requests van de doctor af te handelen
      */
-    private void SendAllClients(Connection connection)
-    {
-        foreach (var client in clients)
-        {
-            connection.Send($"2 {client.Key}");
-        }
-    }
-
-    private string GetIndexClient(string[] messageParts)
-    {
-        return $"{messageParts[1]} {messageParts[2]} {messageParts[3]}";
-    }
-
-    private void SendCommandToClient(string[] messageParts, string command)
-    {
-        var requestedClientId = GetIndexClient(messageParts);
-        foreach (var client in clients)
-        {
-            if (requestedClientId.Equals(client.Value.name))
-            {
-                client.Key.Send(command);
-            }
-        }
-    }
-
-    private void ArtsCallbackHandler(Connection connection, string[] messageParts)
+    private void DoctorCallbackHandler(Connection connection, string[] messageParts)
     {
         switch (Int32.Parse(messageParts[0]))
         {
@@ -96,12 +53,14 @@ public class Server : IArtsCallback, IClientCallback
                 {
                     connection.Send("0 0");
                 }
+
                 break;
             case 1:
                 // Stuur een startcommando naar een specifieke client
                 SendCommandToClient(messageParts, "2");
                 //client in lijst in sessie zetten
                 clients[connection].inSession = true;
+                // Start van sessie opslaan, is ook naam van het bestand waar alle data van sessie in staat
                 clients[connection].sessionTime = $"{DateTime.Now.Year}-{DateTime.Now.Day}-{DateTime.Now.Month} " +
                                                   $"{DateTime.Now.Hour}:{DateTime.Now.Minute}";
                 break;
@@ -128,6 +87,7 @@ public class Server : IArtsCallback, IClientCallback
                 SendCommandToClient(messageParts, $"1 {messageParts[4]}");
                 break;
             case 7:
+                // Opgeslagen sessie(s) ophalen van specifieke client
                 var sessions = fileManager.getAllClientSessions(GetIndexClient(messageParts));
 
                 //geen sessie beschikbaar van client
@@ -136,19 +96,101 @@ public class Server : IArtsCallback, IClientCallback
                     connection.Send("3 null");
                 }
 
-                foreach (var session in sessions)
+                foreach (var session in sessions!)
                 {
                     connection.Send($"3 {session}");
                 }
+
                 break;
             case 8:
+                // Alle clients sturen die nu verbonden zijn
                 SendAllClients(connection);
                 break;
             case 9:
+                // Nieuwe client toevoegen aan clientbestand
                 fileManager.AddNewClient(GetIndexClient(messageParts));
                 break;
-            case 10: 
+            case 10:
+                // Live data ontvangen van specifieke client
+                //TODO live data tonen van client
+                // connection.Send(clients[]);
                 break;
+        }
+    }
+
+    /**
+     * Methode om requests van de client af te handelen
+     */
+    private void ClientCallbackHandler(Connection connection, string[] messageParts)
+    {
+        switch (Int32.Parse(messageParts[0]))
+        {
+            case 0:
+                // Identificatie bij server
+                var index = GetIndexClient(messageParts);
+                // Controleert of client bestaat in het clientensbestand, zo ja toevoegen aan lijst met live clients
+                if (fileManager.CheckClientLogin(index))
+                {
+                    clients.Add(connection, new ClientConnection($"{index}"));
+                    connection.Send("5 1");
+                }
+                else
+                {
+                    connection.Send("5 0");
+                }
+
+                break;
+            case 1:
+                // Fietsdata ontvangen, opslaan en doorsturen naar doctor
+                var clientConnection = clients[connection];
+                var bikeData = convertBikeData(messageParts);
+                
+                // Live data opslaan in object van client
+                clientConnection.liveData = bikeData;
+                
+                // Huidige meting van bikeData opslaan in file
+                fileManager.WriteToFile($"{fileManager.sessionDirectory}/{clientConnection.name}/{clientConnection.sessionTime}",
+                    bikeData);
+                break;
+        }
+    }
+
+    private bool CheckLogin(string username, string password)
+    {
+        // TODO: Inloggegevens opslaan met encrypt en hier ophalen
+        return fileManager.CheckDoctorLogin(username, password);
+    }
+
+    /**
+     * Methode om alle online clients op te halen en te versturen
+     */
+    private void SendAllClients(Connection connection)
+    {
+        foreach (var client in clients)
+        {
+            connection.Send($"2 {client.Key}");
+        }
+    }
+
+    private string GetIndexClient(string[] messageParts)
+    {
+        return $"{messageParts[1]} {messageParts[2]} {messageParts[3]}";
+    }
+
+    private string convertBikeData(string[] messageParts)
+    {
+        return $"{messageParts[1]} {messageParts[2]} {messageParts[3]} {messageParts[4]} {messageParts[5]} {messageParts[6]}";
+    }
+
+    private void SendCommandToClient(string[] messageParts, string command)
+    {
+        var requestedClientId = GetIndexClient(messageParts);
+        foreach (var client in clients)
+        {
+            if (requestedClientId.Equals(client.Value.name))
+            {
+                client.Key.Send(command);
+            }
         }
     }
 }
