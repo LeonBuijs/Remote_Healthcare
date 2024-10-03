@@ -43,8 +43,8 @@ public partial class Program : Application
     }
 
     /**
-     * Methode die het afsluiten van de applicatie afhandelt
-     * Voor de zekerheid sluiten we alle streams en client af
+     * Methode die het afsluiten van de applicatie afhandel
+     * Voor de zekerheid sluiten we alle streams en client
      */
     protected override void OnExit(ExitEventArgs e)
     {
@@ -99,12 +99,17 @@ public partial class Program : Application
                 string argument = packetData[1];
                 if (argument == "0")
                 {
+                    string title = "Login unsuccesfull";
+                    string content = "Your username and/or password is incorrect, please try again. psst (paasword is incorrect)";
+                    MessageBox.Show(content, title);                 
                     Console.WriteLine("Unknown user or password!");
                     //todo afhandelen geweigerd
                 }
                 else if (argument == "1")
                 {
                     Console.WriteLine("Logged in!");
+                    ClientListWindow clientwindow = new ClientListWindow();
+                    clientwindow.Show();
                     //todo afhandelen geaccepteerd
                 }
                 else
@@ -134,5 +139,9 @@ public partial class Program : Application
                 //todo better error handling
                 break;
         }
+    }
+    
+    public static void TryLogin(string username, string password){
+        artsSender.SendLogin(username, password);
     }
 }
