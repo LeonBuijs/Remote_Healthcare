@@ -10,7 +10,7 @@
         
         <StackPanel Margin="10">
             <Label Content="Selecteer een item:" Margin="0,0,0,10"/>
-            <ListBox Name="ItemList" Margin="0,0,0,10" Height="150">
+            <ListBox Name="ItemList" Margin="0,0,0,10" Height="150" SelectionChanged="ChosenClient">
                 <ListBoxItem Content="Item 1"/>
                 <ListBoxItem Content="Item 2"/>
                 <ListBoxItem Content="Item 3"/>

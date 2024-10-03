@@ -11,7 +11,7 @@ public partial class Program : Application
     private static DataSender artsSender;
     private static byte[] artsBuffer = new byte[128];
     private static string totalBuffer;
-
+    
     //todo ophalen van GUI echter met testen hardcoded
     private static string username = "Jan12";
     private static string password = "incorrect";
@@ -24,14 +24,13 @@ public partial class Program : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        
         artsClient = new TcpClient();
         //todo verander de host en poortnummer
         try
         {
             await artsClient.ConnectAsync("127.0.0.1", 7777);
             //won't come here until it has connection.
-            OnConnect();
+            new Thread(OnConnect).Start(); 
             artsSender = new DataSender(artsClient.GetStream());
         }
         catch (SocketException exception)
@@ -43,7 +42,7 @@ public partial class Program : Application
     }
 
     /**
-     * Methode die het afsluiten van de applicatie afhandel
+     * Methode die het afsluiten van de applicatie afhandelt
      * Voor de zekerheid sluiten we alle streams en client
      */
     protected override void OnExit(ExitEventArgs e)
@@ -51,6 +50,7 @@ public partial class Program : Application
         base.OnExit(e);
         artsClient?.Close();
         artsStream?.Close();
+        Environment.Exit(0);
     }
 
 
@@ -65,7 +65,7 @@ public partial class Program : Application
         artsStream.BeginRead(artsBuffer, 0, artsBuffer.Length, new AsyncCallback(OnRead), null);
 
         artsSender = new DataSender(artsStream);
-        artsSender.SendLogin(username, password);
+        // artsSender.SendLogin(username, password);
     }
 
     /**
@@ -74,11 +74,12 @@ public partial class Program : Application
     private static void OnRead(IAsyncResult ar)
     {
         int receivedBytes = artsStream.EndRead(ar);
-        string receivedText = System.Text.Encoding.ASCII.GetString(artsBuffer, 0, receivedBytes);
+        string receivedText = Encoding.ASCII.GetString(artsBuffer, 0, receivedBytes);
         totalBuffer += receivedText;
 
         //todo: pakket opsplitsen
-        //HandleData(packet);
+        string[] packetSplit = receivedText.Split(" ");
+        HandleData(packetSplit);
 
         artsStream.BeginRead(artsBuffer, 0, artsBuffer.Length, new AsyncCallback(OnRead), null);
     }
@@ -107,9 +108,13 @@ public partial class Program : Application
                 }
                 else if (argument == "1")
                 {
-                    Console.WriteLine("Logged in!");
-                    ClientListWindow clientwindow = new ClientListWindow();
-                    clientwindow.Show();
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        Console.WriteLine("Logged in!");
+                        ClientListWindow clientListWindow = new ClientListWindow();
+                        clientListWindow.Show();
+                    });
+                    
                     //todo afhandelen geaccepteerd
                 }
                 else
