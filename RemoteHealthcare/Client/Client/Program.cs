@@ -18,6 +18,8 @@ namespace Client
             BLE bleHeart = new BLE();
             Thread.Sleep(1000); // We need some time to list available devices
 
+            connectToServer();
+
             // StartSimulation(); todo uitcommenten voor simulator
 
             //todo betere afhandeling verbinding, nu in oneindige loop wanneer er verbonden wordt
@@ -93,6 +95,23 @@ namespace Client
             }
 
             Console.Read();
+        }
+
+        private static async Task connectToServer()
+        {
+            // Verbinding maken en Bikedata doorsturen naar server
+            try
+            {
+                string ipAddress = "127.0.0.1";
+                int port = 6666; 
+                
+                ClientApplication clientApp = new ClientApplication(ipAddress, port, bikeData);
+                await clientApp.Start();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Fout Client Applicatie: " + ex.Message);
+            }
         }
 
 

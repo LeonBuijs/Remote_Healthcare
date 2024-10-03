@@ -1,4 +1,5 @@
 ﻿using System.Net.Sockets;
+using System.Text;
 
 namespace Arts;
 
@@ -9,7 +10,7 @@ class Program
     private static DataSender artsSender;
     private static byte[] artsBuffer = new byte[128];
     private static string totalBuffer;
-    
+
     //todo ophalen van GUI echter met testen hardcoded
     private static string username = "Jan12";
     private static string password = "incorrect";
@@ -18,7 +19,15 @@ class Program
     {
         artsClient = new TcpClient();
         //todo verander de host en poortnummer
-        artsClient.BeginConnect("127.0.0.1", 8080, new AsyncCallback(OnConnect), null);
+        artsClient.Connect("127.0.0.1", 7777);
+        
+        artsSender = new DataSender(artsClient.GetStream());
+        
+        //test verbinding
+        artsSender.SendLogin(username, password);
+        var read = artsClient.GetStream().Read(artsBuffer, 0, artsBuffer.Length);
+        Console.WriteLine(Encoding.ASCII.GetString(artsBuffer), 0, read);
+        //test verbinding
     }
 
     /**
