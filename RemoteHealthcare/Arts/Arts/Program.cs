@@ -17,17 +17,35 @@ public partial class Program : Application
     private static string password = "incorrect";
 
 
+    /**
+     * Methode om een aantal verrichtingen te maken voordat de app is opgestart
+     * Voor nu: Connectie met de server maken.
+     */
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
         
         artsClient = new TcpClient();
         //todo verander de host en poortnummer
-        await artsClient.ConnectAsync("127.0.0.1", 7777);
+        try
+        {
+            await artsClient.ConnectAsync("127.0.0.1", 7777);
+            //won't come here until it has connection.
+            OnConnect();
+            artsSender = new DataSender(artsClient.GetStream());
+        }
+        catch (SocketException exception)
+        {
+            //todo try to reconnect/give pop up
+            Console.WriteLine("Can't connect to server");
+        }
         
-        artsSender = new DataSender(artsClient.GetStream());
     }
 
+    /**
+     * Methode die het afsluiten van de applicatie afhandelt
+     * Voor de zekerheid sluiten we alle streams en client af
+     */
     protected override void OnExit(ExitEventArgs e)
     {
         base.OnExit(e);
@@ -40,9 +58,8 @@ public partial class Program : Application
      * Methode om het zoeken naar verbinding te stoppen
      * Gebeurt bij gevonden verbinding en start een listener methode
      */
-    private static void OnConnect(IAsyncResult ar)
+    private static void OnConnect()
     {
-        artsClient.EndConnect(ar);
         Console.WriteLine("Verbonden!");
         artsStream = artsClient.GetStream();
         artsStream.BeginRead(artsBuffer, 0, artsBuffer.Length, new AsyncCallback(OnRead), null);

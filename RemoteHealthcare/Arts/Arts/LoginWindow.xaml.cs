@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices.ComTypes;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -12,9 +13,14 @@ public partial class LoginWindow : Window
 
     private void ButtonClick(object sender, RoutedEventArgs e)
     {
-        ClientListWindow mainWindow = new ClientListWindow();
-        mainWindow.Show();
-        this.Close();
+        //todo methode maken die login checked
+        if (false)
+        {
+            ClientListWindow mainWindow = new ClientListWindow();
+            mainWindow.Show();
+            this.Close();
+        }
+        
         
     }
 
