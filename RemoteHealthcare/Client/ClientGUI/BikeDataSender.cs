@@ -9,6 +9,8 @@ namespace ClientGUI
         private NetworkStream _stream;
         private BikeData _bikeData;
         
+        public BikeData BkData => _bikeData;
+        
         public BikeDataSender(TcpClient client, BikeData bikeData)
         {
             _client = client;
