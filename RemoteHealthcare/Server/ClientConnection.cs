@@ -3,10 +3,11 @@ namespace Server;
 /**
  * Dataklasse om verbindingen, namen en sessies bij te houden
  */
-public class ClientConnection(string name)
+public class ClientConnection(string name, Connection connection)
 {
-    public string name { get; set; } = name;
-    public bool inSession { get; set; } = false;
-    public string sessionTime { get; set; } = "";
-    public string liveData { get; set; } = "";
+    public string Name { get; set; } = name;
+    public Connection Connection { get; set; }
+    public bool InSession { get; set; } = false;
+    public string SessionTime { get; set; } = "";
+    public string LiveData { get; set; } = "";
 }

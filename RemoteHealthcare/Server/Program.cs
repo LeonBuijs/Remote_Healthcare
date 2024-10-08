@@ -3,9 +3,10 @@ namespace Server;
 public class Server : IArtsCallback, IClientCallback
 {
     private FileManager fileManager = new();
+
     // TODO: van groot belang om alle dingen met clients te fixen, worden verkeerd aangeroepen bij doctor
     // TODO: connection veranderen naar String voor index
-    Dictionary<Connection, ClientConnection> clients = new();
+    Dictionary<string, ClientConnection> clients = new();
 
     public static void Main(string[] args)
     {
@@ -59,20 +60,21 @@ public class Server : IArtsCallback, IClientCallback
                 // Stuur een startcommando naar een specifieke client
                 SendCommandToClient(messageParts, "2");
                 //client in lijst in sessie zetten
-                clients[connection].inSession = true;
+                clients[GetIndexClient(messageParts)].InSession = true;
                 // Start van sessie opslaan, is ook naam van het bestand waar alle data van sessie in staat
-                clients[connection].sessionTime = $"{DateTime.Now.Year}-{DateTime.Now.Day}-{DateTime.Now.Month} " +
-                                                  $"{DateTime.Now.Hour}:{DateTime.Now.Minute}";
+                clients[GetIndexClient(messageParts)].SessionTime =
+                    $"{DateTime.Now.Year}-{DateTime.Now.Day}-{DateTime.Now.Month} " +
+                    $"{DateTime.Now.Hour}:{DateTime.Now.Minute}";
                 break;
             case 2:
                 // Stuur een stopcommando naar een specifieke client
                 SendCommandToClient(messageParts, "3");
-                clients[connection].inSession = false;
+                clients[GetIndexClient(messageParts)].InSession = false;
                 break;
             case 3:
                 // Stuur een noodstopcommando naar een specifieke client
                 SendCommandToClient(messageParts, "4");
-                clients[connection].inSession = false;
+                clients[GetIndexClient(messageParts)].InSession = false;
                 break;
             case 4:
                 // Stuur een bericht naar een specifieke client
@@ -131,7 +133,7 @@ public class Server : IArtsCallback, IClientCallback
                 // Controleert of client bestaat in het clientensbestand, zo ja toevoegen aan lijst met live clients
                 if (fileManager.CheckClientLogin(index))
                 {
-                    clients.Add(connection, new ClientConnection($"{index}"));
+                    clients.Add(GetIndexClient(messageParts), new ClientConnection($"{index}", connection));
                     connection.Send("5 1");
                 }
                 else
@@ -142,14 +144,32 @@ public class Server : IArtsCallback, IClientCallback
                 break;
             case 1:
                 // Fietsdata ontvangen, opslaan en doorsturen naar doctor
-                var clientConnection = clients[connection];
-                var bikeData = convertBikeData(messageParts);
-                
+                ClientConnection clientConnection = null;
+
+                // Door middel van connection kijken welke client het in de lijst is
+                foreach (var client in clients)
+                {
+                    if (client.Value.Connection == connection)
+                    {
+                        clientConnection = client.Value;
+                        break;
+                    }
+                }
+
+                // Mocht er een fout optreden, returnen
+                if (clientConnection == null)
+                {
+                    return;
+                }
+
+                var bikeData = ConvertBikeData(messageParts);
+
                 // Live data opslaan in object van client
-                clientConnection.liveData = bikeData;
-                
+                clientConnection.LiveData = bikeData;
+
                 // Huidige meting van bikeData opslaan in file
-                fileManager.WriteToFile($"{fileManager.sessionDirectory}/{clientConnection.name}/{clientConnection.sessionTime}",
+                fileManager.WriteToFile(
+                    $"{fileManager.sessionDirectory}/{clientConnection.Name}/{clientConnection.SessionTime}",
                     bikeData);
                 break;
         }
@@ -177,9 +197,10 @@ public class Server : IArtsCallback, IClientCallback
         return $"{messageParts[1]} {messageParts[2]} {messageParts[3]}";
     }
 
-    private string convertBikeData(string[] messageParts)
+    private string ConvertBikeData(string[] messageParts)
     {
-        return $"{messageParts[1]} {messageParts[2]} {messageParts[3]} {messageParts[4]} {messageParts[5]} {messageParts[6]}";
+        return
+            $"{messageParts[1]} {messageParts[2]} {messageParts[3]} {messageParts[4]} {messageParts[5]} {messageParts[6]}";
     }
 
     private void SendCommandToClient(string[] messageParts, string command)
@@ -187,9 +208,9 @@ public class Server : IArtsCallback, IClientCallback
         var requestedClientId = GetIndexClient(messageParts);
         foreach (var client in clients)
         {
-            if (requestedClientId.Equals(client.Value.name))
+            if (requestedClientId.Equals(client.Value.Name))
             {
-                client.Key.Send(command);
+                client.Value.Connection.Send(command);
             }
         }
     }
