@@ -5,6 +5,7 @@ namespace Arts;
 
 public partial class ClientListWindow : Window
 {
+    
     public ClientListWindow()
     {
         InitializeComponent();
@@ -20,8 +21,21 @@ public partial class ClientListWindow : Window
     {
         if (ItemList.SelectedItem is ListBoxItem client)
         {
-            ClientWindow Clientwindow = new ClientWindow();
+            //Get chosen clientId
+            string? clientId = client.Content.ToString();
+            
+            MessageBox.Show($"Je hebt {clientId} geselecteerd.");
+            
+            ClientWindow clientWindow = new ClientWindow(clientId);
+            clientWindow.Show();
             Console.WriteLine(client.Content);
-            MessageBox.Show($"Je hebt {client.Content} geselecteerd.");        }
+        }
+    }
+
+    private void RefreshClients(object sender, RoutedEventArgs routedEventArgs)
+    {
+        List<string> newClients = Program.GetClientList();
+        ItemList.Items.Clear();
+        newClients.ForEach(value => ItemList.Items.Add(value));
     }
 }

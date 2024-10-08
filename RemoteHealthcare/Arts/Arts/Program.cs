@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System.Collections;
+using System.Net.Sockets;
 using System.Text;
 using System.Windows;
 
@@ -11,6 +12,8 @@ public partial class Program : Application
     private static DataSender artsSender;
     private static byte[] artsBuffer = new byte[128];
     private static string totalBuffer;
+    private static List<IDataUpdateCallback> dataUpdateCallbacks = new List<IDataUpdateCallback>();
+    private static List<string> clients = new List<string>();
     
     //todo ophalen van GUI echter met testen hardcoded
     private static string username = "Jan12";
@@ -126,16 +129,21 @@ public partial class Program : Application
                 break;
             case 1:
                 //todo koppelen met GUI
-                string speed = packetData[1];
-                string distance = packetData[2];
-                string power = packetData[3];
-                string RPM = packetData[4];
-                string heartbeat = packetData[5];
-
-                Console.WriteLine($"received packet page: {packetPage} with {speed} speed, {distance} distance, " +
-                                  $"{power} power, {RPM} RPM, {heartbeat} heartbeat");
+                // string speed = packetData[1];
+                // string distance = packetData[2];
+                // string power = packetData[3];
+                // string RPM = packetData[4];
+                // string heartbeat = packetData[5];
+                
+                //todo make parameters
+                string clientId = packetData[1].Replace(";", " ");
+                string data = packetData[2].Replace(";", " ");
+                dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
+                // Console.WriteLine($"received packet page: {packetPage} with {speed} speed, {distance} distance, " +
+                //                   $"{power} power, {RPM} RPM, {heartbeat} heartbeat");
                 break;
             case 2:
+                clients.Add(packetData[1].Replace(";", " "));
                 break;
             case 3:
                 break;
@@ -149,4 +157,16 @@ public partial class Program : Application
     public static void TryLogin(string username, string password){
         artsSender.SendLogin(username, password);
     }
+
+    public static void AddCallbackMember(IDataUpdateCallback callbackMember)
+    {
+        dataUpdateCallbacks.Add(callbackMember);
+    }
+
+    public static List<string> GetClientList()
+    {
+        return clients;
+    }
+
+
 }

@@ -24,6 +24,7 @@
                 <ListBoxItem Content="Item 11"/>
                 <ListBoxItem Content="Item 12"/>
             </ListBox>
+            <Button Name="refreshButton" Content="Refresh" Click="RefreshClients"/>
         </StackPanel>
         
     </Grid>
