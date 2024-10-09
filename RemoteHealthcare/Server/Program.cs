@@ -12,10 +12,10 @@ public class Server : IArtsCallback, IClientCallback
     {
         Console.WriteLine("Starting server...");
         Server server = new Server();
-        server.setCallbacks();
+        server.SetCallbacks();
     }
 
-    private void setCallbacks()
+    private void SetCallbacks()
     {
         ConnectionHandler handler = new ConnectionHandler(this, this);
         handler.Start();

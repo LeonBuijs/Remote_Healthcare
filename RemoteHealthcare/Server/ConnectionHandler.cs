@@ -107,7 +107,7 @@ public class ConnectionHandler
      */
     private bool CheckConnection(Connection connectionClient)
     {
-        return connectionClient.stream.Socket.Connected;
+        return connectionClient.Stream.Socket.Connected;
     }
 
     public static List<Connection> getClients()
