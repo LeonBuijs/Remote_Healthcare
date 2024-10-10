@@ -39,7 +39,7 @@ public class Server : IArtsCallback, IClientCallback
     /**
      * Methode om requests van de doctor af te handelen
      */
-    private async Task DoctorCallbackHandler(Connection connection, string[] messageParts)
+    private void DoctorCallbackHandler(Connection connection, string[] messageParts)
     {
         // Check om te kijken of de doctor toegang heeft, mocht er geen geldige login zijn
         if (messageParts[0] != "0" && !connection.Access)
@@ -73,24 +73,34 @@ public class Server : IArtsCallback, IClientCallback
                 // Start van sessie opslaan, is ook naam van het bestand waar alle data van sessie in staat
                 clientConnection.SessionTime =
                     $"{DateTime.Now.Year}-{DateTime.Now.Day}-{DateTime.Now.Month} " +
-                    $"{DateTime.Now.Hour}-{DateTime.Now.Minute}";
+                    $"{DateTime.Now.Hour}-{DateTime.Now.Minute}-{DateTime.Now.Second}";
                 Console.WriteLine("Session time: " + clientConnection.SessionTime);
 
                 break;
             case "2":
                 // Stuur een stopcommando naar een specifieke client
+                if (!clients[GetIndexClient(messageParts)].InSession)
+                {
+                    return;
+                }
+                
                 SendCommandToClient(messageParts, "3");
                 clients[GetIndexClient(messageParts)].InSession = false;
                 // Asynchroon berekenen van alle fietsdata
-                await fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)]);
+                // fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)], DateTime.Now);
                 // TODO: gegevens na sessie async omrekenen voor gemiddelde, max, etc
                 break;
             case "3":
                 // Stuur een noodstopcommando naar een specifieke client
+                if (!clients[GetIndexClient(messageParts)].InSession)
+                {
+                    return;
+                }
+                
                 SendCommandToClient(messageParts, "4");
                 clients[GetIndexClient(messageParts)].InSession = false;
                 // Asynchroon berekenen van alle fietsdata
-                await fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)]);
+                // fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)], DateTime.Now);
                 // TODO: gegevens na sessie async omrekenen voor gemiddelde, max, etc
                 break;
             case "4":

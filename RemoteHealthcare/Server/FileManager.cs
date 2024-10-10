@@ -188,9 +188,15 @@ public class FileManager
         return ["File does not exist"];
     }
 
-    public async Task CalculateDataFromSession(ClientConnection connection)
+    public async Task CalculateDataFromSession(ClientConnection connection, DateTime currentTime)
     {
         //$"{fileManager.sessionDirectory}/{clientConnection.Name}/{clientConnection.SessionTime}"
+        
+        //{1}{snelheid afstand vermogen tijd RPM hartslag}
+        //{3}{datum duratie gemiddeldesnelheid maximalesnelheid gemiddeldehartslag maximalehartslag}
+
+        var date = connection.SessionTime;
+        // var duration = currentTime - new DateTime(connection.)
         
     }
 }
