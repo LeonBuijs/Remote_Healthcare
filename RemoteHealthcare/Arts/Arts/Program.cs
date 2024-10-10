@@ -16,9 +16,13 @@ public partial class Program : Application
         base.OnStartup(e);
         NetworkProcessor networkProcessor = new NetworkProcessor();
         
-        LoginWindow loginWindow = new LoginWindow();
-        loginWindow.networkProcessor = networkProcessor;
-        loginWindow.Show();
+        LoginWindowWindow loginWindowWindow = new LoginWindowWindow();
+        
+        //Zet een callback voor het antwoord op de login.
+        networkProcessor.SetLoginCallback(loginWindowWindow);
+        
+        loginWindowWindow.networkProcessor = networkProcessor;
+        loginWindowWindow.Show();
     }
 
     /**

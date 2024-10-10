@@ -28,18 +28,25 @@ public partial class ClientListWindow : Window
             ClientWindow clientWindow = new ClientWindow(clientId, networkProcessor);
             clientWindow.Show();
             Console.WriteLine(client.Content);
+            // Refresh();
         }
     }
 
-    private void RefreshClients(object sender, RoutedEventArgs routedEventArgs)
+    private void RefreshClientsPressed(object sender, RoutedEventArgs routedEventArgs)
     {
+        Refresh();
+    }
+
+    private void MakeClientPressed(object sender, RoutedEventArgs routedEventArgs)
+    {
+        networkProcessor.MakeClient(ClientName.Text + " " + ClientdateOfBirth.Text);
+    }
+
+    private void Refresh()
+    {
+        networkProcessor.refreshClientList();
         List<string> newClients = networkProcessor.GetClientList();
         ItemList.Items.Clear();
         newClients.ForEach(value => ItemList.Items.Add(value));
-    }
-
-    private void MakeClient(object sender, RoutedEventArgs routedEventArgs)
-    {
-        networkProcessor.MakeClient(ClientName.Text + " " + ClientdateOfBirth.Text);
     }
 }

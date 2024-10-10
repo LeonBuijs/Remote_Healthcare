@@ -12,7 +12,7 @@ public class NetworkProcessor
     private DataSender artsSender;
     private byte[] artsBuffer = new byte[128];
     private string totalBuffer;
-    private ILoginCallback loginCallback;
+    private ILoginWindowCallback loginWindowCallback;
     private List<IDataUpdateCallback> dataUpdateCallbacks = new List<IDataUpdateCallback>();
     private List<string> clients = new List<string>();
     private List<string> clientsWhoRecieveData = new List<string>();
@@ -23,7 +23,7 @@ public class NetworkProcessor
         ConnectToServer();
     }
     
-    private async void ConnectToServer()
+    public async void ConnectToServer()
     {
         //todo verander de host en poortnummer
         try
@@ -35,8 +35,8 @@ public class NetworkProcessor
         }
         catch (SocketException exception)
         {
-            //todo try to reconnect/give pop up
-            Console.WriteLine("Can't connect to server");
+            //Notificeert het inlog scherm dat de connectie is gefaald.
+            loginWindowCallback.ConnectionFailed();
         }
     }
     
@@ -85,7 +85,7 @@ public class NetworkProcessor
             case 0:
                 string argument = packetData[1];
                 Console.WriteLine($"Got login answer with argument {argument}");
-                loginCallback.OnLogin(argument);
+                loginWindowCallback.OnLogin(argument);
                 break;
             case 1:
                 //todo make parameters
@@ -124,9 +124,9 @@ public class NetworkProcessor
         artsSender.MakeClient(clientInfo);
     }
 
-    public void SetLoginCallback(ILoginCallback callback)
+    public void SetLoginCallback(ILoginWindowCallback windowCallback)
     {
-        loginCallback = callback;
+        loginWindowCallback = windowCallback;
     }
     
     public List<string> GetClientList()
@@ -134,14 +134,36 @@ public class NetworkProcessor
         return clients;
     }
 
-    public async void GetRealtimeData(string clientInfo)
+    public void GetRealtimeData(string clientInfo)
     {
-        artsSender.ChosenClient(clientInfo);
+
+            artsSender.ChosenClient(clientInfo);
     }
 
-    public void refreshClinetList()
+    public void refreshClientList()
     {
         clients.Clear();
+        artsSender.GetClients();
     }
 
+    public void StartClientSessie(string clientInfo)
+    {
+        artsSender.StartSession(clientInfo);
+    }
+
+    public void StopClientSessie(string clientInfo)
+    {
+        artsSender.StopSession(clientInfo);
+    }
+
+    public void EmergencyStopClientSessie(string clientInfo)
+    {
+        artsSender.EmergencyStopSession(clientInfo);
+    }
+
+    public void SendMessage(string clientInfo, string text)
+    {
+        artsSender.SendMessageToSession(clientInfo, text);
+        
+    }
 }

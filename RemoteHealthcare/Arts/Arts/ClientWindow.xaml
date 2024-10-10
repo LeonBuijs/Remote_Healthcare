@@ -20,7 +20,7 @@
         </Grid.ColumnDefinitions>
 
         <!-- Title of the window: Client Name -->
-        <TextBlock Text="Client 'naam'" FontSize="16" FontWeight="Bold" 
+        <TextBlock Name="TitleBlock" Text="Client 'naam'" FontSize="16" FontWeight="Bold" 
                    Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
                    HorizontalAlignment="Center" VerticalAlignment="Top" />
 
@@ -72,15 +72,26 @@
                         
                     </TextBox>
                     <!-- Button to send message -->
-                    <Button Name="SendButton" Content="Send" HorizontalAlignment="Right" Width="50" Margin="5" />
+                    <Button Name="SendButton" Content="Send" Click="SendPressed" HorizontalAlignment="Right" Width="50" Margin="5" />
                 </Grid>
             </Grid>
         </GroupBox>
 
         <!-- Settings section -->
-        <GroupBox Header="Settings" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Margin="5">
+        <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Header="Settings" Margin="5">
+            
             <!-- Add settings controls here -->
            
         </GroupBox>
+        
+        <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal">
+
+            <Button Name="StartSessie" Content="Start Sessie" Click="StartClientSessie"/>
+            <StackPanel >
+                <Button Name="StopButton" Content="Stop Sessie" Click="StopClientSessie"/>
+                <Button Name ="EmergencyStop" Content="EmergencyStop Sessie" Click="EmergencyStopClientSessie"/>
+            </StackPanel>
+        </StackPanel>
+        
     </Grid>
 </Window>

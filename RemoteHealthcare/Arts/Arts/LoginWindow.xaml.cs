@@ -3,11 +3,11 @@ using System.Windows.Threading;
 
 namespace Arts;
 
-public partial class LoginWindow : Window, ILoginCallback
+public partial class LoginWindowWindow : Window, ILoginWindowCallback
 {
     public NetworkProcessor networkProcessor { get; set; }
 
-    public LoginWindow()
+    public LoginWindowWindow()
     {
         InitializeComponent();
     }
@@ -25,9 +25,7 @@ public partial class LoginWindow : Window, ILoginCallback
         string password = PasswordBox.Password;
         Console.WriteLine($"Username: {username}\nPassword: {password}");
         
-        //Zet een callback voor het antwoord op de login.
-        networkProcessor.SetLoginCallback(this);
-        
+      
         //Stuur aanzoek voor inloggen
         networkProcessor.TryLogin(username, password);
     }
@@ -72,4 +70,55 @@ public partial class LoginWindow : Window, ILoginCallback
             Console.WriteLine("Something went wrong!");
         }
     }
+    
+    /**
+     * <summary>
+     * Methode die een pop-up geeft wanneer de connectie gefaald is.
+     * Deze pop-up vraagt of de dokter het opnieuw wil proberen te verbinden.
+     * </summary>
+     */
+    public void ConnectionFailed()
+    {
+        ShowRetryConnectionMessage();
+    }
+    
+    #region MessageBoxes
+    
+    private void ShowRetryConnectionMessage()
+    {
+        string title = "ERROR 404";
+        string content = "Connection failed, do you want to retry?";
+        MessageBoxResult result = MessageBox.Show(content, title, 
+            MessageBoxButton.YesNo, MessageBoxImage.Question);
+        if (result == MessageBoxResult.Yes)
+        {
+            networkProcessor.ConnectToServer();
+        } else
+        {
+            Close();
+        }
+    }
+    
+    /**
+     * <summary>
+     * Eventuele methode voor een debugger/simulator
+     * Deze zou weergegeven kunnen worden na een x aantal foute verbindings pogingen
+     * </summary>
+     */
+    private void ShowDebugModeMessage()
+    {
+        string title = "Debug mode";
+        string content = "Server seems unresponsive, do you want to enable debug mode?";
+        MessageBoxResult result = MessageBox.Show(content, title, 
+            MessageBoxButton.YesNo, MessageBoxImage.Error);
+        if (result == MessageBoxResult.Yes)
+        {
+            OnLogin("1");
+        } else
+        {
+            // Wanneer er eventueel simulatie wordt gemaakt voeg teller toe!!
+            // amountOfFailedLogins = 0;
+        }
+    }
+    #endregion
 }

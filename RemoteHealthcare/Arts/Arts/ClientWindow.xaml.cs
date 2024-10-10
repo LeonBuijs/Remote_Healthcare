@@ -13,6 +13,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback
         this.networkProcessor = networkProcessor;
         this.networkProcessor.AddCallbackMember(this);
         this.clientId = clientId;
+        TitleBlock.Text = clientId;
     }
 
     /**
@@ -25,12 +26,54 @@ public partial class ClientWindow : Window, IDataUpdateCallback
      */
     public void UpdateData(string clientId, string data)
     {
-        throw new NotImplementedException();
-
         if (this.clientId.Equals(clientId))
         {
             //todo handle data
+            string[] dataSplit = data.Split(" ");
+            //verwerk de data uit de array
+            string speed = dataSplit[0];
+            string distance = dataSplit[1];
+            string power = dataSplit[2];
+            string rpm = dataSplit[3];
+            string heartRate = dataSplit[4];
             
+            //werk de bijbehorende tekstblokken bij
+            SpeedValueTextBlock.Text = speed;
+            DistanceValueTextBlock.Text = distance;
+            PowerValueTextBlock.Text = power;
+            RpmValueTextBlock.Text = rpm;
+            HeartRateValueTextBlock.Text = heartRate;
+        }
+    }
+    private void StartClientSessie(object sender, RoutedEventArgs e)
+    {
+        networkProcessor.StartClientSessie(clientId);
+        //todo client toevoegen aan lijstje met actieve clients voor het opvragen van de actuele data
+        Thread thread = new Thread(() =>
+        {
+            while (true)
+            {
+                networkProcessor.GetRealtimeData(clientId);
+                Thread.Sleep(500);
+            }
+        });
+        
+        thread.Start();
+    }
+    private void StopClientSessie(object sender, RoutedEventArgs e)
+    {
+        networkProcessor.StopClientSessie(clientId);
+    }
+    private void EmergencyStopClientSessie(object sender, RoutedEventArgs e)
+    {
+        networkProcessor.EmergencyStopClientSessie(clientId);
+    }
+    private void SendPressed(object sender, RoutedEventArgs e)
+    {
+        if (ChatInputTextBox.Text.Length > 0)
+        {
+            networkProcessor.SendMessage(clientId, ChatInputTextBox.Text);
+            ChatHistoryBox.Text += ChatInputTextBox.Text + "\n\n";
         }
     }
 }

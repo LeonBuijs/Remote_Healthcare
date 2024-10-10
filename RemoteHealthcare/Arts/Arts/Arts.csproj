@@ -12,6 +12,9 @@
       <Compile Update="Program.cs">
         <DependentUpon>App.xaml</DependentUpon>
       </Compile>
+      <Compile Update="LoginWindow.xaml.cs">
+        <DependentUpon>LoginWindowWindow.xaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

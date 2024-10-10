@@ -63,7 +63,7 @@ public class DataSender
 
     public void GetClients()
     {
-        Write($"8");
+        Write("8");
     }
     
     public void MakeClient(string clientInfo)
