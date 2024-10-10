@@ -10,6 +10,8 @@ public partial class ClientListWindow : Window
     {
         InitializeComponent();
         this.networkProcessor = networkProcessor;
+        // Refresh();
+
     }
 
     /**
@@ -28,7 +30,6 @@ public partial class ClientListWindow : Window
             ClientWindow clientWindow = new ClientWindow(clientId, networkProcessor);
             clientWindow.Show();
             Console.WriteLine(client.Content);
-            // Refresh();
         }
     }
 

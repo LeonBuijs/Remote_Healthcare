@@ -16,6 +16,7 @@ public class NetworkProcessor
     private List<IDataUpdateCallback> dataUpdateCallbacks = new List<IDataUpdateCallback>();
     private List<string> clients = new List<string>();
     private List<string> clientsWhoRecieveData = new List<string>();
+    private bool isAskingData = false;
 
     public NetworkProcessor()
     {
@@ -109,6 +110,40 @@ public class NetworkProcessor
                 break;
         }
     }
+
+    public void AddActiveClient(string clientId)
+    {
+        lock (clientsWhoRecieveData)
+        {
+            if (!clientsWhoRecieveData.Contains(clientId))
+            {
+                clientsWhoRecieveData.Add(clientId);
+            }    
+        }
+        
+        if (isAskingData)
+        {
+            return;
+        }
+        
+        isAskingData = true;
+        new Thread(() =>
+        {
+            //Bij het starten zal er altijd 1 waarde zijn in de lijst.
+            int count = 1;
+            
+            while (count > 0)
+            {
+                lock (clientsWhoRecieveData)
+                {
+                    clientsWhoRecieveData.ForEach(GetRealtimeData);
+                    count = clientsWhoRecieveData.Count;
+                }
+            }
+            isAskingData = false;
+        }).Start();
+
+    }
     
     public void TryLogin(string username, string password){
         artsSender.SendLogin(username, password);
@@ -136,7 +171,6 @@ public class NetworkProcessor
 
     public void GetRealtimeData(string clientInfo)
     {
-
             artsSender.ChosenClient(clientInfo);
     }
 

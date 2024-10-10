@@ -48,17 +48,8 @@ public partial class ClientWindow : Window, IDataUpdateCallback
     private void StartClientSessie(object sender, RoutedEventArgs e)
     {
         networkProcessor.StartClientSessie(clientId);
-        //todo client toevoegen aan lijstje met actieve clients voor het opvragen van de actuele data
-        Thread thread = new Thread(() =>
-        {
-            while (true)
-            {
-                networkProcessor.GetRealtimeData(clientId);
-                Thread.Sleep(500);
-            }
-        });
-        
-        thread.Start();
+        networkProcessor.AddActiveClient(clientId);
+
     }
     private void StopClientSessie(object sender, RoutedEventArgs e)
     {
