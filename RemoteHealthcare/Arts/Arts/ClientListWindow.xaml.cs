@@ -5,12 +5,11 @@ namespace Arts;
 
 public partial class ClientListWindow : Window
 {
-    
-    public ClientListWindow()
+    private NetworkProcessor networkProcessor;
+    public ClientListWindow(NetworkProcessor networkProcessor)
     {
         InitializeComponent();
-        // loginWindow.Hide();
-        
+        this.networkProcessor = networkProcessor;
     }
 
     /**
@@ -26,7 +25,7 @@ public partial class ClientListWindow : Window
             
             MessageBox.Show($"Je hebt {clientId} geselecteerd.");
             
-            ClientWindow clientWindow = new ClientWindow(clientId);
+            ClientWindow clientWindow = new ClientWindow(clientId, networkProcessor);
             clientWindow.Show();
             Console.WriteLine(client.Content);
         }
@@ -34,8 +33,13 @@ public partial class ClientListWindow : Window
 
     private void RefreshClients(object sender, RoutedEventArgs routedEventArgs)
     {
-        List<string> newClients = Program.GetClientList();
+        List<string> newClients = networkProcessor.GetClientList();
         ItemList.Items.Clear();
         newClients.ForEach(value => ItemList.Items.Add(value));
+    }
+
+    private void MakeClient(object sender, RoutedEventArgs routedEventArgs)
+    {
+        networkProcessor.MakeClient(ClientName.Text + " " + ClientdateOfBirth.Text);
     }
 }
