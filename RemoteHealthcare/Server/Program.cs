@@ -87,7 +87,7 @@ public class Server : IArtsCallback, IClientCallback
                 SendCommandToClient(messageParts, "3");
                 clients[GetIndexClient(messageParts)].InSession = false;
                 // Asynchroon berekenen van alle fietsdata
-                // fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)], DateTime.Now);
+                fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)], DateTime.Now);
                 // TODO: gegevens na sessie async omrekenen voor gemiddelde, max, etc
                 break;
             case "3":
@@ -100,7 +100,7 @@ public class Server : IArtsCallback, IClientCallback
                 SendCommandToClient(messageParts, "4");
                 clients[GetIndexClient(messageParts)].InSession = false;
                 // Asynchroon berekenen van alle fietsdata
-                // fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)], DateTime.Now);
+                fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)], DateTime.Now);
                 // TODO: gegevens na sessie async omrekenen voor gemiddelde, max, etc
                 break;
             case "4":

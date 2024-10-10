@@ -75,8 +75,7 @@ public class FileManager
     {
         //todo login hashen en/of encrypten
         var path = sessionDirectory + "/" + index;
-        
-        
+
 
         if (!Directory.Exists(path))
         {
@@ -94,7 +93,7 @@ public class FileManager
         List<string> allSessionData = new List<string>();
 
         string[] allSessions;
-        
+
         try
         {
             allSessions = Directory.GetFiles(sessionDirectory + "/" + client);
@@ -133,7 +132,7 @@ public class FileManager
         //todo login hashen en/of encrypten
         WriteToFile(doctorDirectory + "/doctorData.txt", $"{username} {password}");
     }
-    
+
     /**
      * Methode die controleert of alle directories voor de files aangemaakt zijn, zo niet worden ze aangemaakt
      */
@@ -188,15 +187,37 @@ public class FileManager
         return ["File does not exist"];
     }
 
+    // TODO: verder berekenen van data uit bestand, max en gemiddelde etc.
+    // TODO: mogelijk versimpelen van vergelijken van tijden
     public async Task CalculateDataFromSession(ClientConnection connection, DateTime currentTime)
     {
         //$"{fileManager.sessionDirectory}/{clientConnection.Name}/{clientConnection.SessionTime}"
-        
+
         //{1}{snelheid afstand vermogen tijd RPM hartslag}
         //{3}{datum duratie gemiddeldesnelheid maximalesnelheid gemiddeldehartslag maximalehartslag}
 
         var date = connection.SessionTime;
-        // var duration = currentTime - new DateTime(connection.)
+
+        // Verschil in tijd berekenen met DateTime objecten
+        var start = date.Split(" ");
+
+        var startDate = start[0].Split("-");
+        var startTime = start[1].Split("-");
+
+        var startYear = startDate[0];
+        var startMonth = startDate[1];
+        var startDay = startDate[2];
+
+        var startHour = startTime[0];
+        var startMinute = startTime[1];
+        var startSecond = startTime[2];
+
+        DateTime startDateTime = new DateTime(Convert.ToInt32(startYear), Convert.ToInt32(startMonth),
+            Convert.ToInt32(startDay), Convert.ToInt32(startHour), Convert.ToInt32(startMinute),
+            Convert.ToInt32(startSecond));
+        
+        TimeSpan difference = currentTime - startDateTime; 
+        var duration = $"{difference.Hours}:{difference.Minutes}:{difference.Seconds}";
         
     }
 }
