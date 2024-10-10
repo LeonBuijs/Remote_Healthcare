@@ -35,7 +35,7 @@ public class ConnectionHandler
      */
     private void OpenConnectionArts()
     {
-        Console.WriteLine("Arts Connection thread opened");
+        Console.WriteLine("Doctor Connection thread opened");
         TcpListener listener = new TcpListener(IPAddress.Loopback, 7777);
         listener.Start();
         while (true)
@@ -74,6 +74,7 @@ public class ConnectionHandler
         while (running)
         {
             running = CheckConnection(connection);
+            
             var received = connection.Receive();
             artsCallback.OnReceivedMessage(received, connection);
 
@@ -94,7 +95,7 @@ public class ConnectionHandler
             running = CheckConnection(connection);
 
             var received = connection.Receive();
-            clientCallback.OnReceivedMessage(connection.Receive(), connection);
+            clientCallback.OnReceivedMessage(received, connection);
 
             Console.WriteLine("Client sent: " + received);
         }
@@ -107,7 +108,7 @@ public class ConnectionHandler
      */
     private bool CheckConnection(Connection connectionClient)
     {
-        return connectionClient.stream.Socket.Connected;
+        return connectionClient.Stream.Socket.Connected;
     }
 
     public static List<Connection> getClients()
