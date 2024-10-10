@@ -9,6 +9,7 @@ namespace Server;
 public class Connection(TcpClient client)
 {
     public NetworkStream Stream = client.GetStream();
+    public bool Access { get; set; } = false;
 
     public void Send(string msg)
     {

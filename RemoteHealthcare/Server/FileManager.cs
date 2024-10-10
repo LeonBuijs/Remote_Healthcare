@@ -74,7 +74,15 @@ public class FileManager
     public void AddNewClient(string index)
     {
         //todo login hashen en/of encrypten
-        WriteToFile(clientDirectory + "/clientData.txt", $"{index}");
+        var path = sessionDirectory + "/" + index;
+        
+        
+
+        if (!Directory.Exists(path))
+        {
+            WriteToFile(clientDirectory + "/clientData.txt", $"{index}");
+            Directory.CreateDirectory(path);
+        }
     }
 
     /**
@@ -84,10 +92,14 @@ public class FileManager
     public List<string>? getAllClientSessions(string client)
     {
         List<string> allSessionData = new List<string>();
-        
-        string[] allSessions = Directory.GetFiles(sessionDirectory + "/" + client);
 
-        if (allSessions.Length == 0)
+        string[] allSessions;
+        
+        try
+        {
+            allSessions = Directory.GetFiles(sessionDirectory + "/" + client);
+        }
+        catch (Exception e)
         {
             return null;
         }
@@ -129,26 +141,28 @@ public class FileManager
     {
         rootDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/serverdata";
 
+        Console.WriteLine("Root directory: " + rootDirectory);
+
         clientDirectory = rootDirectory + "/clients";
         doctorDirectory = rootDirectory + "/doctors";
         sessionDirectory = rootDirectory + "/sessions";
 
-        if (Directory.Exists(rootDirectory))
+        if (!Directory.Exists(rootDirectory))
         {
             Directory.CreateDirectory(rootDirectory);
         }
 
-        if (Directory.Exists(clientDirectory))
+        if (!Directory.Exists(clientDirectory))
         {
             Directory.CreateDirectory(clientDirectory);
         }
 
-        if (Directory.Exists(doctorDirectory))
+        if (!Directory.Exists(doctorDirectory))
         {
             Directory.CreateDirectory(doctorDirectory);
         }
 
-        if (Directory.Exists(sessionDirectory))
+        if (!Directory.Exists(sessionDirectory))
         {
             Directory.CreateDirectory(sessionDirectory);
         }

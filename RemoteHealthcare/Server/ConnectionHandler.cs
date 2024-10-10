@@ -74,6 +74,7 @@ public class ConnectionHandler
         while (running)
         {
             running = CheckConnection(connection);
+            
             var received = connection.Receive();
             artsCallback.OnReceivedMessage(received, connection);
 
@@ -94,7 +95,7 @@ public class ConnectionHandler
             running = CheckConnection(connection);
 
             var received = connection.Receive();
-            clientCallback.OnReceivedMessage(connection.Receive(), connection);
+            clientCallback.OnReceivedMessage(received, connection);
 
             Console.WriteLine("Client sent: " + received);
         }
