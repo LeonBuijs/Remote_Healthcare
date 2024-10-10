@@ -39,7 +39,7 @@ public class Server : IArtsCallback, IClientCallback
     /**
      * Methode om requests van de doctor af te handelen
      */
-    private void DoctorCallbackHandler(Connection connection, string[] messageParts)
+    private async Task DoctorCallbackHandler(Connection connection, string[] messageParts)
     {
         // Check om te kijken of de doctor toegang heeft, mocht er geen geldige login zijn
         if (messageParts[0] != "0" && !connection.Access)
@@ -81,12 +81,16 @@ public class Server : IArtsCallback, IClientCallback
                 // Stuur een stopcommando naar een specifieke client
                 SendCommandToClient(messageParts, "3");
                 clients[GetIndexClient(messageParts)].InSession = false;
+                // Asynchroon berekenen van alle fietsdata
+                await fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)]);
                 // TODO: gegevens na sessie async omrekenen voor gemiddelde, max, etc
                 break;
             case "3":
                 // Stuur een noodstopcommando naar een specifieke client
                 SendCommandToClient(messageParts, "4");
                 clients[GetIndexClient(messageParts)].InSession = false;
+                // Asynchroon berekenen van alle fietsdata
+                await fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)]);
                 // TODO: gegevens na sessie async omrekenen voor gemiddelde, max, etc
                 break;
             case "4":
@@ -131,7 +135,6 @@ public class Server : IArtsCallback, IClientCallback
                 break;
             case "10":
                 // Live data ontvangen van specifieke client
-                //TODO live data tonen van client
                 connection.Send(clients[GetIndexClient(messageParts)].LiveData);
                 break;
         }

@@ -187,4 +187,10 @@ public class FileManager
 
         return ["File does not exist"];
     }
+
+    public async Task CalculateDataFromSession(ClientConnection connection)
+    {
+        //$"{fileManager.sessionDirectory}/{clientConnection.Name}/{clientConnection.SessionTime}"
+        
+    }
 }
