@@ -33,57 +33,49 @@
             this._connectButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             
-            // 
-            // _firstNameLabel
-            // 
+             
             this._firstNameLabel.AutoSize = true;
             this._firstNameLabel.Location = new System.Drawing.Point(50, 30);
             this._firstNameLabel.Name = "_firstNameLabel";
             this._firstNameLabel.Size = new System.Drawing.Size(76, 17);
             this._firstNameLabel.TabIndex = 0;
             this._firstNameLabel.Text = "First Name:";
-            // 
-            // _firstNameTextBox
-            // 
+            
+            
             this._firstNameTextBox.Location = new System.Drawing.Point(150, 30);
             this._firstNameTextBox.Name = "_firstNameTextBox";
             this._firstNameTextBox.Size = new System.Drawing.Size(200, 22);
             this._firstNameTextBox.TabIndex = 1;
-            // 
-            // _lastNameLabel
-            // 
+            
+            
             this._lastNameLabel.AutoSize = true;
             this._lastNameLabel.Location = new System.Drawing.Point(50, 70);
             this._lastNameLabel.Name = "_lastNameLabel";
             this._lastNameLabel.Size = new System.Drawing.Size(76, 17);
             this._lastNameLabel.TabIndex = 2;
             this._lastNameLabel.Text = "Last Name:";
-            // 
-            // _lastNameTextBox
-            // 
+            
+            
             this._lastNameTextBox.Location = new System.Drawing.Point(150, 70);
             this._lastNameTextBox.Name = "_lastNameTextBox";
             this._lastNameTextBox.Size = new System.Drawing.Size(200, 22);
             this._lastNameTextBox.TabIndex = 3;
-            // 
-            // _birthDateLabel
-            // 
+            
+            
             this._birthDateLabel.AutoSize = true;
             this._birthDateLabel.Location = new System.Drawing.Point(50, 110);
             this._birthDateLabel.Name = "_birthDateLabel";
             this._birthDateLabel.Size = new System.Drawing.Size(76, 17);
             this._birthDateLabel.TabIndex = 4;
             this._birthDateLabel.Text = "Birth Date:";
-            // 
-            // _birthDateTextBox
-            // 
+            
+            
             this._birthDateTextBox.Location = new System.Drawing.Point(150, 110);
             this._birthDateTextBox.Name = "_birthDateTextBox";
             this._birthDateTextBox.Size = new System.Drawing.Size(200, 22);
             this._birthDateTextBox.TabIndex = 5;
-            // 
-            // _connectButton
-            // 
+             
+            
             this._connectButton.Location = new System.Drawing.Point(150, 150);
             this._connectButton.Name = "_connectButton";
             this._connectButton.Size = new System.Drawing.Size(100, 30);
@@ -91,9 +83,8 @@
             this._connectButton.Text = "Connect";
             this._connectButton.UseVisualStyleBackColor = true;
             this._connectButton.Click += new System.EventHandler(this.connectButton_Click);
-            // 
-            // Form1
-            // 
+             
+            
             this.ClientSize = new System.Drawing.Size(400, 220);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Controls.Add(this._connectButton);
