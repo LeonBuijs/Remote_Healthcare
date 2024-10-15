@@ -39,7 +39,7 @@ public class Server : IArtsCallback, IClientCallback
     /**
      * Methode om requests van de doctor af te handelen
      */
-    private void DoctorCallbackHandler(Connection connection, string[] messageParts)
+    private async void DoctorCallbackHandler(Connection connection, string[] messageParts)
     {
         // Check om te kijken of de doctor toegang heeft, mocht er geen geldige login zijn
         if (messageParts[0] != "0" && !connection.Access)
@@ -83,12 +83,13 @@ public class Server : IArtsCallback, IClientCallback
                 {
                     return;
                 }
-                
+
                 SendCommandToClient(messageParts, "3");
                 clients[GetIndexClient(messageParts)].InSession = false;
                 // Asynchroon berekenen van alle fietsdata
-                fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)], DateTime.Now);
-                // TODO: gegevens na sessie async omrekenen voor gemiddelde, max, etc
+                await fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)],
+                    GetIndexClient(messageParts),
+                    clients[GetIndexClient(messageParts)].SessionTime);
                 break;
             case "3":
                 // Stuur een noodstopcommando naar een specifieke client
@@ -96,11 +97,13 @@ public class Server : IArtsCallback, IClientCallback
                 {
                     return;
                 }
-                
+
                 SendCommandToClient(messageParts, "4");
                 clients[GetIndexClient(messageParts)].InSession = false;
                 // Asynchroon berekenen van alle fietsdata
-                fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)], DateTime.Now);
+                fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)],
+                    GetIndexClient(messageParts),
+                    clients[GetIndexClient(messageParts)].SessionTime);
                 // TODO: gegevens na sessie async omrekenen voor gemiddelde, max, etc
                 break;
             case "4":
@@ -113,6 +116,7 @@ public class Server : IArtsCallback, IClientCallback
                 {
                     client.Value.Connection.Send($"0 {messageParts[1]}");
                 }
+
                 break;
             case "6":
                 // Stuur de weerstand naar een specifieke client

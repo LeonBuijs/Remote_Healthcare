@@ -189,15 +189,71 @@ public class FileManager
 
     // TODO: verder berekenen van data uit bestand, max en gemiddelde etc.
     // TODO: mogelijk versimpelen van vergelijken van tijden
-    public async Task CalculateDataFromSession(ClientConnection connection, DateTime currentTime)
+    /**
+     * Async methode om gewenste waardes van een sessie te berekenen
+     * Na het berekenen van de gewenste waarden worden alle andere waarden vervangen in het bestand door de gewenste waarden
+     */
+    public async Task CalculateDataFromSession(ClientConnection connection, string clientName, string sessionTime)
     {
-        //$"{fileManager.sessionDirectory}/{clientConnection.Name}/{clientConnection.SessionTime}"
+        Console.WriteLine("Calculating data from session: " + clientName);
+        
+        await Task.Run(() =>
+        {
+            Console.WriteLine("Calculating data from session in task: " + clientName);
 
-        //{1}{snelheid afstand vermogen tijd RPM hartslag}
-        //{3}{datum duratie gemiddeldesnelheid maximalesnelheid gemiddeldehartslag maximalehartslag}
+            var date = connection.SessionTime;
 
-        var date = connection.SessionTime;
+            var duration = GetDuration(date);
 
+            // Lijsten waar alle data uit bestand in komt te staan
+            var allSpeeds = new List<int>();
+            var allHeartRates = new List<int>();
+
+            var filePath = $"{sessionDirectory}/{clientName}/{sessionTime}";
+
+            Console.WriteLine($"Calculating {filePath}");
+
+            var fileContents = ReadAllLines(filePath);
+
+            //Checks om te kijken of er geen foutieve waarden zijn
+            if (fileContents.Length == 0)
+            {
+                return;
+            }
+
+            if (fileContents[0].Equals("File does not exist"))
+            {
+                return;
+            }
+
+            // Verschillende data ophalen en uit string opsplitsen
+            foreach (var data in fileContents)
+            {
+                var split = data.Split(" ");
+
+                allSpeeds.Add(int.Parse(split[0]));
+                allHeartRates.Add(int.Parse(split[5]));
+            }
+
+            var averageSpeed = allSpeeds.Average();
+            var maxSpeed = allSpeeds.Max();
+
+            var averageHeartRate = allHeartRates.Average();
+            var maxHeartRate = allHeartRates.Max();
+
+            var calculatedData = $"{date} {duration} {averageSpeed} {maxSpeed} {averageHeartRate} {maxHeartRate}";
+
+            Console.WriteLine($"Calculated data: {calculatedData}");
+
+            File.WriteAllText(filePath, calculatedData);
+        });
+    }
+
+    /**
+     * Helper methode om de duratie van de sessie te verkrijgen
+     */
+    private static string GetDuration(string date)
+    {
         // Verschil in tijd berekenen met DateTime objecten
         var start = date.Split(" ");
 
@@ -205,19 +261,21 @@ public class FileManager
         var startTime = start[1].Split("-");
 
         var startYear = startDate[0];
-        var startMonth = startDate[1];
-        var startDay = startDate[2];
+        var startDay = startDate[1];
+        var startMonth = startDate[2];
 
         var startHour = startTime[0];
         var startMinute = startTime[1];
         var startSecond = startTime[2];
 
+        Console.WriteLine($"new date: {startYear} {startMonth} {startDay} {startHour} {startMinute} {startSecond}");
+
         DateTime startDateTime = new DateTime(Convert.ToInt32(startYear), Convert.ToInt32(startMonth),
             Convert.ToInt32(startDay), Convert.ToInt32(startHour), Convert.ToInt32(startMinute),
             Convert.ToInt32(startSecond));
-        
-        TimeSpan difference = currentTime - startDateTime; 
+
+        TimeSpan difference = DateTime.Now - startDateTime;
         var duration = $"{difference.Hours}:{difference.Minutes}:{difference.Seconds}";
-        
+        return duration;
     }
 }
