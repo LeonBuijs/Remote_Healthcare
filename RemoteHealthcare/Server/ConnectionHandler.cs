@@ -28,7 +28,7 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
     {
         var listener = new TcpListener(IPAddress.Loopback, 7777);
         listener.Start();
-        
+
         while (true)
         {
             var connectionClient = new Connection(listener.AcceptTcpClient());
@@ -46,7 +46,7 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
     {
         var listener = new TcpListener(IPAddress.Loopback, 6666);
         listener.Start();
-        
+
         while (true)
         {
             var connectionClient = new Connection(listener.AcceptTcpClient());
@@ -61,15 +61,19 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
      */
     private void HandleConnectionDoctor(Connection connection)
     {
-        Boolean running = true;
-        while (running)
+        while (true)
         {
-            running = CheckConnection(connection);
+            try
+            {
+                var received = connection.Receive();
+                doctorCallback.OnReceivedMessage(received, connection);
 
-            var received = connection.Receive();
-            doctorCallback.OnReceivedMessage(received, connection);
-
-            Console.WriteLine("Doctor sent: " + received);
+                Console.WriteLine("Doctor sent: " + received);
+            }
+            catch (Exception)
+            {
+                break;
+            }
         }
 
         doctors.Remove(connection);
@@ -80,25 +84,21 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
      */
     private void HandleConnectionClient(Connection connection)
     {
-        var running = true;
-        while (running)
+        while (true)
         {
-            running = CheckConnection(connection);
-            
-            var received = connection.Receive();
-            clientCallback.OnReceivedMessage(received, connection);
+            try
+            {
+                var received = connection.Receive();
+                clientCallback.OnReceivedMessage(received, connection);
 
-            Console.WriteLine("Client sent: " + received);
+                Console.WriteLine("Client sent: " + received);
+            }
+            catch (Exception)
+            {
+                break;
+            }
         }
 
         clients.Remove(connection);
-    }
-
-    /**
-     * Methode om te kijken of een client/doctor nog verbonden is
-     */
-    private static bool CheckConnection(Connection connectionClient)
-    {
-        return connectionClient.Stream.Socket.Connected;
     }
 }
