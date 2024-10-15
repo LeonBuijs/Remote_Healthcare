@@ -3,5 +3,6 @@ namespace Server;
 public enum ClientDataIndex
 {
     Login,
-    ReceiveBikeData
+    ReceiveBikeData,
+    Disconnected = 404
 }

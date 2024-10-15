@@ -12,5 +12,6 @@ public enum DoctorDataIndex
     RetrieveSessionData,
     RetrieveAllClients,
     AddNewClient,
-    RetrieveLiveData
+    RetrieveLiveData,
+    Disconnected = 404
 }

@@ -78,6 +78,9 @@ public class Server : IDoctorCallback, IClientCallback
             case DoctorDataIndex.RetrieveLiveData:
                 connection.Send(clients[GetIndexClient(messageParts)].LiveData);
                 break;
+            case DoctorDataIndex.Disconnected:
+                // Mogelijkheid om hier iets te implementeren
+                break;
         }
     }
 
@@ -100,6 +103,15 @@ public class Server : IDoctorCallback, IClientCallback
                 break;
             case ClientDataIndex.ReceiveBikeData:
                 ReceiveBikeData(connection, messageParts);
+                break;
+            case ClientDataIndex.Disconnected:
+                foreach (var clientName in clients.Keys)
+                {
+                    if (connection.Equals(clients[clientName].Connection))
+                    {
+                        clients.Remove(clientName);
+                    }
+                }
                 break;
         }
     }
