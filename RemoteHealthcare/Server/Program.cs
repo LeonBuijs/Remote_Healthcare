@@ -4,6 +4,8 @@ public class Server : IDoctorCallback, IClientCallback
 {
     private readonly FileManager fileManager = new();
     private readonly Dictionary<string, ClientConnection> clients = new();
+    private ConnectionHandler connectionHandler;
+
     public static void Main(string[] args)
     {
         Console.WriteLine("Starting server...");
@@ -13,8 +15,8 @@ public class Server : IDoctorCallback, IClientCallback
 
     private void SetCallbacks()
     {
-        var handler = new ConnectionHandler(this, this);
-        handler.Start();
+        connectionHandler = new ConnectionHandler(this, this);
+        connectionHandler.Start();
     }
 
     /**
@@ -76,10 +78,11 @@ public class Server : IDoctorCallback, IClientCallback
                 fileManager.AddNewClient(GetIndexClient(messageParts));
                 break;
             case DoctorDataIndex.RetrieveLiveData:
-                connection.Send(clients[GetIndexClient(messageParts)].LiveData);
+                SendLiveData(connection, messageParts);
                 break;
             case DoctorDataIndex.Disconnected:
                 // Mogelijkheid om hier iets te implementeren
+                SendClientDisconnected(connection);
                 break;
         }
     }
@@ -105,13 +108,7 @@ public class Server : IDoctorCallback, IClientCallback
                 ReceiveBikeData(connection, messageParts);
                 break;
             case ClientDataIndex.Disconnected:
-                foreach (var clientName in clients.Keys)
-                {
-                    if (connection.Equals(clients[clientName].Connection))
-                    {
-                        clients.Remove(clientName);
-                    }
-                }
+                DisconnectClient(connection);
                 break;
         }
     }
@@ -140,8 +137,16 @@ public class Server : IDoctorCallback, IClientCallback
      */
     private void StartSession(string[] messageParts)
     {
+        var clientIndex = GetIndexClient(messageParts);
+
+        // Check om te controleren of de client bestaat/verbonden is
+        if (!clients.ContainsKey(clientIndex))
+        {
+            return;
+        }
+
         SendCommandToClient(messageParts, "2");
-        var clientConnection = clients[GetIndexClient(messageParts)];
+        var clientConnection = clients[clientIndex];
 
         //client in lijst in sessie zetten
         clientConnection.InSession = true;
@@ -157,18 +162,26 @@ public class Server : IDoctorCallback, IClientCallback
     */
     private async Task StopSession(string[] messageParts)
     {
-        if (!clients[GetIndexClient(messageParts)].InSession)
+        var clientIndex = GetIndexClient(messageParts);
+
+        // Check om te controleren of de client bestaat/verbonden is
+        if (!clients.ContainsKey(clientIndex))
+        {
+            return;
+        }
+
+        var client = clients[clientIndex];
+
+        if (!client.InSession)
         {
             return;
         }
 
         SendCommandToClient(messageParts, "3");
-        clients[GetIndexClient(messageParts)].InSession = false;
+        client.InSession = false;
 
         // Asynchroon berekenen van alle fietsdata
-        await fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)],
-            GetIndexClient(messageParts),
-            clients[GetIndexClient(messageParts)].SessionTime);
+        await fileManager.CalculateDataFromSession(client, clientIndex, client.SessionTime);
     }
 
     /**
@@ -176,18 +189,26 @@ public class Server : IDoctorCallback, IClientCallback
      */
     private async Task EmergencyStop(string[] messageParts)
     {
-        if (!clients[GetIndexClient(messageParts)].InSession)
+        var clientIndex = GetIndexClient(messageParts);
+
+        // Check om te controleren of de client bestaat/verbonden is
+        if (!clients.ContainsKey(clientIndex))
+        {
+            return;
+        }
+
+        var client = clients[clientIndex];
+
+        if (!client.InSession)
         {
             return;
         }
 
         SendCommandToClient(messageParts, "4");
-        clients[GetIndexClient(messageParts)].InSession = false;
+        client.InSession = false;
 
         // Asynchroon berekenen van alle fietsdata
-        await fileManager.CalculateDataFromSession(clients[GetIndexClient(messageParts)],
-            GetIndexClient(messageParts),
-            clients[GetIndexClient(messageParts)].SessionTime);
+        await fileManager.CalculateDataFromSession(client, clientIndex, client.SessionTime);
     }
 
     /**
@@ -206,7 +227,9 @@ public class Server : IDoctorCallback, IClientCallback
      */
     private void GetSessionData(Connection connection, string[] messageParts)
     {
-        var sessions = fileManager.getAllClientSessions(GetIndexClient(messageParts));
+        var clientIndex = GetIndexClient(messageParts);
+
+        var sessions = fileManager.getAllClientSessions(clientIndex);
 
         //geen sessie beschikbaar van client
         if (sessions == null)
@@ -218,6 +241,71 @@ public class Server : IDoctorCallback, IClientCallback
         foreach (var session in sessions)
         {
             connection.Send($"3 {session}");
+        }
+    }
+
+    /**
+     * Helper methode om alle verbonden clients op te halen en te versturen
+     */
+    private void SendAllClients(Connection connection)
+    {
+        foreach (var client in clients)
+        {
+            connection.Send($"2 {client.Key}");
+        }
+    }
+
+    /**
+     * Helper methode om live data van een bepaalde client naar de doctor te sturen
+     */
+    private void SendLiveData(Connection connection, string[] messageParts)
+    {
+        var clientIndex = GetIndexClient(messageParts);
+
+        // Check om te controleren of de client bestaat/verbonden is
+        if (!clients.ContainsKey(clientIndex))
+        {
+            return;
+        }
+
+        connection.Send(clients[clientIndex].LiveData);
+    }
+
+
+    /**
+     * Helper methode om het verbreken van een verbinding van een client door te geven
+     */
+    private void SendClientDisconnected(Connection connection)
+    {
+        foreach (var doctor in connectionHandler.doctors)
+        {
+            foreach (var client in clients)
+            {
+                if (connection.Equals(client.Value.Connection))
+                {
+                    doctor.Send($"4 {client.Key}");
+                }
+            }
+        }
+    }
+
+    /**
+     * Helper methode om de login van een client af te handelen
+     */
+    private void ClientLogin(Connection connection, string[] messageParts)
+    {
+        var clientIndex = GetIndexClient(messageParts);
+
+        // Controleert of client bestaat in het clientsbestand, zo ja toevoegen aan lijst met live clients
+        if (fileManager.CheckClientLogin(clientIndex))
+        {
+            clients.Add(GetIndexClient(messageParts), new ClientConnection($"{clientIndex}", connection));
+            connection.Access = true;
+            connection.Send("5 1");
+        }
+        else
+        {
+            connection.Send("5 0");
         }
     }
 
@@ -244,6 +332,12 @@ public class Server : IDoctorCallback, IClientCallback
             return;
         }
 
+        // Bij ongeldige fietsData, returnen
+        if (messageParts.Length < 7)
+        {
+            return;
+        }
+
         var bikeData = $"{messageParts[1]} {messageParts[2]} {messageParts[3]} {messageParts[4]} " +
                        $"{messageParts[5]} {messageParts[6]}";
 
@@ -258,42 +352,25 @@ public class Server : IDoctorCallback, IClientCallback
                 bikeData);
         }
     }
-
+    
     /**
-     * Helper methode om de login van een client af te handelen
+     * Helper methode om een client te disconnecten van de server
      */
-    private void ClientLogin(Connection connection, string[] messageParts)
+    private void DisconnectClient(Connection connection)
     {
-        var index = GetIndexClient(messageParts);
-
-        // Controleert of client bestaat in het clientsbestand, zo ja toevoegen aan lijst met live clients
-        if (fileManager.CheckClientLogin(index))
+        foreach (var clientName in clients.Keys)
         {
-            clients.Add(GetIndexClient(messageParts), new ClientConnection($"{index}", connection));
-            connection.Access = true;
-            connection.Send("5 1");
-        }
-        else
-        {
-            connection.Send("5 0");
-        }
-    }
-
-    /**
-     * Methode om alle online clients op te halen en te versturen
-     */
-    private void SendAllClients(Connection connection)
-    {
-        foreach (var client in clients)
-        {
-            connection.Send($"2 {client.Key}");
+            if (connection.Equals(clients[clientName].Connection))
+            {
+                clients.Remove(clientName);
+            }
         }
     }
 
     /**
      * Methode om de index (voornaam achternaam geboortedatum) van een client te verkrijgen
      */
-    private string GetIndexClient(string[] messageParts)
+    private static string GetIndexClient(string[] messageParts)
     {
         return $"{messageParts[1]} {messageParts[2]} {messageParts[3]}";
     }

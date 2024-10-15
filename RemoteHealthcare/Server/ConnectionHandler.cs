@@ -8,8 +8,8 @@ namespace Server;
  */
 public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback doctorCallback)
 {
-    private static readonly List<Connection> clients = [];
-    private static readonly List<Connection> doctors = [];
+    public List<Connection> clients = [];
+    public List<Connection> doctors { get; } = [];
 
     public void Start()
     {
@@ -95,6 +95,8 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
             }
             catch (Exception)
             {
+                doctorCallback.OnReceivedMessage("404", connection);
+                clientCallback.OnReceivedMessage("404", connection);
                 break;
             }
         }
