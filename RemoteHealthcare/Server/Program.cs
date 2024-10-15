@@ -1,9 +1,9 @@
 namespace Server;
 
-public class Server : IArtsCallback, IClientCallback
+public class Server : IDoctorCallback, IClientCallback
 {
-    private FileManager fileManager = new();
-    Dictionary<string, ClientConnection> clients = new();
+    private readonly FileManager fileManager = new();
+    private readonly Dictionary<string, ClientConnection> clients = new();
     public static void Main(string[] args)
     {
         Console.WriteLine("Starting server...");
@@ -18,9 +18,9 @@ public class Server : IArtsCallback, IClientCallback
     }
 
     /**
-     * Callbacks voor het verwerken van requests vanuit de Arts en Client(s)
+     * Callbacks voor het verwerken van requests vanuit de Doctor en Client(s)
      */
-    void IArtsCallback.OnReceivedMessage(string message, Connection connection)
+    void IDoctorCallback.OnReceivedMessage(string message, Connection connection)
     {
         var messageParts = message.Split(' ');
         DoctorCallbackHandler(connection, messageParts);
@@ -141,8 +141,8 @@ public class Server : IArtsCallback, IClientCallback
     }
 
     /**
-     * Helper methode om een sessie van een client stop te zetten
-     */
+    * Helper methode om een sessie van een client stop te zetten
+    */
     private async Task StopSession(string[] messageParts)
     {
         if (!clients[GetIndexClient(messageParts)].InSession)
@@ -203,7 +203,7 @@ public class Server : IArtsCallback, IClientCallback
             return;
         }
 
-        foreach (var session in sessions!)
+        foreach (var session in sessions)
         {
             connection.Send($"3 {session}");
         }
@@ -254,7 +254,7 @@ public class Server : IArtsCallback, IClientCallback
     {
         var index = GetIndexClient(messageParts);
 
-        // Controleert of client bestaat in het clientensbestand, zo ja toevoegen aan lijst met live clients
+        // Controleert of client bestaat in het clientsbestand, zo ja toevoegen aan lijst met live clients
         if (fileManager.CheckClientLogin(index))
         {
             clients.Add(GetIndexClient(messageParts), new ClientConnection($"{index}", connection));

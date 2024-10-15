@@ -8,8 +8,8 @@ namespace Server;
  */
 public class Connection(TcpClient client)
 {
-    public NetworkStream Stream = client.GetStream();
-    public bool Access { get; set; } = false;
+    public readonly NetworkStream Stream = client.GetStream();
+    public bool Access { get; set; }
 
     public void Send(string msg)
     {
