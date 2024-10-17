@@ -9,7 +9,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Server\Server.csproj" />
+      <Reference Include="BLELibrary">
+        <HintPath>..\Client\BLELibrary.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
