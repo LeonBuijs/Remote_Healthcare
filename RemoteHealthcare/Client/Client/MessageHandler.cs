@@ -1,120 +1,97 @@
 using System;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
-using Avans.TI.BLE;
 using Client;
 
-namespace ClientGUI
+namespace ClientGUI;
+
+public class MessageHandler
 {
-    public class MessageHandler
+    private BLEHandler bleHandler;
+    private VRHandler vrHandler;
+    public bool loggedIn { get; set; }
+
+    public MessageHandler(BLEHandler bleHandler, VRHandler vrHandler)
     {
-        private ClientApplication clientApp;
-        private NetworkStream stream;
-        private BikeData bikeData;
+        this.bleHandler = bleHandler;
+        this.vrHandler = vrHandler;
+    }
+
+
+    public void ProcessMessage(string message)
+    {
+        Console.WriteLine($"Received message: {message}");
         
-
-        public MessageHandler(ClientApplication clientApp, NetworkStream stream, BikeData bikeData)
+        if (string.IsNullOrWhiteSpace(message))
         {
-            this.clientApp = clientApp;
-            this.stream = stream;
-            this.bikeData = bikeData;
+            return;
         }
 
-        public async Task ReceiveMessages()
+        var identifier = message[0];
+        var content = message.Substring(1);
+
+        switch (identifier)
         {
-            NetworkStream stream = clientApp._stream;
-
-            while (true)
-            {
-                byte[] buffer = new byte[1024]; // Buffer om berichten te ontvangen
-                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-
-                if (bytesRead > 0)
-                {
-                    string message = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                    AnalyseMessage(message);
-                }
-            }
+            case '0':
+                HandleChatMessage(content);
+                break;
+            case '1':
+                HandleBikeResistanceSettings(content);
+                break;
+            case '2':
+                HandleStartCommand();
+                break;
+            case '3':
+                HandleStopCommand();
+                break;
+            case '4':
+                HandleEmergencyStopCommand();
+                break;
+            case '5':
+                HandleLoginConfirmation(content);
+                break;
         }
+    }
 
-        private void AnalyseMessage(string message)
+    private void HandleChatMessage(string message)
+    {
+        Console.WriteLine($"Chat message from doctor: {message}");
+        vrHandler.SendChatToVr(message);
+    }
+
+    private void HandleBikeResistanceSettings(string settings)
+    {
+        Console.WriteLine($"Bike resistance settings: {settings}");
+
+        var resistance = Encoding.UTF8.GetBytes(settings);
+        // TODO: kijken of dit echt werkt
+        bleHandler.SetResistance(resistance[0]);
+    }
+
+    private void HandleStartCommand()
+    {
+        vrHandler.StartSession();
+    }
+
+    private void HandleStopCommand()
+    {
+        vrHandler.StopSession();
+    }
+
+    private void HandleEmergencyStopCommand()
+    {
+        vrHandler.EmergencyStop();
+    }
+
+    private void HandleLoginConfirmation(string confirmation)
+    {
+        if (confirmation == "1")
         {
-            if (string.IsNullOrWhiteSpace(message))
-                return;
-
-            char identifier = message[0];
-            string content = message.Substring(1);
-
-            switch (identifier)
-            {
-                case '0':
-                    HandleChatMessage(content);
-                    break;
-                case '1':
-                    HandleBikeResistanceSettings(content);
-                    break;
-                case '2':
-                    HandleStartCommand();
-                    break;
-                case '3':
-                    HandleStopCommand();
-                    break;
-                case '4':
-                    HandleEmergencyStopCommand();
-                    break;
-                case '5':
-                    HandleLoginConfirmation(content);
-                    break;
-                default:
-                    Console.WriteLine("Unknown message type");
-                    break;
-            }
+            loggedIn = true;
         }
-
-        private void HandleChatMessage(string message)
+        else
         {
-            Console.WriteLine($"Chat message from doctor: {message}");
-            
-        }
-
-        private void HandleBikeResistanceSettings(string settings)
-        {
-            Console.WriteLine($"Bike resistance settings: {settings}");
-            
-            if (byte.TryParse(settings, out byte resistance))
-            {
-                // Program.setResistance(resistance);
-                Console.WriteLine($"Resistance set to {resistance}");
-            }
-            else
-            {
-                Console.WriteLine("Invalid resistance value received");
-            }
-        }
-
-        private void HandleStartCommand()
-        {
-            Console.WriteLine("Start command received");
-            
-        }
-
-        private void HandleStopCommand()
-        {
-            Console.WriteLine("Stop command received");
-            
-        }
-
-        private void HandleEmergencyStopCommand()
-        {
-            Console.WriteLine("Emergency stop command received");
-            
-        }
-
-        private void HandleLoginConfirmation(string confirmation)
-        {
-            Console.WriteLine($"Login confirmation: {confirmation}");
-            
+            loggedIn = false;
         }
     }
 }

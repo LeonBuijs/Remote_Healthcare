@@ -156,7 +156,7 @@ public class BLEHandler
                 checksum ^= b;
             }
 
-            byte[] data = new byte[payload.Length + 5];
+            var data = new byte[payload.Length + 5];
             data[0] = sync;
             data[1] = length;
             data[2] = msgId;
@@ -171,13 +171,13 @@ public class BLEHandler
         }
 
         /**
-         * Specefieke methode om de weerstand van de fiets aan te passen
+         * Specifieke methode om de weerstand van de fiets aan te passen
          */
-        public static void setResistance(byte resistance)
+        public void SetResistance(byte resistance)
         {
             byte resistancePage = 0x30;
             byte zero = 0x00;
-            byte[] payload = { resistancePage, zero, zero, zero, zero, zero, zero, resistance };
+            byte[] payload = [resistancePage, zero, zero, zero, zero, zero, zero, resistance];
             SendMessageToBike(payload);
         }
 
@@ -188,14 +188,14 @@ public class BLEHandler
         {
             Console.WriteLine("SIMULATION MODE");
 
-            TcpClient tcpClient = new TcpClient("127.0.0.1", 8080);
+            var tcpClient = new TcpClient("127.0.0.1", 8080);
 
             while (true)
             {
-                NetworkStream stream = tcpClient.GetStream();
+                var stream = tcpClient.GetStream();
 
-                byte[] buffer1 = new byte[1024];
-                int bytesRead1 = stream.Read(buffer1, 0, buffer1.Length);
+                var buffer1 = new byte[1024];
+                var bytesRead1 = stream.Read(buffer1, 0, buffer1.Length);
                 bikeData.UpdateData(BitConverter.ToString(buffer1, 0, bytesRead1).Replace("-", " "));
                 Console.WriteLine(
                     $"Speed: {bikeData.Speed} RPM: {bikeData.Rpm} Distance: {bikeData.Distance} Watts: {bikeData.Watt} Time: {bikeData.Time} HeartRate: {bikeData.HeartRate}");

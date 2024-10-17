@@ -51,7 +51,7 @@
   <ItemGroup>
     <Compile Include="BikeData.cs" />
     <Compile Include="BLEHandler.cs" />
-    <Compile Include="ClientApplication.cs" />
+    <Compile Include="Connection.cs" />
     <Compile Include="Form.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -61,6 +61,7 @@
     <Compile Include="MessageHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VRHandler.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

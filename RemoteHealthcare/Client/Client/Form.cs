@@ -1,18 +1,21 @@
 using System;
-using System.Net.Sockets;
+using System.Globalization;
+using System.Threading;
 using System.Windows.Forms;
+using ClientGUI;
 
 namespace Client;
 
 public partial class Form : System.Windows.Forms.Form
 {
-    private BLEHandler bleHandler;
-    private ClientApplication _clientApp;
-    private TcpClient _tcpClient;
+    private BLEHandler bleHandler = new();
+    private VRHandler vrHandler = new();
+    private MessageHandler messageHandler;
+    private Connection connection;
         
-    public Form(BLEHandler bleHandler)
+    public Form()
     {
-        this.bleHandler = bleHandler;
+        messageHandler = new MessageHandler(bleHandler, vrHandler);
         InitializeComponent();
     }
         
@@ -33,32 +36,32 @@ public partial class Form : System.Windows.Forms.Form
             
         try
         {
-            ConnectToServer(serverIp, deviceId, firstName, lastName, birthDate);
+            var connected = ConnectToServer(serverIp, deviceId, firstName, lastName, birthDate);
+
+            if (!connected)
+            {
+                return;
+            }
         }
         catch (Exception ex)
         {
             MessageBox.Show($"Fout bij het verbinden {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
-        //Start sending data...
-        // await _clientApp.Start(); todo
+        //Start sending data... todo
+
+        Console.WriteLine("Connected!");
         Hide();
     }
-    private void ConnectToServer(string ip, string deviceId, string firstName, string lastName, string birthDate)
+    private bool ConnectToServer(string ip, string deviceId, string firstName, string lastName, string birthDate)
     {
-        bleHandler.Start(deviceId);
+        // bleHandler.Start(deviceId); todo
             
-        _clientApp = new ClientApplication(ip, 6666, null);//todo
+        connection = new Connection(ip, 6666, messageHandler);
             
-        var loginMessage = GetIndex(firstName, lastName, birthDate);
-        _clientApp.SendMessage(loginMessage); // Send login to Server
-            
-        // await _clientApp.Start();
-        Console.WriteLine("Connected to server");
-    }
-                                    
-    private static string GetIndex(string firstName, string lastName, string birthDate)
-    {
-        return $"0 {firstName} {lastName} {birthDate}";
+        var loginMessage = $"0 {firstName} {lastName} {birthDate}";
+        connection.SendMessage(loginMessage);
+        
+        return messageHandler.loggedIn;
     }
 }
