@@ -65,8 +65,7 @@ public class NetworkProcessor
         int receivedBytes = artsStream.EndRead(ar);
         string receivedText = Encoding.ASCII.GetString(artsBuffer, 0, receivedBytes);
         totalBuffer += receivedText;
-
-        //todo: pakket opsplitsen
+        
         string[] packetSplit = receivedText.Split(" ");
         HandleData(packetSplit);
 
