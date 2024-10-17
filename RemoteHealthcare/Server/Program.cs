@@ -372,6 +372,10 @@ public class Server : IDoctorCallback, IClientCallback
      */
     private static string GetIndexClient(string[] messageParts)
     {
+        if (messageParts.Length < 4)
+        {
+            return "";
+        }
         return $"{messageParts[1]} {messageParts[2]} {messageParts[3]}";
     }
 
