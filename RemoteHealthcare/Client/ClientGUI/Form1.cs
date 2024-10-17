@@ -37,6 +37,7 @@ namespace ClientGUI
                 MessageBox.Show($"Fout bij het verbinden {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+            // Start sending data...
             await _clientApp.Start();
             Hide();
         }
@@ -50,7 +51,10 @@ namespace ClientGUI
             string identificationMessage = FormatIdentificationMessage(firstName, lastName, birthDate);
             await _clientApp.SendMessage(identificationMessage); // Send identification to Server
             
-            // Start sending data...
+            // Storage data
+            Storage storage = new Storage();
+            storage.AddData(identificationMessage);
+            
             // await _clientApp.Start();
             Console.WriteLine("Connected to server");
         }
