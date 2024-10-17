@@ -20,6 +20,7 @@ namespace Simulation
             serverThread.IsBackground = true;
             serverThread.Start();
             
+            // Click op button, dan sendData() runnen
             sendButton.Click += (sender, args) => SendData();
         }
 
@@ -33,7 +34,6 @@ namespace Simulation
 
         private void SendData()
         {
-            
             if (int.TryParse(field1.Text, out int speed) &&
                 int.TryParse(field2.Text, out int wattage) &&
                 int.TryParse(field3.Text, out int rpm) &&
