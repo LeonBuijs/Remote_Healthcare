@@ -27,6 +27,8 @@ class VRConnection
         CreateRoad(stream, uuidRoute);
         
         FollowRoute(stream, uuidRoute, uuidBike);
+        
+        ChangeFollowRouteSpeed(stream, uuidBike, 10);
 
 
         // SendPacket(stream, "{\"id\" : " +
@@ -45,6 +47,24 @@ class VRConnection
         // RecievePacket(stream);
     }
 
+    private static void ChangeFollowRouteSpeed(NetworkStream stream, string uuidBike, int speed)
+    {
+        SendPacket(stream, "{\"id\" : " +
+                           "\"tunnel/send\", " +
+                           "\"data\" :" +
+                           "{\"dest\" : \"" +
+                           SessionID +
+                           "\", " +
+                           "\"data\" :" +
+                           "{\"id\" : \"route/follow/speed\", " +
+                           "\"data\" : " +
+                           "{\"node\" : \"" + uuidBike + "\"," + 
+                           "\"speed\" : " + speed + "," +
+                           "}}}}");
+
+        RecievePacket(stream);
+    }
+
     private static void FollowRoute(NetworkStream stream, string uuidRoute, string uuidBike)
     {
         SendPacket(stream, "{\"id\" : " +
@@ -58,7 +78,7 @@ class VRConnection
                            "\"data\" : " +
                            "{\"route\" : \"" + uuidRoute + "\"," +
                            "\"node\" : \"" + uuidBike + "\"," + 
-                           "\"speed\" : 10.0," +
+                           "\"speed\" : 50.0," +
                            "\"offset\" : 0.0," +
                            "\"rotate\" : \"XZ\"," +
                            "\"smoothing\" : 1.0," +
