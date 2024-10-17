@@ -23,7 +23,7 @@ namespace ClientGUI
 
         public async Task ReceiveMessages()
         {
-            NetworkStream stream = clientApp.Stream;
+            NetworkStream stream = clientApp._stream;
 
             while (true)
             {
