@@ -20,27 +20,10 @@ class VRConnection
         CreateTunnel(stream);
         // Werkende methodes:
         // SetTime(stream, 0);
-        createTerrain(stream);
-        string uuid = CreateNode(stream);
+        // string uuidBike = CreateNodeForBike(stream);
+        // string uuidTerrain = CreateNodeForTerrain(stream);
 
-
-        // SendPacket(stream, "{\"id\" :" +
-        //                    "\"tunnel/send\", " +
-        //                    "\"data\" :" +
-        //                    "{\"dest\" :\"" +
-        //                    SessionID +
-        //                    "\", " +
-        //                    "\"data\" :" +
-        //                    "{\"id\" : \"scene/node/moveto\", " +
-        //                    "\"data\" :" +
-        //                    "{\"id\" : " + uuid + "," +
-        //                    "\"position\" : [ 0, 0, 0 ]," +
-        //                    "\"interpolate\" : \"linear\"," +
-        //                    "\"followheight\" : false," +
-        //                    "\"speed\" : 10," +
-        //                    "\"time\" : 10" +
-        //                    "}}}}");
-        // RecievePacket(stream);
+        string uuidRoute = CreateRoute(stream);
 
 
         // SendPacket(stream, "{\"id\" : " +
@@ -57,25 +40,28 @@ class VRConnection
         //                    "\"position\" : [ 0.0, 0.0 ]" +
         //                    "}}}}");
         // RecievePacket(stream);
+    }
 
-
-        // SendPacket(stream, "{\"id\" : " +
-        //                    "\"tunnel/send\", " +
-        //                    "\"data\" :" +
-        //                    "{\"dest\" : \"" +
-        //                    SessionID +
-        //                    "\", " +
-        //                    "\"data\" :" +
-        //                    "{\"id\" : \"route/add\", " +
-        //                    "\"data\" : " +
-        //                    "\"id\" : " + uuid + "," +
-        //                    "{\"nodes\" : " +
-        //                    "[{\"pos\" : [ 0, 0, 0  ],\"dir\" :[ 5, 0, -5]}," +
-        //                    "{\"pos\" : [ 50, 0, 0 ],\"dir\" :[ 5, 0, 5]}," +
-        //                    "{\"pos\" : [ 50, 0, 50],\"dir\" :[ -5, 0, 5]}," +
-        //                    "{\"pos\" : [ 0, 0, 50 ],\"dir\" :[ -5, 0, -5]}]" +
-        //                    "}}}}");
-        // RecievePacket(stream);
+    private static string CreateRoute(NetworkStream stream)
+    {
+        SendPacket(stream, "{\"id\" :" +
+                           "\"tunnel/send\", " +
+                           "\"data\" :" +
+                           "{\"dest\" :\"" +
+                           SessionID +
+                           "\", " +
+                           "\"data\" :" +
+                           "{\"id\" : \"route/add\", " +
+                           "\"data\" :{ \"nodes\" : " +
+                           "[" +
+                           "{\"pos\" : [ 0, 0, 0  ],\"dir\" : [ 5, 0, -5]}," +
+                           "{\"pos\" : [ 50, 0, 0  ],\"dir\" : [ 5, 0, 5]}," +
+                           "{\"pos\" : [ 50, 0, 50  ],\"dir\" : [ -5, 0, 5]}," +
+                           "{\"pos\" : [ 0, 0, 50  ],\"dir\" : [ -5, 0, -5]} " +
+                           "]" +
+                           "}}}}");
+        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
 
     private static void createTerrain(NetworkStream stream)
@@ -84,9 +70,9 @@ class VRConnection
 
         for (int i = 0; i < newArray.Length; i++)
         {
-            newArray[i] = 0;
+            newArray[i] = 1;
         }
-        
+
         StringBuilder jsonBuilder = new StringBuilder();
         jsonBuilder.Append("[");
 
@@ -105,7 +91,7 @@ class VRConnection
 
         // De resulterende JSON-string
         string jsonString = jsonBuilder.ToString();
-        
+
         SendPacket(stream, "{\"id\" : " +
                            "\"tunnel/send\", " +
                            "\"data\" :" +
@@ -121,7 +107,7 @@ class VRConnection
         RecievePacket(stream);
     }
 
-    private static string CreateNode(NetworkStream stream)
+    private static string CreateNodeForBike(NetworkStream stream)
     {
         SendPacket(stream, "{\"id\" :" +
                            "\"tunnel/send\", " +
@@ -140,22 +126,31 @@ class VRConnection
                            "\"rotation\" : [ 0, 0, 0 ]}, " +
                            "\"model\" : " +
                            "{\"file\" : \"data/NetworkEngine/models/bike/bike.fbx\"}, " +
+                           "}}}}}");
+        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        return jsonObject["data"]["data"]["data"]["uuid"].ToString();
+    }
 
-                           // "\"cullbackfaces\" : true, " +
-                           // "\"animated\" : false, " +
-                           // "\"animation\" : \"animationname\"}" +
+    private static string CreateNodeForTerrain(NetworkStream stream)
+    {
+        createTerrain(stream);
+        SendPacket(stream, "{\"id\" :" +
+                           "\"tunnel/send\", " +
+                           "\"data\" :" +
+                           "{\"dest\" :\"" +
+                           SessionID +
+                           "\", " +
+                           "\"data\" :" +
+                           "{\"id\" : \"scene/node/add\", " +
+                           "\"data\" :" +
+                           "{\"name\" : \"test\", " +
+                           "\"components\" : {" +
+                           "\"transform\" : " +
+                           "{\"position\" : [ 0, 0, 0 ], " +
+                           "\"scale\" : 1, " +
+                           "\"rotation\" : [ 0, 0, 0 ]}, " +
                            "\"terrain\" : " +
                            "{\"smoothnormals\" : true}" +
-
-                           // "\"panel\" : " +
-                           // "{\"size\" : [ 10, 10 ], " +
-                           // "\"resolution\" : [ 512, 512 ], " +
-                           // "\"background\" : [ 1, 1, 1, 1], " +
-                           // "\"castShadow\" : true}" +
-
-                           // "\"water\" :" +
-                           // "{\"size\" : [ 20, 20 ], " +
-                           // "\"resolution\" : 0.1}
                            "}}}}}");
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
