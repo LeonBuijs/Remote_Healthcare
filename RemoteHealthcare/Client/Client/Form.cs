@@ -18,27 +18,27 @@ namespace Client
         
         private async void connectButton_Click(object sender, EventArgs e)
         {
-            // string firstName = firstNameTextBox.Text;
-            // string lastName = lastNameTextBox.Text;
-            // string birthDate = birthDateTextBox.Text;
-            //
-            // // Verification
-            // if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(birthDate))
-            // {
-            //     MessageBox.Show("Vul alle velden in !", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            //     return;
-            // }
-            //
-            // try
-            // {
-            //     await ConnectToServer(firstName, lastName, birthDate);
-            // }
-            // catch (Exception ex)
-            // {
-            //     MessageBox.Show($"Fout bij het verbinden {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            //     return;
-            // }
-            // Start sending data...
+            string firstName = firstNameTextBox.Text;
+            string lastName = lastNameTextBox.Text;
+            string birthDate = birthDateTextBox.Text;
+            
+            // Verification
+            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(birthDate))
+            {
+                MessageBox.Show("Vul alle velden in !", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
+            try
+            {
+                await ConnectToServer(firstName, lastName, birthDate);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Fout bij het verbinden {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            //Start sending data...
             await _clientApp.Start();
             Hide();
         }
