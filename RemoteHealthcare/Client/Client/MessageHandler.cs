@@ -84,7 +84,7 @@ namespace ClientGUI
             
             if (byte.TryParse(settings, out byte resistance))
             {
-                Program.setResistance(resistance);
+                // Program.setResistance(resistance);
                 Console.WriteLine($"Resistance set to {resistance}");
             }
             else

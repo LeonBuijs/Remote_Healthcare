@@ -97,7 +97,7 @@ namespace Client
             this.Controls.Add(this.firstNameLabel);
             this.Name = "Form1";
             this.Text = "Remote Healthcare Client";
-            // this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            // this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
         }
