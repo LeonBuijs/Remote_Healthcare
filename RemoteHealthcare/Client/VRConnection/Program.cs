@@ -26,27 +26,7 @@ class VRConnection
         string uuidRoute = CreateRoute(stream);
         CreateRoad(stream, uuidRoute);
         
-        SendPacket(stream, "{\"id\" : " +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" : \"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"route/follow\", " +
-                           "\"data\" : " +
-                           "{\"route\" : \"" + uuidRoute + "\"," +
-                           "\"node\" : \"" + uuidBike + "\"," + 
-                           "\"speed\" : 69.0," +
-                           "\"offset\" : 0.0," +
-                           "\"rotate\" : \"XZ\"," +
-                           "\"smoothing\" : 1.0," +
-                           "\"followHeight\" : false," +
-                           "\"rotateOffset\" : [ 0, 0, 0 ]," +
-                           "\"positionOffset\" : [ 0, 0, 0]" +
-                           "}}}}");
-
-        RecievePacket(stream);
+        FollowRoute(stream, uuidRoute, uuidBike);
 
 
         // SendPacket(stream, "{\"id\" : " +
@@ -63,6 +43,31 @@ class VRConnection
         //                    "\"position\" : [ 0.0, 0.0 ]" +
         //                    "}}}}");
         // RecievePacket(stream);
+    }
+
+    private static void FollowRoute(NetworkStream stream, string uuidRoute, string uuidBike)
+    {
+        SendPacket(stream, "{\"id\" : " +
+                           "\"tunnel/send\", " +
+                           "\"data\" :" +
+                           "{\"dest\" : \"" +
+                           SessionID +
+                           "\", " +
+                           "\"data\" :" +
+                           "{\"id\" : \"route/follow\", " +
+                           "\"data\" : " +
+                           "{\"route\" : \"" + uuidRoute + "\"," +
+                           "\"node\" : \"" + uuidBike + "\"," + 
+                           "\"speed\" : 10.0," +
+                           "\"offset\" : 0.0," +
+                           "\"rotate\" : \"XZ\"," +
+                           "\"smoothing\" : 1.0," +
+                           "\"followHeight\" : false," +
+                           "\"rotateOffset\" : [ 0, 0, 0 ]," +
+                           "\"positionOffset\" : [ 0, 0, 0]" +
+                           "}}}}");
+
+        RecievePacket(stream);
     }
 
     private static void CreateRoad(NetworkStream stream, string uuidRoute)
