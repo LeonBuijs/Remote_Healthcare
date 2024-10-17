@@ -92,7 +92,7 @@ public class ServerSimulation():IDoctorCallback, IClientCallback
                 {
                     if (testClient.voornaam == messageParts[1] && testClient.achternaam == messageParts[2] && testClient.geboortedatum == messageParts[3])
                     {
-                        connection.Send($"1 {testClient.GetData()}");
+                        connection.Send($"1 {testClient.GetClientInfo()} {testClient.GetData()}");
                     }
                 }
                 break;
@@ -128,16 +128,16 @@ public class TestClient()
     {
         speed++; hardrate++; rpm++; distance++; power++;
         history += 0.5;
-        return speed + " " + hardrate + " " + rpm + " " + distance + " " + power;
+        return speed + ";" + hardrate + ";" + rpm + ";" + distance + ";" + power;
     }
 
     public string GetHistory()
     {
-        return speed/history + " " + hardrate/history + " " + rpm/history + " " + distance/history + " " + power/history;
+        return speed/history + ";" + hardrate/history + ";" + rpm/history + ";" + distance/history + ";" + power/history;
     }
 
     public string GetClientInfo()
     {
-        return voornaam + " " + achternaam + " " + geboortedatum;
+        return voornaam + ";" + achternaam + ";" + geboortedatum;
     }
 }

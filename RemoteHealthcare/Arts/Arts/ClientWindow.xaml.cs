@@ -38,15 +38,20 @@ public partial class ClientWindow : Window, IDataUpdateCallback
             string heartRate = dataSplit[4];
             
             //werk de bijbehorende tekstblokken bij
-            SpeedValueTextBlock.Text = speed;
-            DistanceValueTextBlock.Text = distance;
-            PowerValueTextBlock.Text = power;
-            RpmValueTextBlock.Text = rpm;
-            HeartRateValueTextBlock.Text = heartRate;
+            Dispatcher.Invoke(() =>
+            {
+                SpeedValueTextBlock.Text = speed;
+                DistanceValueTextBlock.Text = distance;
+                PowerValueTextBlock.Text = power;
+                RpmValueTextBlock.Text = rpm;
+                HeartRateValueTextBlock.Text = heartRate;
+            });
+
         }
     }
     private void StartClientSessie(object sender, RoutedEventArgs e)
     {
+        Console.WriteLine("Starting session!");
         networkProcessor.StartClientSessie(clientId);
         networkProcessor.AddActiveClient(clientId);
 

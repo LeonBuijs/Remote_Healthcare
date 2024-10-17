@@ -112,8 +112,10 @@ public class NetworkProcessor
 
     public void AddActiveClient(string clientId)
     {
+        Console.WriteLine($"adding {clientId} to active clients");
         lock (clientsWhoRecieveData)
         {
+            Console.WriteLine($"{clientId} added to clients list!");
             if (!clientsWhoRecieveData.Contains(clientId))
             {
                 clientsWhoRecieveData.Add(clientId);
@@ -138,6 +140,7 @@ public class NetworkProcessor
                     clientsWhoRecieveData.ForEach(GetRealtimeData);
                     count = clientsWhoRecieveData.Count;
                 }
+                Thread.Sleep(500);
             }
             isAskingData = false;
         }).Start();
@@ -170,11 +173,16 @@ public class NetworkProcessor
 
     public void StartClientSessie(string clientInfo)
     {
+        Console.WriteLine($"telling server {clientInfo} started");
         artsSender.StartSession(clientInfo);
     }
 
     public void StopClientSessie(string clientInfo)
     {
+        lock (clientsWhoRecieveData)
+        {
+            clientsWhoRecieveData.Remove(clientInfo);
+        }
         artsSender.StopSession(clientInfo);
     }
 
