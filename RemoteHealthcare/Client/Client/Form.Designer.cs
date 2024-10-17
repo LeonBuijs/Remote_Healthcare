@@ -1,8 +1,10 @@
-﻿namespace ClientGUI
+using System.ComponentModel;
+
+namespace Client
 {
-    partial class Form1
+    partial class Form
     {
-        private System.ComponentModel.IContainer components = null;
+       private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.Label firstNameLabel;
         private System.Windows.Forms.TextBox firstNameTextBox;
         private System.Windows.Forms.Label lastNameLabel;
@@ -101,5 +103,6 @@
         }
 
         #endregion
+
     }
 }

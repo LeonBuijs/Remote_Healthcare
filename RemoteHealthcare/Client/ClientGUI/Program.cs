@@ -1,6 +1,5 @@
 using Avans.TI.BLE;
-
-namespace ClientGUI;
+using ClientGUI;
 
 static class Program
 {

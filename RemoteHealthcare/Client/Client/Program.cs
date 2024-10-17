@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using Avans.TI.BLE;
+using ClientGUI;
 
 namespace Client
 {
     class Program
     {
-        private static BikeData bikeData = new BikeData();
+        private static BikeData bikeData = new();
+        private static BLE bleBike;
 
         static async Task Main(string[] args)
         {
             int errorCode;
-            BLE bleBike = new BLE();
+            bleBike = new BLE();
             BLE bleHeart = new BLE();
             Thread.Sleep(1000); // We need some time to list available devices
 
@@ -33,7 +36,7 @@ namespace Client
             }
 
             // Connecting
-            errorCode = await bleBike.OpenDevice("Tacx Flux 01140");
+            errorCode = await bleBike.OpenDevice("Tacx Flux 00472");
             Console.WriteLine($"BikeOpen: {errorCode}");
 
             while (errorCode != 0)
@@ -67,33 +70,37 @@ namespace Client
             // Heart rate
             errorCode = await bleHeart.OpenDevice("Decathlon Dual HR");
             Console.WriteLine($"Heart: {errorCode}");
-            while (errorCode != 0)
-            {
-                errorCode = await bleHeart.OpenDevice("Decathlon Dual HR");
-                Console.WriteLine($"Heart: {errorCode}");
-                Thread.Sleep(1000);
-            }
+            // while (errorCode != 0)
+            // {
+            //     errorCode = await bleHeart.OpenDevice("Decathlon Dual HR");
+            //     Console.WriteLine($"Heart: {errorCode}");
+            //     Thread.Sleep(1000);
+            // }
 
             errorCode = await bleHeart.SetService("HeartRate");
             Console.WriteLine($"HeartRate: {errorCode}");
-            while (errorCode != 0)
-            {
-                errorCode = await bleHeart.SetService("HeartRate");
-                Console.WriteLine($"Heart: {errorCode}");
-                Thread.Sleep(1000);
-            }
+            // while (errorCode != 0)
+            // {
+            //     errorCode = await bleHeart.SetService("HeartRate");
+            //     Console.WriteLine($"Heart: {errorCode}");
+            //     Thread.Sleep(1000);
+            // }
 
             bleHeart.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
             errorCode = await bleHeart.SubscribeToCharacteristic("HeartRateMeasurement");
             Console.WriteLine($"HeartRateMeasurement: {errorCode}");
 
-            while (errorCode != 0)
-            {
-                errorCode = await bleHeart.SubscribeToCharacteristic("HeartRateMeasurement");
-                Console.WriteLine($"Heart: {errorCode}");
-                Thread.Sleep(1000);
-            }
+            // while (errorCode != 0)
+            // {
+            //     errorCode = await bleHeart.SubscribeToCharacteristic("HeartRateMeasurement");
+            //     Console.WriteLine($"Heart: {errorCode}");
+            //     Thread.Sleep(1000);
+            // }
 
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Form());
+            
             Console.Read();
         }
 
@@ -125,7 +132,7 @@ namespace Client
         /**
          * Hoofdmethode om data naar een fiets te sturen
          */
-        private static async void SendMessageToBike(byte[] payload, BLE bleBike)
+        private static async void SendMessageToBike(byte[] payload)
         {
             byte sync = 0xA4;
             byte length = 0x09;
@@ -160,12 +167,12 @@ namespace Client
         /**
          * Specefieke methode om de weerstand van de fiets aan te passen 
          */
-        public static void setResistance(byte resistance, BLE bike)
+        public static void setResistance(byte resistance)
         {
             byte resistancePage = 0x30;
             byte zero = 0x00;
             byte[] payload = { resistancePage, zero, zero, zero, zero, zero, zero, resistance };
-            SendMessageToBike(payload, bike);
+            SendMessageToBike(payload);
         }
 
         /**

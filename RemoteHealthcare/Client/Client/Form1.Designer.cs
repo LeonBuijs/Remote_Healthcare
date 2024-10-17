@@ -1,4 +1,4 @@
-﻿namespace ClientGUI
+namespace ClientGUI
 {
     partial class Form1
     {
@@ -11,13 +11,13 @@
         private System.Windows.Forms.TextBox birthDateTextBox;
         private System.Windows.Forms.Button connectButton;
 
-        protected override void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             if (disposing && (components != null))
             {
                 components.Dispose();
             }
-            base.Dispose(disposing);
+            // base.Dispose(disposing);
         }
 
         #region Windows Form Designer generated code
