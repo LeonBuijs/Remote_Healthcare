@@ -7,6 +7,91 @@
         mc:Ignorable="d"
         Title="ClientWindow" Height="450" Width="800">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Title row -->
+            <RowDefinition Height="*"/>    <!-- Data and chat row -->
+            <RowDefinition Height="0.5*"/> <!-- Settings row -->
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/> <!-- Realtime data column -->
+            <ColumnDefinition Width="2*"/> <!-- History data column -->
+            <ColumnDefinition Width="1.5*"/> <!-- Chat column -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Title of the window: Client Name -->
+        <TextBlock Name="TitleBlock" Text="Client 'naam'" FontSize="16" FontWeight="Bold" 
+                   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                   HorizontalAlignment="Center" VerticalAlignment="Top" />
+
+        <!-- Data section -->
+        <GroupBox Header="Realtime data" Grid.Row="1" Grid.Column="0" Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+        
+                    <TextBlock Text="Speed:" Grid.Row="0" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
+                    <TextBlock Name="SpeedValueTextBlock" Grid.Row="0" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+
+                    <TextBlock Text="Distance:" Grid.Row="1" HorizontalAlignment="Left" FontWeight="Bold"/>
+                    <TextBlock Name="DistanceValueTextBlock" Grid.Row="1" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+
+                    <TextBlock Text="Power:" Grid.Row="2" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
+                    <TextBlock Name="PowerValueTextBlock" Grid.Row="2" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+                    
+                    <TextBlock Text="RPM:" Grid.Row="3" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
+                    <TextBlock Name="RpmValueTextBlock" Grid.Row="3" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+                    
+                    <TextBlock Text="HeartRate:" Grid.Row="4" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
+                    <TextBlock Name="HeartRateValueTextBlock" Grid.Row="4" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+                </Grid>
+        </GroupBox>
+        
+        <GroupBox Header="Data History" Grid.Row="1" Grid.Column="2" Margin="5">
+            
+        </GroupBox>
+
+        <!-- Chat section -->
+        <GroupBox Header="Chat" Grid.Row="1" Grid.Column="1" Margin="5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <!-- Text area for the chat history -->
+                <TextBox Grid.Row="0" Name="ChatHistoryBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+                <Grid Grid.Row="1">
+                    
+                    <!-- Text input for chat sending -->
+                    <TextBox Name="ChatInputTextBox" HorizontalAlignment="Stretch" Margin="5,5,60,5" >
+                        
+                    </TextBox>
+                    <!-- Button to send message -->
+                    <Button Name="SendButton" Content="Send" Click="SendPressed" HorizontalAlignment="Right" Width="50" Margin="5" />
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+        <!-- Settings section -->
+        <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Header="Settings" Margin="5">
+            
+            <!-- Add settings controls here -->
+           
+        </GroupBox>
+        
+        <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal">
+
+            <Button Name="StartSessie" Content="Start Sessie" Click="StartClientSessie"/>
+            <StackPanel >
+                <Button Name="StopButton" Content="Stop Sessie" Click="StopClientSessie"/>
+                <Button Name ="EmergencyStop" Content="EmergencyStop Sessie" Click="EmergencyStopClientSessie"/>
+            </StackPanel>
+        </StackPanel>
         
     </Grid>
 </Window>
