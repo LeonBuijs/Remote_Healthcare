@@ -40,6 +40,7 @@ public partial class Form : System.Windows.Forms.Form
 
             if (!connected)
             {
+                MessageBox.Show("Invalid login details", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
         }
@@ -61,6 +62,8 @@ public partial class Form : System.Windows.Forms.Form
             
         var loginMessage = $"0 {firstName} {lastName} {birthDate}";
         connection.SendMessage(loginMessage);
+        
+        Thread.Sleep(2500);
         
         return messageHandler.loggedIn;
     }

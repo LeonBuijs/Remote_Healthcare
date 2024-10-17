@@ -1,5 +1,4 @@
 using System;
-using System.Net.Sockets;
 using System.Text;
 using Client;
 
@@ -28,7 +27,7 @@ public class MessageHandler
         }
 
         var identifier = message[0];
-        var content = message.Substring(1);
+        var content = message.Substring(2);
 
         switch (identifier)
         {
@@ -87,10 +86,12 @@ public class MessageHandler
     {
         if (confirmation == "1")
         {
+            Console.WriteLine("Logging in");
             loggedIn = true;
         }
         else
         {
+            Console.WriteLine("Wrong username or password");
             loggedIn = false;
         }
     }

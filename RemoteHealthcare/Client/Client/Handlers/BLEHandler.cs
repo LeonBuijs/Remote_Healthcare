@@ -12,10 +12,11 @@ public class BLEHandler
         private static BikeData bikeData = new();
         private static BLE bleBike = new();
         private static BLE bleHeart = new ();
+        private static bool simulationMode;
 
         public BLEHandler()
         {
-            
+            TrySimulationMode();
         }
 
         /**
@@ -24,6 +25,11 @@ public class BLEHandler
          */
         public bool Start(string deviceId)
         {
+            if (simulationMode)
+            {
+                return false;
+            }      
+            
             if (DeviceAvailable(deviceId))
             {
                 Task.Run(async () =>
@@ -175,6 +181,11 @@ public class BLEHandler
          */
         public void SetResistance(byte resistance)
         {
+            if (simulationMode)
+            {
+                return;
+            }      
+
             byte resistancePage = 0x30;
             byte zero = 0x00;
             byte[] payload = [resistancePage, zero, zero, zero, zero, zero, zero, resistance];
@@ -183,13 +194,22 @@ public class BLEHandler
 
         /**
          * Methode om verbinding te maken met de simulator applicatie
+         * Als de sim niet live is, returnen
          */
-        private static void StartSimulation()
+        private static void TrySimulationMode()
         {
-            Console.WriteLine("SIMULATION MODE");
+            TcpClient tcpClient;
+            try
+            {
+                tcpClient = new TcpClient("127.0.0.1", 8080);
+            }
+            catch (Exception)
+            {
+                return;
+            }
 
-            var tcpClient = new TcpClient("127.0.0.1", 8080);
-
+            simulationMode = true;
+            
             while (true)
             {
                 var stream = tcpClient.GetStream();
