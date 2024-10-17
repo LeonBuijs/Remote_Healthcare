@@ -1,6 +1,8 @@
 ﻿using System.Net.Sockets;
+using System.Security.AccessControl;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Threading.Channels;
 
 class VRConnection
 {
@@ -9,7 +11,7 @@ class VRConnection
     public static void Main(string[] args)
     {
         // Stap 1
-        TcpClient tcpClient = new TcpClient();    
+        TcpClient tcpClient = new TcpClient();
         tcpClient.Connect("85.145.62.130", 6666);
         tcpClient.ReceiveTimeout = 10000;
         NetworkStream stream = tcpClient.GetStream();
@@ -17,11 +19,30 @@ class VRConnection
 
         CreateTunnel(stream);
         // Werkende methodes:
-        SetTime(stream, 0);
-        // CreateNode(stream);
+        // SetTime(stream, 0);
+        createTerrain(stream);
+        string uuid = CreateNode(stream);
 
-        
-        
+
+        // SendPacket(stream, "{\"id\" :" +
+        //                    "\"tunnel/send\", " +
+        //                    "\"data\" :" +
+        //                    "{\"dest\" :\"" +
+        //                    SessionID +
+        //                    "\", " +
+        //                    "\"data\" :" +
+        //                    "{\"id\" : \"scene/node/moveto\", " +
+        //                    "\"data\" :" +
+        //                    "{\"id\" : " + uuid + "," +
+        //                    "\"position\" : [ 0, 0, 0 ]," +
+        //                    "\"interpolate\" : \"linear\"," +
+        //                    "\"followheight\" : false," +
+        //                    "\"speed\" : 10," +
+        //                    "\"time\" : 10" +
+        //                    "}}}}");
+        // RecievePacket(stream);
+
+
         // SendPacket(stream, "{\"id\" : " +
         //                    "\"tunnel/send\", " +
         //                    "\"data\" :" +
@@ -31,15 +52,76 @@ class VRConnection
         //                    "\"data\" :" +
         //                    "{\"id\" : \"scene/panel/drawtext\", " +
         //                    "\"data\" : " +
-        //                    "{\"id\" : {1}, " +
+        //                    "{\"id\" : " + uuid + ", " +
         //                    "\"text\" : \"Hello World\", " +
-        //                    "\"position\" : [ 100.0, 100.0 ], " +
-        //                    "\"size\" : 128.0, " +
-        //                    "\"color\" : [ 0,0,0,1 ], }}}}");
+        //                    "\"position\" : [ 0.0, 0.0 ]" +
+        //                    "}}}}");
+        // RecievePacket(stream);
+
+
+        // SendPacket(stream, "{\"id\" : " +
+        //                    "\"tunnel/send\", " +
+        //                    "\"data\" :" +
+        //                    "{\"dest\" : \"" +
+        //                    SessionID +
+        //                    "\", " +
+        //                    "\"data\" :" +
+        //                    "{\"id\" : \"route/add\", " +
+        //                    "\"data\" : " +
+        //                    "\"id\" : " + uuid + "," +
+        //                    "{\"nodes\" : " +
+        //                    "[{\"pos\" : [ 0, 0, 0  ],\"dir\" :[ 5, 0, -5]}," +
+        //                    "{\"pos\" : [ 50, 0, 0 ],\"dir\" :[ 5, 0, 5]}," +
+        //                    "{\"pos\" : [ 50, 0, 50],\"dir\" :[ -5, 0, 5]}," +
+        //                    "{\"pos\" : [ 0, 0, 50 ],\"dir\" :[ -5, 0, -5]}]" +
+        //                    "}}}}");
         // RecievePacket(stream);
     }
 
-    private static void CreateNode(NetworkStream stream)
+    private static void createTerrain(NetworkStream stream)
+    {
+        int[] newArray = new int[256 * 256];
+
+        for (int i = 0; i < newArray.Length; i++)
+        {
+            newArray[i] = 0;
+        }
+        
+        StringBuilder jsonBuilder = new StringBuilder();
+        jsonBuilder.Append("[");
+
+        for (int i = 0; i < newArray.Length; i++)
+        {
+            jsonBuilder.Append(newArray[i]);
+
+            // Voeg een komma toe als dit niet het laatste element is
+            if (i < newArray.Length - 1)
+            {
+                jsonBuilder.Append(",");
+            }
+        }
+
+        jsonBuilder.Append("]");
+
+        // De resulterende JSON-string
+        string jsonString = jsonBuilder.ToString();
+        
+        SendPacket(stream, "{\"id\" : " +
+                           "\"tunnel/send\", " +
+                           "\"data\" :" +
+                           "{\"dest\" : \"" +
+                           SessionID +
+                           "\", " +
+                           "\"data\" :" +
+                           "{\"id\" : \"scene/terrain/add\", " +
+                           "\"data\" : " +
+                           "{\"size\" : [ 3, 3 ], " +
+                           "\"heights\" : " + jsonString +
+                           "}}}}");
+        RecievePacket(stream);
+    }
+
+    private static string CreateNode(NetworkStream stream)
     {
         SendPacket(stream, "{\"id\" :" +
                            "\"tunnel/send\", " +
@@ -50,30 +132,33 @@ class VRConnection
                            "\"data\" :" +
                            "{\"id\" : \"scene/node/add\", " +
                            "\"data\" :" +
-                           "{\"name\" : \"test\" " +
-                           // "\"components\" :" +
-                           // "{\"transform\" : " +
-                           // "{\"position\" : [ 0, 0, 0 ], " +
-                           // "\"scale\" : 1, " +
-                           // "\"rotation\" : [ 0, 0, 0 ]}," +
-                           // "\"model\" : " +
-                           // "{\"file\" : \"filename\", " +
+                           "{\"name\" : \"test\", " +
+                           "\"components\" : {" +
+                           "\"transform\" : " +
+                           "{\"position\" : [ 0, 0, 0 ], " +
+                           "\"scale\" : 1, " +
+                           "\"rotation\" : [ 0, 0, 0 ]}, " +
+                           "\"model\" : " +
+                           "{\"file\" : \"data/NetworkEngine/models/bike/bike.fbx\"}, " +
+
                            // "\"cullbackfaces\" : true, " +
                            // "\"animated\" : false, " +
-                           // "\"animation\" : \"animationname\"}," +
-                           // "\"terrain\" : " +
-                           // "{\"smoothnormals\" : true}, " +
+                           // "\"animation\" : \"animationname\"}" +
+                           "\"terrain\" : " +
+                           "{\"smoothnormals\" : true}" +
+
                            // "\"panel\" : " +
-                           // "{\"size\" : [ 1, 1 ], " +
+                           // "{\"size\" : [ 10, 10 ], " +
                            // "\"resolution\" : [ 512, 512 ], " +
                            // "\"background\" : [ 1, 1, 1, 1], " +
-                           // "\"castShadow\" : true}, " +
+                           // "\"castShadow\" : true}" +
+
                            // "\"water\" :" +
                            // "{\"size\" : [ 20, 20 ], " +
                            // "\"resolution\" : 0.1}
-                           "}}}}");
-        RecievePacket(stream);
-        RecievePacket(stream);
+                           "}}}}}");
+        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
 
     private static void SetTime(NetworkStream stream, int time)
@@ -89,7 +174,6 @@ class VRConnection
                            "\"data\" : " +
                            "{\"time\" : " + time + "}}}}");
         RecievePacket(stream);
-
     }
 
     private static void CreateTunnel(NetworkStream stream)
@@ -110,7 +194,7 @@ class VRConnection
                 ID = session["id"].ToString();
             }
         }
-        
+
         // Stap 4
         SendPacket(stream, "{\"id\" : " +
                            "\"tunnel/create\", " +
@@ -118,10 +202,10 @@ class VRConnection
                            "{\"session\" : \"" +
                            ID +
                            "\",}}");
-        
+
         jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         SessionID = jsonObject["data"]["id"].ToString();
-        
+
         // Stap 5
         SendPacket(stream, "{\"id\" : " +
                            "\"tunnel/send\", " +
@@ -138,7 +222,15 @@ class VRConnection
     private static void SendPacket(NetworkStream stream, string packetString)
     {
         var array = Encoding.ASCII.GetBytes(packetString);
-        byte[] prefix = new byte[] { (byte)array.Length, 0x00, 0x00, 0x00 };
+        int length = array.Length;
+        byte[] prefix = new byte[4];
+
+        // Zet de lengte in de relevante bytes
+        prefix[0] = (byte)(length & 0xFF); // Eerste byte (LSB)
+        prefix[1] = (byte)((length >> 8) & 0xFF); // Tweede byte
+        prefix[2] = (byte)((length >> 16) & 0xFF); // Derde byte
+        prefix[3] = (byte)((length >> 24) & 0xFF); // Vierde byte (MSB)      
+
         byte[] combinedArray = new byte[prefix.Length + array.Length];
         Array.Copy(prefix, 0, combinedArray, 0, prefix.Length);
         Array.Copy(array, 0, combinedArray, prefix.Length, array.Length);
@@ -152,10 +244,10 @@ class VRConnection
         // Uitlezen van de lengte
         var lengthBuffer = new byte[4];
         int bytesToRead = stream.Read(lengthBuffer, 0, lengthBuffer.Length);
-        
+
         int packetLength = BitConverter.ToInt32(lengthBuffer, 0);
         Console.WriteLine(packetLength);
-        
+
         int totalBytesRead = 0;
         var buffer = new byte[packetLength];
         var bytesRead = stream.Read(buffer, 0, buffer.Length);
