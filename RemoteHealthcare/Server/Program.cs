@@ -290,6 +290,25 @@ public class Server : IDoctorCallback, IClientCallback
     }
 
     /**
+     * Helper methode om een client te disconnecten van de server
+     */
+    private async Task DisconnectClient(Connection connection)
+    {
+        var client = getClientConnection(connection);
+
+        // Asynchroon berekenen van alle fietsdata
+        await fileManager.CalculateDataFromSession(client.Item1, client.Item2, client.Item1.SessionTime);
+        
+        foreach (var clientName in clients.Keys)
+        {
+            if (connection.Equals(clients[clientName].Connection))
+            {
+                clients.Remove(clientName);
+            }
+        }
+    }
+
+    /**
      * Helper methode om de login van een client af te handelen
      */
     private void ClientLogin(Connection connection, string[] messageParts)
@@ -340,25 +359,6 @@ public class Server : IDoctorCallback, IClientCallback
             fileManager.WriteToFile(
                 $"{fileManager.sessionDirectory}/{clientConnection.Item1.Name}/{clientConnection.Item1.SessionTime}",
                 bikeData);
-        }
-    }
-
-    /**
-     * Helper methode om een client te disconnecten van de server
-     */
-    private async Task DisconnectClient(Connection connection)
-    {
-        var client = getClientConnection(connection);
-
-        // Asynchroon berekenen van alle fietsdata
-        await fileManager.CalculateDataFromSession(client.Item1, client.Item2, client.Item1.SessionTime);
-        
-        foreach (var clientName in clients.Keys)
-        {
-            if (connection.Equals(clients[clientName].Connection))
-            {
-                clients.Remove(clientName);
-            }
         }
     }
 
