@@ -229,7 +229,7 @@ public class Server : IDoctorCallback, IClientCallback
     {
         var clientIndex = GetIndexClient(messageParts);
 
-        var sessions = fileManager.getAllClientSessions(clientIndex);
+        var sessions = fileManager.GetAllClientSessions(clientIndex);
 
         //geen sessie beschikbaar van client
         if (sessions == null)
@@ -297,7 +297,7 @@ public class Server : IDoctorCallback, IClientCallback
         var clientIndex = GetIndexClient(messageParts);
 
         // Controleert of client bestaat in het clientsbestand, zo ja toevoegen aan lijst met live clients
-        if (fileManager.CheckClientLogin(clientIndex))
+        if (fileManager.CheckClientLogin(clientIndex) && !clients.ContainsKey(clientIndex))
         {
             clients.Add(GetIndexClient(messageParts), new ClientConnection($"{clientIndex}", connection));
             connection.Access = true;
@@ -346,12 +346,16 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om een client te disconnecten van de server
      */
-    private async Task DisconnectClient(Connection connection)
+    private void DisconnectClient(Connection connection)
     {
         var client = getClientConnection(connection);
 
-        // Asynchroon berekenen van alle fietsdata
-        await fileManager.CalculateDataFromSession(client.Item1, client.Item2, client.Item1.SessionTime);
+        //Asynchroon berekenen van alle fietsdata
+        Task.Run(async () =>
+        {
+            await fileManager.CalculateDataFromSession(client.Item1, client.Item2, client.Item1.SessionTime);
+        });
+        
         
         foreach (var clientName in clients.Keys)
         {

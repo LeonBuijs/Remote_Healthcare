@@ -93,8 +93,9 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
 
                 Console.WriteLine("Client sent: " + received);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine(e);
                 doctorCallback.OnReceivedMessage("404", connection);
                 clientCallback.OnReceivedMessage("404", connection);
                 break;
