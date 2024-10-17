@@ -4,46 +4,37 @@ using System.Net.Sockets;
 namespace Server;
 
 /**
- * Klasse voor het afhandelen van de verbindingen tussen clients/artsen en de server
+ * Klasse voor het afhandelen van de verbindingen tussen clients/doctors en de server
  */
-public class ConnectionHandler
+public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback doctorCallback)
 {
-    private static List<Connection> clients = new();
-    private static List<Connection> artsen = new();
-
-    private IClientCallback clientCallback;
-    private IArtsCallback artsCallback;
-
-    public ConnectionHandler(IClientCallback clientCallback, IArtsCallback artsCallback)
-    {
-        this.clientCallback = clientCallback;
-        this.artsCallback = artsCallback;
-    }
+    public List<Connection> clients = [];
+    public List<Connection> doctors { get; } = [];
 
     public void Start()
     {
-        Thread ThreadClient = new Thread(OpenConnectionClient);
-        ThreadClient.Start();
+        var threadClient = new Thread(OpenConnectionClient);
+        threadClient.Start();
 
-        Thread ThreadArts = new Thread(OpenConnectionArts);
-        ThreadArts.Start();
+        var threadDoctor = new Thread(OpenConnectionDoctor);
+        threadDoctor.Start();
     }
 
     /**
-     * Methode voor het verbinden van artsen, er wordt gewacht voor een verbinding en bij een nieuwe verbinding
+     * Methode voor het verbinden van doctoren, er wordt gewacht voor een verbinding en bij een nieuwe verbinding
      * wordt er een nieuwe thread aangemaakt voor die verbinding en start het proces opnieuw
      */
-    private void OpenConnectionArts()
+    private void OpenConnectionDoctor()
     {
-        Console.WriteLine("Doctor Connection thread opened");
-        TcpListener listener = new TcpListener(IPAddress.Loopback, 7777);
+        var listener = new TcpListener(IPAddress.Loopback, 7777);
         listener.Start();
+
         while (true)
         {
-            Connection connectionClient = new Connection(listener.AcceptTcpClient());
-            artsen.Add(connectionClient);
-            Thread ThreadConnection = new Thread(() => HandleConnectionArts(connectionClient));
-            ThreadConnection.Start();
+            var connectionClient = new Connection(listener.AcceptTcpClient());
+            doctors.Add(connectionClient);
+            var threadConnection = new Thread(() => HandleConnectionDoctor(connectionClient));
+            threadConnection.Start();
         }
     }
 
@@ -53,34 +44,39 @@ public class ConnectionHandler
      */
     private void OpenConnectionClient()
     {
-        Console.WriteLine("Client Connection thread opened");
-        TcpListener listener = new TcpListener(IPAddress.Loopback, 6666);
+        var listener = new TcpListener(IPAddress.Loopback, 6666);
         listener.Start();
+
         while (true)
         {
-            Connection connectionClient = new Connection(listener.AcceptTcpClient());
+            var connectionClient = new Connection(listener.AcceptTcpClient());
             clients.Add(connectionClient);
-            Thread ThreadConnection = new Thread(() => HandleConnectionClient(connectionClient));
-            ThreadConnection.Start();
+            var threadConnection = new Thread(() => HandleConnectionClient(connectionClient));
+            threadConnection.Start();
         }
     }
 
     /**
-     * Methode voor het afhandelen van requests van de arts, met de callback wordt de server genotificeerd
+     * Methode voor het afhandelen van requests van de doctor, met de callback wordt de server genotificeerd
      */
-    private void HandleConnectionArts(Connection connection)
+    private void HandleConnectionDoctor(Connection connection)
     {
-        Boolean running = true;
-        while (running)
+        while (true)
         {
-            running = CheckConnection(connection);
-            var received = connection.Receive();
-            artsCallback.OnReceivedMessage(received, connection);
+            try
+            {
+                var received = connection.Receive();
+                doctorCallback.OnReceivedMessage(received, connection);
 
-            Console.WriteLine("Arts sent: " + received);
+                Console.WriteLine("Doctor sent: " + received);
+            }
+            catch (Exception)
+            {
+                break;
+            }
         }
 
-        artsen.Remove(connection);
+        doctors.Remove(connection);
     }
 
     /**
@@ -88,30 +84,23 @@ public class ConnectionHandler
      */
     private void HandleConnectionClient(Connection connection)
     {
-        Boolean running = true;
-        while (running)
+        while (true)
         {
-            running = CheckConnection(connection);
+            try
+            {
+                var received = connection.Receive();
+                clientCallback.OnReceivedMessage(received, connection);
 
-            var received = connection.Receive();
-            clientCallback.OnReceivedMessage(connection.Receive(), connection);
-
-            Console.WriteLine("Client sent: " + received);
+                Console.WriteLine("Client sent: " + received);
+            }
+            catch (Exception)
+            {
+                doctorCallback.OnReceivedMessage("404", connection);
+                clientCallback.OnReceivedMessage("404", connection);
+                break;
+            }
         }
 
         clients.Remove(connection);
-    }
-
-    /**
-     * Methode om te kijken of een client/arts nog verbonden is
-     */
-    private bool CheckConnection(Connection connectionClient)
-    {
-        return connectionClient.stream.Socket.Connected;
-    }
-
-    public static List<Connection> getClients()
-    {
-        return clients;
     }
 }

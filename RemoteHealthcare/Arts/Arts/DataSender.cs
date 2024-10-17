@@ -60,4 +60,19 @@ public class DataSender
     {
         Write($"7 {session}");
     }
+
+    public void GetClients()
+    {
+        Write("8");
+    }
+    
+    public void MakeClient(string clientInfo)
+    {
+        Write($"9 {clientInfo} ");
+    }
+    
+    public void ChosenClient(string clientInfo)
+    {
+        Write($"10 {clientInfo} ");
+    }
 }

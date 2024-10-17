@@ -8,15 +8,6 @@ namespace Server;
 //TODO: bepalen hoe de data opgeslagen wordt: hashen encrypten etc.
 public class FileManager
 {
-    //TODO: bestand voor beheren geregistreerde clients
-    //server stuurt data hiernaar en vergelijkt hashes om te kijken of het geldig is
-
-    //TODO: bestand voor beheren geregistreerde artsen
-    //server stuurt data hiernaar en vergelijkt hashes om te kijken of het geldig is
-
-    //TODO: bestand per geregistreerde client om sessie waardes op te slaan
-    //per client een mapje maken met alle historische data
-
     public string rootDirectory { get; set; }
     public string clientDirectory { get; set; }
     public string doctorDirectory { get; set; }
@@ -74,7 +65,14 @@ public class FileManager
     public void AddNewClient(string index)
     {
         //todo login hashen en/of encrypten
-        WriteToFile(clientDirectory + "/clientData.txt", $"{index}");
+        var path = sessionDirectory + "/" + index;
+
+
+        if (!Directory.Exists(path))
+        {
+            WriteToFile(clientDirectory + "/clientData.txt", $"{index}");
+            Directory.CreateDirectory(path);
+        }
     }
 
     /**
@@ -84,10 +82,14 @@ public class FileManager
     public List<string>? getAllClientSessions(string client)
     {
         List<string> allSessionData = new List<string>();
-        
-        string[] allSessions = Directory.GetFiles(sessionDirectory + "/" + client);
 
-        if (allSessions.Length == 0)
+        string[] allSessions;
+
+        try
+        {
+            allSessions = Directory.GetFiles(sessionDirectory + "/" + client);
+        }
+        catch (Exception e)
         {
             return null;
         }
@@ -121,7 +123,7 @@ public class FileManager
         //todo login hashen en/of encrypten
         WriteToFile(doctorDirectory + "/doctorData.txt", $"{username} {password}");
     }
-    
+
     /**
      * Methode die controleert of alle directories voor de files aangemaakt zijn, zo niet worden ze aangemaakt
      */
@@ -129,26 +131,28 @@ public class FileManager
     {
         rootDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal) + "/serverdata";
 
+        Console.WriteLine("Root directory: " + rootDirectory);
+
         clientDirectory = rootDirectory + "/clients";
         doctorDirectory = rootDirectory + "/doctors";
         sessionDirectory = rootDirectory + "/sessions";
 
-        if (Directory.Exists(rootDirectory))
+        if (!Directory.Exists(rootDirectory))
         {
             Directory.CreateDirectory(rootDirectory);
         }
 
-        if (Directory.Exists(clientDirectory))
+        if (!Directory.Exists(clientDirectory))
         {
             Directory.CreateDirectory(clientDirectory);
         }
 
-        if (Directory.Exists(doctorDirectory))
+        if (!Directory.Exists(doctorDirectory))
         {
             Directory.CreateDirectory(doctorDirectory);
         }
 
-        if (Directory.Exists(sessionDirectory))
+        if (!Directory.Exists(sessionDirectory))
         {
             Directory.CreateDirectory(sessionDirectory);
         }
@@ -172,5 +176,97 @@ public class FileManager
         }
 
         return ["File does not exist"];
+    }
+
+    // TODO: verder berekenen van data uit bestand, max en gemiddelde etc.
+    // TODO: mogelijk versimpelen van vergelijken van tijden
+    /**
+     * Async methode om gewenste waardes van een sessie te berekenen
+     * Na het berekenen van de gewenste waarden worden alle andere waarden vervangen in het bestand door de gewenste waarden
+     */
+    public async Task CalculateDataFromSession(ClientConnection connection, string clientName, string sessionTime)
+    {
+        Console.WriteLine("Calculating data from session: " + clientName);
+        
+        await Task.Run(() =>
+        {
+            Console.WriteLine("Calculating data from session in task: " + clientName);
+
+            var date = connection.SessionTime;
+
+            var duration = GetDuration(date);
+
+            // Lijsten waar alle data uit bestand in komt te staan
+            var allSpeeds = new List<int>();
+            var allHeartRates = new List<int>();
+
+            var filePath = $"{sessionDirectory}/{clientName}/{sessionTime}";
+
+            Console.WriteLine($"Calculating {filePath}");
+
+            var fileContents = ReadAllLines(filePath);
+
+            //Checks om te kijken of er geen foutieve waarden zijn
+            if (fileContents.Length == 0)
+            {
+                return;
+            }
+
+            if (fileContents[0].Equals("File does not exist"))
+            {
+                return;
+            }
+
+            // Verschillende data ophalen en uit string opsplitsen
+            foreach (var data in fileContents)
+            {
+                var split = data.Split(" ");
+
+                allSpeeds.Add(int.Parse(split[0]));
+                allHeartRates.Add(int.Parse(split[5]));
+            }
+
+            var averageSpeed = allSpeeds.Average();
+            var maxSpeed = allSpeeds.Max();
+
+            var averageHeartRate = allHeartRates.Average();
+            var maxHeartRate = allHeartRates.Max();
+
+            var calculatedData = $"{date} {duration} {averageSpeed} {maxSpeed} {averageHeartRate} {maxHeartRate}";
+
+            Console.WriteLine($"Calculated data: {calculatedData}");
+
+            File.WriteAllText(filePath, calculatedData);
+        });
+    }
+
+    /**
+     * Helper methode om de duratie van de sessie te verkrijgen
+     */
+    private static string GetDuration(string date)
+    {
+        // Verschil in tijd berekenen met DateTime objecten
+        var start = date.Split(" ");
+
+        var startDate = start[0].Split("-");
+        var startTime = start[1].Split("-");
+
+        var startYear = startDate[0];
+        var startDay = startDate[1];
+        var startMonth = startDate[2];
+
+        var startHour = startTime[0];
+        var startMinute = startTime[1];
+        var startSecond = startTime[2];
+
+        Console.WriteLine($"new date: {startYear} {startMonth} {startDay} {startHour} {startMinute} {startSecond}");
+
+        DateTime startDateTime = new DateTime(Convert.ToInt32(startYear), Convert.ToInt32(startMonth),
+            Convert.ToInt32(startDay), Convert.ToInt32(startHour), Convert.ToInt32(startMinute),
+            Convert.ToInt32(startSecond));
+
+        TimeSpan difference = DateTime.Now - startDateTime;
+        var duration = $"{difference.Hours}:{difference.Minutes}:{difference.Seconds}";
+        return duration;
     }
 }

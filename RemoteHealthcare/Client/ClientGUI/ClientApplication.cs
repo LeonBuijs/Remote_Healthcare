@@ -1,5 +1,6 @@
 using System.Net.Sockets;
 using System.Text;
+using Avans.TI.BLE;
 
 namespace ClientGUI
 {
@@ -9,23 +10,24 @@ namespace ClientGUI
         private NetworkStream _stream;
         private BikeDataSender _bikeDataSender;
         private BikeData _bikeData;
+        private MessageHandler _messageHandler;
 
         public NetworkStream Stream => _stream; // For MessageHandler class
         
-        
 
-        public ClientApplication(string ipAddress, int port)
+        public ClientApplication(string ipAddress, int port, BLE bleBike = null)
         {
             _client = new TcpClient(ipAddress, port);
             _stream = _client.GetStream();
             _bikeData = new BikeData();
             _bikeDataSender = new BikeDataSender(_client, _bikeData);
+            _messageHandler = new MessageHandler(this, _stream, bleBike);
         }
 
         public async Task Start()
         {
             await _bikeDataSender.SendBikeData();
-            // await _messageHandler.ReceiveMessages();
+            await _messageHandler.ReceiveMessages();
         }
 
         public async Task SendMessage(string message)

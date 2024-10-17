@@ -24,6 +24,12 @@
                 <ListBoxItem Content="Item 11"/>
                 <ListBoxItem Content="Item 12"/>
             </ListBox>
+            <Button Name="refreshButton" Content="Refresh" Click="RefreshClientsPressed"/>
+                <StackPanel Orientation="horizontal" Margin="10">
+                    <TextBox Name="ClientName" ></TextBox>
+                    <TextBox Name="ClientdateOfBirth" ></TextBox>
+                    <Button Name="MakeClientButton" Content="Create Client" Click="MakeClientPressed"></Button>
+                </StackPanel>
         </StackPanel>
         
     </Grid>

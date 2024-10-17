@@ -1,4 +1,4 @@
-<Window x:Class="Arts.LoginWindow"
+<Window x:Class="Arts.LoginWindowWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -24,7 +24,7 @@
                 <Label Content="To continue please login" FontWeight="Bold" FontSize="15" HorizontalAlignment="Left" Canvas.Left="75" Canvas.Top="48" VerticalAlignment="Top"/>
             </Canvas>
         </Border>
-        
+         
         <Grid>
             
             <Popup Name="MyPopup" StaysOpen="False" Placement="Mouse" AllowsTransparency="True">

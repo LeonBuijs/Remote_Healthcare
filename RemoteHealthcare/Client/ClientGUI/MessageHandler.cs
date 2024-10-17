@@ -9,12 +9,14 @@ namespace ClientGUI
     {
         private ClientApplication _clientApp;
         private NetworkStream _stream;
+        private BLE bleBike;
         
 
-        public MessageHandler(ClientApplication clientApp, NetworkStream stream)
+        public MessageHandler(ClientApplication clientApp, NetworkStream stream, BLE bike)
         {
             _clientApp = clientApp;
             _stream = stream;
+            bleBike = bike;
         }
 
         public async Task ReceiveMessages()
@@ -78,7 +80,15 @@ namespace ClientGUI
         {
             Console.WriteLine($"Bike resistance settings: {settings}");
             
-            // todo add SetResistance methode hier
+            if (byte.TryParse(settings, out byte resistance))
+            {
+                Program.setResistance(resistance, bleBike);
+                Console.WriteLine($"Resistance set to {resistance}");
+            }
+            else
+            {
+                Console.WriteLine("Invalid resistance value received");
+            }
         }
 
         private void HandleStartCommand()
