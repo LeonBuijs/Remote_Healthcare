@@ -12,9 +12,11 @@ public class NetworkProcessor
     private DataSender artsSender;
     private byte[] artsBuffer = new byte[128];
     private string totalBuffer;
-    private ILoginWindowCallback loginWindowCallback;
+    
+    public ILoginWindowCallback LoginWindowCallback { set; get; }
+    public IListWindowCallback ListWindowCallback { set; get; }
+    
     private List<IDataUpdateCallback> dataUpdateCallbacks = new List<IDataUpdateCallback>();
-    private List<string> clients = new List<string>();
     private List<string> clientsWhoRecieveData = new List<string>();
     private bool isAskingData = false;
 
@@ -37,7 +39,7 @@ public class NetworkProcessor
         catch (SocketException exception)
         {
             //Notificeert het inlog scherm dat de connectie is gefaald.
-            loginWindowCallback.ConnectionFailed();
+            LoginWindowCallback.ConnectionFailed();
         }
     }
     
@@ -86,10 +88,9 @@ public class NetworkProcessor
             case 0:
                 string argument = packetData[1];
                 Console.WriteLine($"Got login answer with argument {argument}");
-                loginWindowCallback.OnLogin(argument);
+                LoginWindowCallback.OnLogin(argument);
                 break;
             case 1:
-                //todo make parameters
                 string clientId = packetData[1].Replace(";", " ");
                 string data = packetData[2].Replace(";", " ");
                 Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");
@@ -97,10 +98,9 @@ public class NetworkProcessor
                 dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
                 break;
             case 2:
-                if (!clients.Contains(packetData[1].Replace(";", " ")))
-                {
-                    clients.Add(packetData[1].Replace(";", " "));
-                }
+                string newClientId = packetData[1].Replace(";", " ");
+                Console.WriteLine($"Kreeg clientId {newClientId}");
+                ListWindowCallback.AddNewClient(newClientId);
                 break;
             case 3:
                 break;
@@ -159,24 +159,13 @@ public class NetworkProcessor
         artsSender.MakeClient(clientInfo);
     }
 
-    public void SetLoginCallback(ILoginWindowCallback windowCallback)
-    {
-        loginWindowCallback = windowCallback;
-    }
-    
-    public List<string> GetClientList()
-    {
-        return clients;
-    }
-
     public void GetRealtimeData(string clientInfo)
     {
-            artsSender.ChosenClient(clientInfo);
+        artsSender.ChosenClient(clientInfo);
     }
 
-    public void refreshClientList()
+    public void RefreshClientList()
     {
-        clients.Clear();
         artsSender.GetClients();
     }
 
@@ -198,6 +187,5 @@ public class NetworkProcessor
     public void SendMessage(string clientInfo, string text)
     {
         artsSender.SendMessageToSession(clientInfo, text);
-        
     }
 }

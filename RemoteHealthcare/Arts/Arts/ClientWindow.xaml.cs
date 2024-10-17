@@ -21,8 +21,8 @@ public partial class ClientWindow : Window, IDataUpdateCallback
      * Methode die controleert of deze window de client is waarvan een update is gestuurd.
      * Bij true zal het GUI worden aangepast met de nieuwe waardes.
      * </summary>
-     * <param name="clientId">The id of the client which the data originates from</param>>
-     * <param name="data">The data itself, containing the speed, distance etc.</param>
+     * <param name="clientId">De naam en geboortedatum van de client</param>>
+     * <param name="data">De data van de client, zoals snelheid enz</param>
      */
     public void UpdateData(string clientId, string data)
     {

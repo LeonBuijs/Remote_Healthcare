@@ -19,7 +19,7 @@ public partial class Program : Application
         LoginWindowWindow loginWindowWindow = new LoginWindowWindow();
         
         //Zet een callback voor het antwoord op de login.
-        networkProcessor.SetLoginCallback(loginWindowWindow);
+        networkProcessor.LoginWindowCallback = loginWindowWindow;
         
         loginWindowWindow.networkProcessor = networkProcessor;
         loginWindowWindow.Show();

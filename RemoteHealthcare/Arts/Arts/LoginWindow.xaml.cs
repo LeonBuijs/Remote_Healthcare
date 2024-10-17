@@ -5,7 +5,7 @@ namespace Arts;
 
 public partial class LoginWindowWindow : Window, ILoginWindowCallback
 {
-    public NetworkProcessor networkProcessor { get; set; }
+    public NetworkProcessor networkProcessor;
 
     public LoginWindowWindow()
     {

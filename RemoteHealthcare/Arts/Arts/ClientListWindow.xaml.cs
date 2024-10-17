@@ -1,16 +1,21 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;      
 
 namespace Arts;
 
-public partial class ClientListWindow : Window
+public partial class ClientListWindow : Window, IListWindowCallback
 {
     private NetworkProcessor networkProcessor;
+    private ObservableCollection<string> fileNames;
     public ClientListWindow(NetworkProcessor networkProcessor)
     {
         InitializeComponent();
         this.networkProcessor = networkProcessor;
-        // Refresh();
+        fileNames = new ObservableCollection<string>();
+        ItemList.ItemsSource = fileNames;
+        networkProcessor.ListWindowCallback = this;
+        Refresh();
 
     }
 
@@ -20,16 +25,16 @@ public partial class ClientListWindow : Window
      */
     private void ChosenClient(object sender, SelectionChangedEventArgs e)
     {
-        if (ItemList.SelectedItem is ListBoxItem client)
+        if (ItemList.SelectedItem is string client)
         {
             //Get chosen clientId
-            string? clientId = client.Content.ToString();
+            string? clientId = client;
             
             MessageBox.Show($"Je hebt {clientId} geselecteerd.");
             
             ClientWindow clientWindow = new ClientWindow(clientId, networkProcessor);
             clientWindow.Show();
-            Console.WriteLine(client.Content);
+            Console.WriteLine(client);
         }
     }
 
@@ -45,9 +50,43 @@ public partial class ClientListWindow : Window
 
     private void Refresh()
     {
-        networkProcessor.refreshClientList();
-        List<string> newClients = networkProcessor.GetClientList();
-        ItemList.Items.Clear();
-        newClients.ForEach(value => ItemList.Items.Add(value));
+        fileNames.Clear();
+        networkProcessor.RefreshClientList();
+    }
+
+    /**
+     * <summary>
+     * Methode die een nieuwe client aan de lijst toevoegd.
+     * Als de client al in de list zit zal hij returnen en niks toevoegen.
+     * </summary>
+     * <param name="clientId">De client naam en geboortedatum</param>
+     */
+    public void AddNewClient(string clientId)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (fileNames.Contains(clientId))
+                return;
+
+            fileNames.Add(clientId);
+        });
+    }
+
+    /**
+     * <summary>
+     * Methode die een client verwijdert van de lijst
+     * Als de client niet bestaat zal hij returnen.
+     * </summary>
+     * <param name="clientId">De client naam en geboortedatum</param>
+     */
+    public void RemoveClient(string clientId)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            if (!fileNames.Contains(clientId))
+                return;
+        
+            fileNames.Remove(clientId);
+        });
     }
 }
