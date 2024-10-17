@@ -14,14 +14,12 @@ public partial class Program : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        NetworkProcessor networkProcessor = new NetworkProcessor();
+        
         
         LoginWindowWindow loginWindowWindow = new LoginWindowWindow();
         
         //Zet een callback voor het antwoord op de login.
-        networkProcessor.LoginWindowCallback = loginWindowWindow;
         
-        loginWindowWindow.networkProcessor = networkProcessor;
         loginWindowWindow.Show();
     }
 
@@ -37,6 +35,5 @@ public partial class Program : Application
         base.OnExit(e);
         Environment.Exit(0);
     }
-
-
+    
 }

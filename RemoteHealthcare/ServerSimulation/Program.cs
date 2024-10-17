@@ -5,12 +5,17 @@ public class ServerSimulation():IDoctorCallback, IClientCallback
     private static List<TestClient> clients = [];
     public static void Main(string[] args)
     {
+        Start();
+    }
+
+    public static void Start()
+    {
         clients.Add(new TestClient("Frodo", "Baggins", "20022003"));
         clients.Add(new TestClient("Biba", "Beer", "03071987"));
         clients.Add(new TestClient("jaap", "ZonderBroek", "01121960"));
         clients.Add(new TestClient("jasmien", "Waterpad", "19052012"));
-     ServerSimulation simulation = new ServerSimulation();
-     simulation.SetCallbacks();
+        ServerSimulation simulation = new ServerSimulation();
+        simulation.SetCallbacks();
     }
 
     private void SetCallbacks()

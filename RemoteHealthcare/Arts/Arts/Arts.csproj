@@ -17,4 +17,8 @@
       </Compile>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\Simulation\Simulation.csproj" />
+    </ItemGroup>
+
 </Project>

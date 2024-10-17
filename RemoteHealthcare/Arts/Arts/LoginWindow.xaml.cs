@@ -6,6 +6,7 @@ namespace Arts;
 public partial class LoginWindowWindow : Window, ILoginWindowCallback
 {
     public NetworkProcessor networkProcessor;
+    private string ipAddress;
 
     public LoginWindowWindow()
     {
@@ -21,6 +22,14 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
      */
     private void OnLoginClick(object sender, RoutedEventArgs e)
     {
+        if (ipAddress != IpAdressBox.Text)
+        {
+            ipAddress = IpAdressBox.Text;
+            NetworkProcessor networkProcessor = new NetworkProcessor(ipAddress);
+            networkProcessor.LoginWindowCallback = this;
+        }
+        
+        
         string username = UsernameBox.Text;
         string password = PasswordBox.Password;
         Console.WriteLine($"Username: {username}\nPassword: {password}");
@@ -92,7 +101,7 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
             MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (result == MessageBoxResult.Yes)
         {
-            networkProcessor.ConnectToServer();
+            networkProcessor.ConnectToServer(ipAddress);
         } else
         {
             Close();

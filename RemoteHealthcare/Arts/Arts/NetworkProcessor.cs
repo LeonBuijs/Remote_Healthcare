@@ -20,18 +20,18 @@ public class NetworkProcessor
     private List<string> clientsWhoRecieveData = new List<string>();
     private bool isAskingData = false;
 
-    public NetworkProcessor()
+    public NetworkProcessor(string ipAdres)
     {
         artsClient = new TcpClient();
-        ConnectToServer();
+        ConnectToServer(ipAdres);
     }
     
-    public async void ConnectToServer()
+    public async void ConnectToServer(string ipAdres)
     {
         //todo verander de host en poortnummer
         try
         {
-            await artsClient.ConnectAsync("127.0.0.1", 7777);
+            await artsClient.ConnectAsync(ipAdres, 7777);
             //won't come here until it has connection.
             new Thread(OnConnect).Start(); 
             artsSender = new DataSender(artsClient.GetStream());
