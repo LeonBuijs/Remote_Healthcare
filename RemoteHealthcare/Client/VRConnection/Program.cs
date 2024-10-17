@@ -20,12 +20,33 @@ class VRConnection
         CreateTunnel(stream);
         // Werkende methodes:
         // SetTime(stream, 0);
-        // string uuidBike = CreateNodeForBike(stream);
+        string uuidBike = CreateNodeForBike(stream);
         // string uuidTerrain = CreateNodeForTerrain(stream);
 
         string uuidRoute = CreateRoute(stream);
-        
         CreateRoad(stream, uuidRoute);
+        
+        SendPacket(stream, "{\"id\" : " +
+                           "\"tunnel/send\", " +
+                           "\"data\" :" +
+                           "{\"dest\" : \"" +
+                           SessionID +
+                           "\", " +
+                           "\"data\" :" +
+                           "{\"id\" : \"route/follow\", " +
+                           "\"data\" : " +
+                           "{\"route\" : \"" + uuidRoute + "\"," +
+                           "\"node\" : \"" + uuidBike + "\"," + 
+                           "\"speed\" : 69.0," +
+                           "\"offset\" : 0.0," +
+                           "\"rotate\" : \"XZ\"," +
+                           "\"smoothing\" : 1.0," +
+                           "\"followHeight\" : false," +
+                           "\"rotateOffset\" : [ 0, 0, 0 ]," +
+                           "\"positionOffset\" : [ 0, 0, 0]" +
+                           "}}}}");
+
+        RecievePacket(stream);
 
 
         // SendPacket(stream, "{\"id\" : " +
