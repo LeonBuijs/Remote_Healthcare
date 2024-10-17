@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Windows;
 
 namespace Arts;
@@ -59,6 +60,14 @@ public partial class ClientWindow : Window, IDataUpdateCallback
     private void StopClientSessie(object sender, RoutedEventArgs e)
     {
         networkProcessor.StopClientSessie(clientId);
+        Dispatcher.Invoke(() =>
+            {
+                SpeedValueTextBlock.Text = null;
+                DistanceValueTextBlock.Text = null;
+                PowerValueTextBlock.Text = null;
+                RpmValueTextBlock.Text = null;
+                HeartRateValueTextBlock.Text = null;
+            });
     }
     private void EmergencyStopClientSessie(object sender, RoutedEventArgs e)
     {
@@ -71,5 +80,18 @@ public partial class ClientWindow : Window, IDataUpdateCallback
             networkProcessor.SendMessage(clientId, ChatInputTextBox.Text);
             ChatHistoryBox.Text += ChatInputTextBox.Text + "\n\n";
         }
+    }
+
+    private void ConfirmResistancePressed(object sender, RoutedEventArgs e)
+    {
+        //Pak de slider waarde en stuur het door naar de server
+        //InvariantCulture zorgt voor een punt ("10.0") en niet een comma ("10,0")
+        string resistanceValue = ResistanceSlider.Value.ToString("0.0", CultureInfo.InvariantCulture);
+        networkProcessor.SendConfigs(clientId, resistanceValue);
+    }
+
+    private void GetHistoryClicked(object sender, RoutedEventArgs e)
+    {
+        
     }
 }

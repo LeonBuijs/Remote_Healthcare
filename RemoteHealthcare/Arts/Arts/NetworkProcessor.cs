@@ -191,8 +191,18 @@ public class NetworkProcessor
         artsSender.EmergencyStopSession(clientInfo);
     }
 
-    public void SendMessage(string clientInfo, string text)
+    public void SendConfigs(string session, string resistance)
     {
-        artsSender.SendMessageToSession(clientInfo, text);
+        artsSender.SendBikeConfigs(session, resistance);
+    }
+    
+    public void SendMessage(string clientInfo, string messege)
+    {
+        artsSender.SendMessageToSession(clientInfo, messege);
+    }
+
+    public void SendMessageToAll(string message)
+    {
+        artsSender.SendMessageToAllSessions(message);
     }
 }

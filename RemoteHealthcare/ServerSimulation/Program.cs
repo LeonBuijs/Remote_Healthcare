@@ -2,7 +2,7 @@
  
 public class ServerSimulation():IDoctorCallback, IClientCallback
 {
-    private static List<TestClient> clients = new List<TestClient>();
+    private static List<TestClient> clients = [];
     public static void Main(string[] args)
     {
         clients.Add(new TestClient("Frodo", "Baggins", "20022003"));

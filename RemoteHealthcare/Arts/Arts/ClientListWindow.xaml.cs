@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;      
 
@@ -45,7 +46,21 @@ public partial class ClientListWindow : Window, IListWindowCallback
 
     private void MakeClientPressed(object sender, RoutedEventArgs routedEventArgs)
     {
-        networkProcessor.MakeClient(ClientName.Text + " " + ClientdateOfBirth.Text);
+        if (IsValidInput(ClientdateOfBirth.Text))
+        {
+            networkProcessor.MakeClient(ClientName.Text + " " + ClientdateOfBirth.Text.Replace("-",""));
+            invalidDob.Visibility = Visibility.Hidden;
+            ClientName.Text = "";
+            ClientdateOfBirth.Text = "";
+            string content = "Client has been added";
+            string title = "Success!";
+            MessageBox.Show(content, title);
+        }
+        else
+        {
+            invalidDob.Visibility = Visibility.Visible;
+        }
+        
     }
 
     private void Refresh()
@@ -53,6 +68,13 @@ public partial class ClientListWindow : Window, IListWindowCallback
         fileNames.Clear();
         networkProcessor.RefreshClientList();
     }
+    
+    private bool IsValidInput(string text)
+    {
+        Regex regex = new Regex("^(0[1-9]|[12][0-9]|3[01])-(0[1-9]|1[0-2])-\\d{4}$");
+        return regex.IsMatch(text);
+    }
+
 
     /**
      * <summary>
@@ -88,5 +110,10 @@ public partial class ClientListWindow : Window, IListWindowCallback
         
             fileNames.Remove(clientId);
         });
+    }
+
+    private void ChatButtonPressed(object sender, RoutedEventArgs e)
+    {
+        networkProcessor.SendMessageToAll(ChatTextBox.Text);
     }
 }
