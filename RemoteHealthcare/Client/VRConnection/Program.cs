@@ -24,6 +24,8 @@ class VRConnection
         // string uuidTerrain = CreateNodeForTerrain(stream);
 
         string uuidRoute = CreateRoute(stream);
+        
+        CreateRoad(stream, uuidRoute);
 
 
         // SendPacket(stream, "{\"id\" : " +
@@ -40,6 +42,22 @@ class VRConnection
         //                    "\"position\" : [ 0.0, 0.0 ]" +
         //                    "}}}}");
         // RecievePacket(stream);
+    }
+
+    private static void CreateRoad(NetworkStream stream, string uuidRoute)
+    {
+        SendPacket(stream, "{\"id\" : " +
+                           "\"tunnel/send\", " +
+                           "\"data\" :" +
+                           "{\"dest\" : \"" +
+                           SessionID +
+                           "\", " +
+                           "\"data\" :" +
+                           "{\"id\" : \"scene/road/add\", " +
+                           "\"data\" : " +
+                           "{\"route\" : \""+ uuidRoute + "\"" +
+                           "}}}}");
+        RecievePacket(stream);
     }
 
     private static string CreateRoute(NetworkStream stream)
