@@ -1,27 +1,29 @@
 using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using Avans.TI.BLE;
+using Client;
 
 namespace ClientGUI
 {
     public class MessageHandler
     {
-        private ClientApplication _clientApp;
-        private NetworkStream _stream;
-        private BLE bleBike;
+        private ClientApplication clientApp;
+        private NetworkStream stream;
+        private BikeData bikeData;
         
 
-        public MessageHandler(ClientApplication clientApp, NetworkStream stream, BLE bike)
+        public MessageHandler(ClientApplication clientApp, NetworkStream stream, BikeData bikeData)
         {
-            _clientApp = clientApp;
-            _stream = stream;
-            bleBike = bike;
+            this.clientApp = clientApp;
+            this.stream = stream;
+            this.bikeData = bikeData;
         }
 
         public async Task ReceiveMessages()
         {
-            NetworkStream stream = _clientApp.Stream;
+            NetworkStream stream = clientApp.Stream;
 
             while (true)
             {
@@ -82,7 +84,7 @@ namespace ClientGUI
             
             if (byte.TryParse(settings, out byte resistance))
             {
-                Program.setResistance(resistance, bleBike);
+                Program.setResistance(resistance);
                 Console.WriteLine($"Resistance set to {resistance}");
             }
             else
