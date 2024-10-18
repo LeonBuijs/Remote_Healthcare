@@ -23,21 +23,21 @@ class VRConnection
         // Werkende methodes:
         // SetTime(stream, 0);
 
-        // string uuidBike = CreateNodeForBike(stream);
+        string uuidBike = CreateNodeForBike(stream);
         // string uuidTerrain = CreateNodeForTerrain(stream);
 
-        // string uuidRoute = CreateRoute(stream);
-        // CreateRoad(stream, uuidRoute);
+        string uuidRoute = CreateRoute(stream);
+        CreateRoad(stream, uuidRoute);
 
-        // FollowRoute(stream, uuidRoute, uuidBike);
-        //
-        // ChangeFollowRouteSpeed(stream, uuidBike, 50.0);
-        //
-        // AttachCameraToBike(stream, uuidBike);
+        FollowRoute(stream, uuidRoute, uuidBike);
+        
+        ChangeFollowRouteSpeed(stream, uuidBike, 50.0);
+        
+        AttachCameraToBike(stream, uuidBike);
 
-        string uuidPanel = CreateNodeForPanel(stream);
-        DrawTextOnPanel(stream, "Hello World", uuidPanel);
-        SwapPanel(stream, uuidPanel);
+        // string uuidPanel = CreateNodeForPanel(stream);
+        // DrawTextOnPanel(stream, "Hello World", uuidPanel);
+        // SwapPanel(stream, uuidPanel);
     }
 
     /**
@@ -78,7 +78,7 @@ class VRConnection
         });
         RecievePacket(stream);
     }
-    
+
     /**
      * Methode die een node maakt waardoor het panel weergegeven kan worden.
      */
@@ -136,7 +136,7 @@ class VRConnection
             parent = uuidBike,
             transform = new
             {
-                position = new[] { 1, 0, 2 },
+                position = new[] { -2, 0, 0 },
                 scale = 1,
                 rotation = new[] { 0, 90, 0 }
             }
@@ -237,10 +237,17 @@ class VRConnection
         {
             nodes = new[]
             {
-                new { pos = new[] { 0, 0, 0 }, dir = new[] { 5, 0, -5 }, },
-                new { pos = new[] { 50, 0, 0 }, dir = new[] { 5, 0, 5 }, },
-                new { pos = new[] { 50, 0, 50 }, dir = new[] { -5, 0, 5 }, },
-                new { pos = new[] { 0, 0, 50 }, dir = new[] { -5, 0, -5 }, }
+                new { pos = new[] { 0, 0, 0 }, dir = new[] { 5, 0, 0 }},
+                new { pos = new[] { 40, 0, 0 }, dir = new[] { 5, 0, 2 }},
+                new { pos = new[] { 75, 0, 20 }, dir = new[] { 3, 0, 3 }},
+                new { pos = new[] { 100, 0, 50 }, dir = new[] { 0, 0, 5 }},
+                new { pos = new[] { 100, 0, 100 }, dir = new[] { -3, 0, 3 }},
+                new { pos = new[] { 75, 0, 125 }, dir = new[] { -5, 0, 2 }},
+                new { pos = new[] { 40, 0, 140 }, dir = new[] { -5, 0, -2 }},
+                new { pos = new[] { 0, 0, 125 }, dir = new[] { -3, 0, -3 }},
+                new { pos = new[] { -25, 0, 100 }, dir = new[] { 0, 0, -5 }},
+                new { pos = new[] { -25, 0, 50 }, dir = new[] { 3, 0, -3 }},
+                new { pos = new[] { 0, 0, 25 }, dir = new[] { 5, 0, 0 }}
             }
         });
 
