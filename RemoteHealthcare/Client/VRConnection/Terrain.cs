@@ -31,7 +31,7 @@ public class Terrain : VREngine
     /**
      * Methode die een node aanmaakt voor een terrein, hierdoor kan het terrein weergegeven worden in de simulator.
      */
-    private static string CreateNodeForTerrain(NetworkStream stream)
+    public static string CreateNodeForTerrain(NetworkStream stream)
     {
         createTerrain(stream);
         SendThroughTunnel(stream, "scene/node/add", new

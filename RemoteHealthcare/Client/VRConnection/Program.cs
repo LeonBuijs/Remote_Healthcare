@@ -26,7 +26,7 @@ public class VREngine
         DeleteStartingNodes(stream);
 
         string uuidBike = CreateNodeForBike(stream);
-        string uuidTerrain = CreateNodeForTerrain(stream);
+        string uuidTerrain = Terrain.CreateNodeForTerrain(stream);
 
         string uuidRoute = Route.CreateRoute(stream);
         Route.CreateRoad(stream, uuidRoute);
