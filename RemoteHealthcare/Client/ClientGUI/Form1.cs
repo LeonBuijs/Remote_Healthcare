@@ -17,9 +17,9 @@ namespace ClientGUI
 
         private async void connectButton_Click(object sender, EventArgs e)
         {
-            string firstName = _firstNameTextBox.Text;
-            string lastName = _lastNameTextBox.Text;
-            string birthDate = _birthDateTextBox.Text;
+            string firstName = firstNameTextBox.Text;
+            string lastName = lastNameTextBox.Text;
+            string birthDate = birthDateTextBox.Text;
 
             // Verification
             if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(birthDate))

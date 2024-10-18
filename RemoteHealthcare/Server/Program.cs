@@ -229,7 +229,7 @@ public class Server : IDoctorCallback, IClientCallback
     {
         var clientIndex = GetIndexClient(messageParts);
 
-        var sessions = fileManager.getAllClientSessions(clientIndex);
+        var sessions = fileManager.GetAllClientSessions(clientIndex);
 
         //geen sessie beschikbaar van client
         if (sessions == null)
@@ -297,7 +297,7 @@ public class Server : IDoctorCallback, IClientCallback
         var clientIndex = GetIndexClient(messageParts);
 
         // Controleert of client bestaat in het clientsbestand, zo ja toevoegen aan lijst met live clients
-        if (fileManager.CheckClientLogin(clientIndex))
+        if (fileManager.CheckClientLogin(clientIndex) && !clients.ContainsKey(clientIndex))
         {
             clients.Add(GetIndexClient(messageParts), new ClientConnection($"{clientIndex}", connection));
             connection.Access = true;
@@ -314,17 +314,7 @@ public class Server : IDoctorCallback, IClientCallback
      */
     private void ReceiveBikeData(Connection connection, string[] messageParts)
     {
-        ClientConnection clientConnection = null;
-
-        // Door middel van connection kijken welke client het in de lijst is
-        foreach (var client in clients)
-        {
-            if (client.Value.Connection == connection)
-            {
-                clientConnection = client.Value;
-                break;
-            }
-        }
+        var clientConnection = getClientConnection(connection);
 
         // Mocht er een fout optreden, returnen
         if (clientConnection == null)
@@ -342,22 +332,31 @@ public class Server : IDoctorCallback, IClientCallback
                        $"{messageParts[5]} {messageParts[6]}";
 
         // Live data opslaan in object van client
-        clientConnection.LiveData = bikeData;
+        clientConnection.Item1.LiveData = bikeData;
 
         // Huidige meting van bikeData opslaan in file
-        if (clientConnection.InSession)
+        if (clientConnection.Item1.InSession)
         {
             fileManager.WriteToFile(
-                $"{fileManager.sessionDirectory}/{clientConnection.Name}/{clientConnection.SessionTime}",
+                $"{fileManager.sessionDirectory}/{clientConnection.Item1.Name}/{clientConnection.Item1.SessionTime}",
                 bikeData);
         }
     }
-    
+
     /**
      * Helper methode om een client te disconnecten van de server
      */
     private void DisconnectClient(Connection connection)
     {
+        var client = getClientConnection(connection);
+
+        //Asynchroon berekenen van alle fietsdata
+        Task.Run(async () =>
+        {
+            await fileManager.CalculateDataFromSession(client.Item1, client.Item2, client.Item1.SessionTime);
+        });
+        
+        
         foreach (var clientName in clients.Keys)
         {
             if (connection.Equals(clients[clientName].Connection))
@@ -372,6 +371,11 @@ public class Server : IDoctorCallback, IClientCallback
      */
     private static string GetIndexClient(string[] messageParts)
     {
+        if (messageParts.Length < 4)
+        {
+            return "";
+        }
+
         return $"{messageParts[1]} {messageParts[2]} {messageParts[3]}";
     }
 
@@ -388,5 +392,19 @@ public class Server : IDoctorCallback, IClientCallback
                 client.Value.Connection.Send(command);
             }
         }
+    }
+
+    private Tuple<ClientConnection, string> getClientConnection(Connection connection)
+    {
+        // Door middel van connection kijken welke client het in de lijst is
+        foreach (var client in clients)
+        {
+            if (client.Value.Connection == connection)
+            {
+                return new Tuple<ClientConnection, string>(client.Value, client.Key);
+            }
+        }
+
+        return null;
     }
 }

@@ -78,10 +78,9 @@ public class FileManager
     /**
      * Methode om sessies van client op te halen
      */
-    //todo
-    public List<string>? getAllClientSessions(string client)
+    public List<string>? GetAllClientSessions(string client)
     {
-        List<string> allSessionData = new List<string>();
+        var allSessionData = new List<string>();
 
         string[] allSessions;
 
@@ -96,23 +95,25 @@ public class FileManager
 
         foreach (var session in allSessions)
         {
-            allSessionData.Add(getDataFromSession(session));
+            allSessionData.Add(GetDataFromSession(session));
         }
 
         return allSessionData;
     }
 
     /**
-     * Methode voor het omrekenen van data uit het bestand en zet het in een string waarde
+     * Methode voor het lezen van de inhoud van het bestand
      */
-    private string getDataFromSession(string session)
+    private static string GetDataFromSession(string session)
     {
         var fileContents = File.ReadAllLines(session);
 
-        var split = session.Split("/");
-        var sessionDate = split[split.Length - 1].Replace(".txt", "");
-        //TODO file uitlezen en data berekenen
-        return $"{sessionDate} ";
+        if (fileContents.Length > 1)
+        {
+            return fileContents[0];
+        }
+
+        return "";
     }
 
     /**
