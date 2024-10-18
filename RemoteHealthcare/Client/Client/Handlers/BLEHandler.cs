@@ -210,6 +210,7 @@ public class BLEHandler
 
             simulationMode = true;
             
+            // todo op thread zetten
             while (true)
             {
                 var stream = tcpClient.GetStream();

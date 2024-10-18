@@ -1,5 +1,7 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using ClientGUI;
@@ -67,6 +69,11 @@ public partial class Form : System.Windows.Forms.Form
     private bool ConnectToServer(string ip, string deviceId, string firstName, string lastName, string birthDate)
     {
         // bleHandler.Start(deviceId); todo
+        
+        // Process firstProc = new Process();
+        // firstProc.StartInfo.FileName = "C:\\Users\\jaspe\\RiderProjects\\Remote_Healthcare\\RemoteHealthcare\\Client\\VRConnection\\bin\\Debug\\net8.0\\VRConnection.exe";
+        //
+        // firstProc.Start();
 
         connection = new Connection(ip, 6666, messageHandler);
 
