@@ -9,19 +9,19 @@ public class Route : VREngine
      * Methode die de snelheid aanpast waarmee een node een route volgt,
      * je geeft de uuid van de node mee met de snelheid die je wilt instellen.
      */
-    public static void ChangeFollowRouteSpeed(NetworkStream stream, string uuidBike, double speed)
+    public static void ChangeFollowRouteSpeed(string uuidBike, double speed)
     {
-        SendThroughTunnel(stream, "route/follow/speed", new { node = uuidBike, speed = speed });
-        RecievePacket(stream);
+        SendThroughTunnel("route/follow/speed", new { node = uuidBike, speed = speed });
+        RecievePacket();
     }
 
     /**
      * Methode die een node een route laat volgen,
      * je geeft de uuid van de route mee en de uuid van de node die deze route moet volgen.
      */
-    public static void FollowRoute(NetworkStream stream, string uuidRoute, string uuidBike)
+    public static void FollowRoute(string uuidRoute, string uuidBike)
     {
-        SendThroughTunnel(stream, "route/follow", new
+        SendThroughTunnel("route/follow", new
         {
             route = uuidRoute,
             node = uuidBike,
@@ -34,24 +34,24 @@ public class Route : VREngine
             positionOffset = new[] { 0, 0, 0 }
         });
 
-        RecievePacket(stream);
+        RecievePacket();
     }
 
     /**
      * Methode die een road aanmaakt op een route, je geeft de uuid van de route mee.
      */
-    public static void CreateRoad(NetworkStream stream, string uuidRoute)
+    public static void CreateRoad(string uuidRoute)
     {
-        SendThroughTunnel(stream, "scene/road/add", new { route = uuidRoute });
-        RecievePacket(stream);
+        SendThroughTunnel("scene/road/add", new { route = uuidRoute });
+        RecievePacket();
     }
 
     /**
      * Methode die een route aanmaakt door middel van een aantal punten.
      */
-    public static string CreateRoute(NetworkStream stream)
+    public static string CreateRoute()
     {
-        SendThroughTunnel(stream, "route/add", new
+        SendThroughTunnel("route/add", new
         {
             nodes = new[]
             {
@@ -69,7 +69,7 @@ public class Route : VREngine
             }
         });
 
-        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
 }

@@ -8,65 +8,86 @@ public class Panel : VREngine
     /**
      * Methode om de naam aan te passen op het panel, je geeft de uuid van het panel mee en de naam.
      */
-    public static void ChangeNamePanel(NetworkStream stream, string uuidPanel, string name)
+    public static void ChangeNamePanel(string uuidPanel, string name)
     {
-        DrawTextOnPanel(stream, name, uuidPanel,new[] { 10, 30 }, 30);
+        DrawTextOnPanel(name, uuidPanel,new[] { 10, 30 }, 30);
     }
 
     /**
      * Methode om de snelheid aan te passen op het panel, je geeft de uuid van het panel mee en de snelheid.
      */
-    public static void ChangeSpeedPanel(NetworkStream stream, string uuidPanel, int speed)
+    public static void ChangeSpeedPanel(string uuidPanel, int speed)
     {
-        DrawTextOnPanel(stream, "Snelheid: " + speed, uuidPanel,new[] { 10, 60 }, 20);
+        DrawTextOnPanel("Snelheid: " + speed, uuidPanel,new[] { 10, 60 }, 20);
     }
 
     /**
      * Methode om het wattage aan te passen op het panel, je geeft de uuid van het panel mee en het wattage.
      */
-    public static void ChangeWattPanel(NetworkStream stream, string uuidPanel, int watt)
+    public static void ChangeWattPanel(string uuidPanel, int watt)
     {
-        DrawTextOnPanel(stream, "Watt: " + watt, uuidPanel,new[] { 10, 80 }, 20);
+        DrawTextOnPanel("Watt: " + watt, uuidPanel,new[] { 10, 80 }, 20);
     }
 
     /**
      * Methode om de RPM aan te passen op het panel, je geeft de uuid van het panel mee en de RPM.
      */
-    public static void ChangeRPMPanel(NetworkStream stream, string uuidPanel, int rpm)
+    public static void ChangeRPMPanel(string uuidPanel, int rpm)
     {
-        DrawTextOnPanel(stream, "RPM: " + rpm, uuidPanel,new[] { 10, 100 }, 20);
+        DrawTextOnPanel("RPM: " + rpm, uuidPanel,new[] { 10, 100 }, 20);
     }
 
     /**
      * Methode om de hartslag aan te passen op het panel, je geeft de uuid van het panel mee en de hartslag.
      */
-    public static void ChangeHeartRatePanel(NetworkStream stream, string uuidPanel, int heartRate)
+    public static void ChangeHeartRatePanel(string uuidPanel, int heartRate)
     {
-        DrawTextOnPanel(stream, "Hartslag: " + heartRate, uuidPanel,new[] { 10, 120 }, 20);
+        DrawTextOnPanel("Hartslag: " + heartRate, uuidPanel,new[] { 10, 120 }, 20);
     }
 
     /**
      * Methode om de tijd aan te passen op het panel, je geeft de uuid van het panel mee en de tijd.
      */
-    public static void ChangeTimePanel(NetworkStream stream, string uuidPanel, string time)
+    public static void ChangeTimePanel(string uuidPanel, string time)
     {
-        DrawTextOnPanel(stream, "Tijdsduur: " + time, uuidPanel,new[] { 10, 140 }, 20);
+        DrawTextOnPanel("Tijdsduur: " + time, uuidPanel,new[] { 10, 140 }, 20);
     }
 
     /**
      * Methode om de afstand aan te passen op het panel, je geeft de uuid van het panel mee en de afstand.
      */
-    public static void ChangeDistancePanel(NetworkStream stream, string uuidPanel, int distance)
+    public static void ChangeDistancePanel(string uuidPanel, int distance)
     {
-        DrawTextOnPanel(stream, "Afstand: " + distance, uuidPanel,new[] { 10, 160 }, 20);
+        DrawTextOnPanel("Afstand: " + distance, uuidPanel,new[] { 10, 160 }, 20);
+    }
+    
+    /**
+     * Methode om de afstand aan te passen op het panel, je geeft de uuid van het panel mee en de afstand.
+     */
+    public static void ChangeChatsPanel(string uuidPanel, List<string> chats)
+    {
+        if (chats.Count >= 5)
+        {
+            for (int i = 5; i > 0; i--)
+            {
+                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (5 - i) * 20 + 30 }, 20);
+            }
+        }
+        else
+        {
+            for (int i = chats.Count; i > 0; i--)
+            {
+                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (chats.Count - i) * 20 + 30 }, 20);
+            }
+        }
     }
     
     /**
      * Methode om meegegeven tekst weer te geven op het meegegeven panel.
      */
-    private static void DrawTextOnPanel(NetworkStream stream, string text, string uuidPanel, int[] position, int size)
+    private static void DrawTextOnPanel(string text, string uuidPanel, int[] position, int size)
     {
-        SendThroughTunnel(stream, "scene/panel/drawtext", new
+        SendThroughTunnel("scene/panel/drawtext", new
         {
             id = uuidPanel,
             text = text,
@@ -74,37 +95,37 @@ public class Panel : VREngine
             size = size,
             color = new[] { 0, 0, 0, 1 }
         });
-        RecievePacket(stream);
+        RecievePacket();
     }
 
     /**
      * Methode om het meegegeven panel te clearen.
      */
-    public static void ClearPanel(NetworkStream stream, string uuid)
+    public static void ClearPanel(string uuid)
     {
-        SendThroughTunnel(stream, "scene/panel/clear", new { id = uuid });
-        RecievePacket(stream);
+        SendThroughTunnel("scene/panel/clear", new { id = uuid });
+        RecievePacket();
     }
 
     /**
      * Methode die de buffer wisselt van het panel die je meegeeft,
      * dit zorgt er eigenlijk voor dat het panel geupdate wordt.
      */
-    public static void SwapPanel(NetworkStream stream, string uuid)
+    public static void SwapPanel(string uuid)
     {
-        SendThroughTunnel(stream, "scene/panel/swap", new
+        SendThroughTunnel("scene/panel/swap", new
         {
             id = uuid
         });
-        RecievePacket(stream);
+        RecievePacket();
     }
 
     /**
      * Methode die een node maakt waardoor het panel weergegeven kan worden.
      */
-    public static string CreateNodeForPanel(NetworkStream stream)
+    public static string CreateNodeForPanel()
     {
-        SendThroughTunnel(stream, "scene/node/add", new
+        SendThroughTunnel("scene/node/add", new
         {
             name = "Panel",
             components = new
@@ -125,7 +146,7 @@ public class Panel : VREngine
             }
         });
 
-        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
     
@@ -133,19 +154,19 @@ public class Panel : VREngine
      * Methode die het panel koppelt aan de bike zodat het panel in beeld staat,
      * je moet de uuid van het panel en de bike meegeven.
      */
-    public static void AttachPanelToBike(NetworkStream stream, string uuidPanel, string uuidBike)
+    public static void AttachPanelToBike(string uuidPanel, string uuidBike, double[] position)
     {
-        SendThroughTunnel(stream, "scene/node/update", new
+        SendThroughTunnel("scene/node/update", new
         {
             id = uuidPanel,
             parent = uuidBike,
             transform = new
             {
-                position = new[] { -2, 2.4, -2.1 },
+                position = position,
                 scale = 1,
                 rotation = new[] { 0, 90, 0 }
             }
         });
-        RecievePacket(stream);
+        RecievePacket();
     }
 }

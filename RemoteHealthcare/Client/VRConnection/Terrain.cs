@@ -8,7 +8,7 @@ public class Terrain : VREngine
     /**
      * Methode die een terrein aanmaakt van 256 x 256 met een bepaalde hoogte.
      */
-    private static void createTerrain(NetworkStream stream)
+    private static void createTerrain()
     {
         // Heuvellandschap
 
@@ -19,22 +19,22 @@ public class Terrain : VREngine
 
         int[] heights = new int[256 * 256];
 
-        SendThroughTunnel(stream, "scene/terrain/add", new
+        SendThroughTunnel("scene/terrain/add", new
         {
             size = new int[] { 256, 256 },
             heights = heights
         });
 
-        RecievePacket(stream);
+        RecievePacket();
     }
     
     /**
      * Methode die een node aanmaakt voor een terrein, hierdoor kan het terrein weergegeven worden in de simulator.
      */
-    public static string CreateNodeForTerrain(NetworkStream stream)
+    public static string CreateNodeForTerrain()
     {
-        createTerrain(stream);
-        SendThroughTunnel(stream, "scene/node/add", new
+        createTerrain();
+        SendThroughTunnel("scene/node/add", new
         {
             name = "Terrain",
             components = new
@@ -52,13 +52,13 @@ public class Terrain : VREngine
             }
         });
 
-        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
 
-    public static void AddLayerToTerrain(NetworkStream stream, string uuid)
+    public static void AddLayerToTerrain(string uuid)
     {
-        SendThroughTunnel(stream, "scene/node/addlayer", new
+        SendThroughTunnel("scene/node/addlayer", new
         {
             id = uuid,
             diffuse = "data/NetworkEngine/textures/grass/grass_green_d.jpg",
@@ -67,7 +67,7 @@ public class Terrain : VREngine
             maxHeight = 10,
             fadeDist = 1
         });
-        RecievePacket(stream);
+        RecievePacket();
     }
     
     // private static void GenerateTerrain(int width, int height, int[] terrainMap)
