@@ -1,6 +1,8 @@
-﻿using System.Net.Sockets;
+﻿using System.IO.Compression;
+using System.Net.Sockets;
 using System.Security.AccessControl;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Channels;
 
@@ -20,6 +22,7 @@ class VRConnection
         CreateTunnel(stream);
         // Werkende methodes:
         // SetTime(stream, 0);
+
         string uuidBike = CreateNodeForBike(stream);
         // string uuidTerrain = CreateNodeForTerrain(stream);
         
@@ -27,9 +30,9 @@ class VRConnection
         CreateRoad(stream, uuidRoute);
         
         FollowRoute(stream, uuidRoute, uuidBike);
-        
-        ChangeFollowRouteSpeed(stream, uuidBike, 10);
-        
+        //
+        ChangeFollowRouteSpeed(stream, uuidBike, 50.0);
+        //
         AttachCameraToBike(stream, uuidBike);
 
 
@@ -51,15 +54,8 @@ class VRConnection
 
     private static void AttachCameraToBike(NetworkStream stream, string uuidBike)
     {
-        SendPacket(stream, "{\"id\" : " +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" : \"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"scene/get\", " +
-                           "}}}");
+        SendThroughTunnel(stream, "scene/get", null);
+        
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         JsonArray dataArray = (JsonArray)jsonObject["data"]["data"]["data"]["children"];
         string cameraUuid = null;
@@ -71,23 +67,18 @@ class VRConnection
                 cameraUuid = child["uuid"].ToString();
             }
         }
-
-        SendPacket(stream, "{\"id\" : " +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" : \"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"scene/node/update\", " +
-                           "\"data\" : " +
-                           "{\"id\" : \"" + cameraUuid + "\", " +
-                           "\"parent\" : \"" + uuidBike + "\"," +
-                           "\"transform\" :" +
-                           "{\"position\" : [ 1, 0, 2 ]," +
-                           "\"scale\" : 1.0," +
-                           "\"rotation\" : [ 0, 180, 0 ]," +
-                           "}}}}}");
+        // TODO: Positie verbeteren
+        SendThroughTunnel(stream, "scene/node/update", new
+        {
+            id = cameraUuid,
+            parent = uuidBike,
+            transform = new
+            {
+                position = new[] {1,0,2},
+                scale = 1,
+                rotation = new[] {0, 90, 0}
+            }
+        });
         RecievePacket(stream);
     }
     // private static void GenerateTerrain(int width, int height, int[] terrainMap)
@@ -133,83 +124,49 @@ class VRConnection
     //     return jsonBuilder.ToString();
     // }
 
-    private static void ChangeFollowRouteSpeed(NetworkStream stream, string uuidBike, int speed)
+    private static void ChangeFollowRouteSpeed(NetworkStream stream, string uuidBike, double speed)
     {
-        SendPacket(stream, "{\"id\" : " +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" : \"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"route/follow/speed\", " +
-                           "\"data\" : " +
-                           "{\"node\" : \"" + uuidBike + "\"," + 
-                           "\"speed\" : " + speed + "," +
-                           "}}}}");
-
+        SendThroughTunnel(stream, "route/follow/speed", new { node = uuidBike, speed = speed });
         RecievePacket(stream);
     }
 
     private static void FollowRoute(NetworkStream stream, string uuidRoute, string uuidBike)
     {
-        SendPacket(stream, "{\"id\" : " +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" : \"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"route/follow\", " +
-                           "\"data\" : " +
-                           "{\"route\" : \"" + uuidRoute + "\"," +
-                           "\"node\" : \"" + uuidBike + "\"," + 
-                           "\"speed\" : 50.0," +
-                           "\"offset\" : 0.0," +
-                           "\"rotate\" : \"XZ\"," +
-                           "\"smoothing\" : 1.0," +
-                           "\"followHeight\" : false," +
-                           "\"rotateOffset\" : [ 0, 0, 0 ]," +
-                           "\"positionOffset\" : [ 0, 0, 0]" +
-                           "}}}}");
-
+        SendThroughTunnel(stream, "route/follow", new
+        {
+            route = uuidRoute,
+            node = uuidBike,
+            speed = 10.0,
+            offset = 0.0,
+            rotate = "XZ",
+            smoothing = 1.0,
+            followHeight = false,
+            rotateOffset = new[] { 0, 0, 0 },
+            positionOffset = new[] { 0, 0, 0 }
+        });
+        
         RecievePacket(stream);
     }
 
     private static void CreateRoad(NetworkStream stream, string uuidRoute)
     {
-        SendPacket(stream, "{\"id\" : " +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" : \"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"scene/road/add\", " +
-                           "\"data\" : " +
-                           "{\"route\" : \""+ uuidRoute + "\"" +
-                           "}}}}");
+        SendThroughTunnel(stream, "scene/road/add", new { route = uuidRoute });
         RecievePacket(stream);
     }
 
     private static string CreateRoute(NetworkStream stream)
     {
-        SendPacket(stream, "{\"id\" :" +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" :\"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"route/add\", " +
-                           "\"data\" :{ \"nodes\" : " +
-                           "[" +
-                           "{\"pos\" : [ 0, 0, 0  ],\"dir\" : [ 5, 0, -5]}," +
-                           "{\"pos\" : [ 50, 0, 0  ],\"dir\" : [ 5, 0, 5]}," +
-                           "{\"pos\" : [ 50, 0, 50  ],\"dir\" : [ -5, 0, 5]}," +
-                           "{\"pos\" : [ 0, 0, 50  ],\"dir\" : [ -5, 0, -5]} " +
-                           "]" +
-                           "}}}}");
+        SendThroughTunnel(stream, "route/add", new
+        {
+            nodes = new[]
+            {
+                new { pos = new[] { 0, 0, 0 }, dir = new[] { 5, 0, -5 }, },
+                new { pos = new[] { 50, 0, 0 }, dir = new[] { 5, 0, 5 }, },
+                new { pos = new[] { 50, 0, 50 }, dir = new[] { -5, 0, 5 }, },
+                new { pos = new[] { 0, 0, 50 }, dir = new[] { -5, 0, -5 }, }
+            }
+        });
+
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
@@ -217,72 +174,43 @@ class VRConnection
     private static void createTerrain(NetworkStream stream)
     {
         // Heuvellandschap
-        
+
         // int[] terrainMap = new int[256 * 256];
         // GenerateTerrain(256, 256, terrainMap);
         // string jsonString = ConvertArrayToJson(terrainMap);
-        
-        int[] newArray = new int[256 * 256];
-        
-        for (int i = 0; i < newArray.Length; i++)
-        {
-            newArray[i] = 1;
-        }
-        
-        StringBuilder jsonBuilder = new StringBuilder();
-        jsonBuilder.Append("[");
-        
-        for (int i = 0; i < newArray.Length; i++)
-        {
-            jsonBuilder.Append(newArray[i]);
-        
-            // Voeg een komma toe als dit niet het laatste element is
-            if (i < newArray.Length - 1)
-            {
-                jsonBuilder.Append(",");
-            }
-        }
-        
-        jsonBuilder.Append("]");
-        
-        // De resulterende JSON-string
-        string jsonString = jsonBuilder.ToString();
 
-        SendPacket(stream, "{\"id\" : " +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" : \"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"scene/terrain/add\", " +
-                           "\"data\" : " +
-                           "{\"size\" : [ 256, 256 ], " +
-                           "\"heights\" : " + jsonString +
-                           "}}}}");
+
+        int[] heights = new int[256 * 256];
+
+        SendThroughTunnel(stream, "scene/terrain/add", new
+        {
+            size = new int[] { 256, 256 },
+            heights = heights
+        });
+
         RecievePacket(stream);
     }
 
     private static string CreateNodeForBike(NetworkStream stream)
     {
-        SendPacket(stream, "{\"id\" :" +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" :\"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"scene/node/add\", " +
-                           "\"data\" :" +
-                           "{\"name\" : \"test\", " +
-                           "\"components\" : {" +
-                           "\"transform\" : " +
-                           "{\"position\" : [ 0, 0, 0 ], " +
-                           "\"scale\" : 1, " +
-                           "\"rotation\" : [ 0, 0, 0 ]}, " +
-                           "\"model\" : " +
-                           "{\"file\" : \"data/NetworkEngine/models/bike/bike.fbx\"}, " +
-                           "}}}}}");
+        SendThroughTunnel(stream, "scene/node/add", new
+        {
+            name = "Bike",
+            components = new
+            {
+                transform = new
+                {
+                    position = new[] { 0, 0, 0 },
+                    scale = 1,
+                    rotation = new[] { 0, 0, 0 },
+                },
+                model = new
+                {
+                    file = "data/NetworkEngine/models/bike/bike.fbx"
+                }
+            }
+        });
+
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
@@ -290,47 +218,58 @@ class VRConnection
     private static string CreateNodeForTerrain(NetworkStream stream)
     {
         createTerrain(stream);
-        SendPacket(stream, "{\"id\" :" +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" :\"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"scene/node/add\", " +
-                           "\"data\" :" +
-                           "{\"name\" : \"test\", " +
-                           "\"components\" : {" +
-                           "\"transform\" : " +
-                           "{\"position\" : [ 0, 0, 0 ], " +
-                           "\"scale\" : 1, " +
-                           "\"rotation\" : [ 0, 0, 0 ]}, " +
-                           "\"terrain\" : " +
-                           "{\"smoothnormals\" : true}" +
-                           "}}}}}");
+        SendThroughTunnel(stream, "scene/node/add", new
+        {
+            name = "Terrain",
+            components = new
+            {
+                transform = new
+                {
+                    position = new[] { 0, 0, 0 },
+                    scale = 1,
+                    rotation = new[] { 0, 0, 0 }
+                },
+                terrain = new
+                {
+                    smoothnormals = true
+                }
+            }
+        });
+
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
 
     private static void SetTime(NetworkStream stream, int time)
     {
-        SendPacket(stream, "{\"id\" : " +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" : \"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"scene/skybox/settime\", " +
-                           "\"data\" : " +
-                           "{\"time\" : " + time + "}}}}");
+        SendThroughTunnel(stream, "scene/skybox/settime", new { time = time });
         RecievePacket(stream);
+    }
+
+    private static void SendThroughTunnel(NetworkStream stream, string command, object data)
+    {
+        var packet = new
+        {
+            id = "tunnel/send",
+            data = new
+            {
+                dest = SessionID,
+                data = new
+                {
+                    id = command,
+                    data = data
+                }
+            }
+        };
+
+
+        SendPacket(stream, packet);
     }
 
     private static void CreateTunnel(NetworkStream stream)
     {
         // Stap 2
-        SendPacket(stream, "{\"id\" : \"session/list\"}");
+        SendPacket(stream, new { id = "session/list" });
 
         // Stap 3
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
@@ -347,32 +286,39 @@ class VRConnection
         }
 
         // Stap 4
-        SendPacket(stream, "{\"id\" : " +
-                           "\"tunnel/create\", " +
-                           "\"data\" : " +
-                           "{\"session\" : \"" +
-                           ID +
-                           "\",}}");
+        SendPacket(stream, new
+        {
+            id = "tunnel/create",
+            data = new
+            {
+                session = ID,
+            }
+        });
 
         jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         SessionID = jsonObject["data"]["id"].ToString();
 
         // Stap 5
-        SendPacket(stream, "{\"id\" : " +
-                           "\"tunnel/send\", " +
-                           "\"data\" :" +
-                           "{\"dest\" : \"" +
-                           SessionID +
-                           "\", " +
-                           "\"data\" :" +
-                           "{\"id\" : \"scene/reset\", " +
-                           "\"data\" : {}}}}");
+        SendPacket(stream, new
+        {
+            id = "tunnel/send",
+            data = new
+            {
+                dest = SessionID,
+                data = new
+                {
+                    id = "scene/reset",
+                    data = new { }
+                }
+            }
+        });
         RecievePacket(stream);
     }
 
-    private static void SendPacket(NetworkStream stream, string packetString)
+    private static void SendPacket(NetworkStream stream, object packetString)
     {
-        var array = Encoding.ASCII.GetBytes(packetString);
+        string jsonString = JsonSerializer.Serialize(packetString);
+        var array = Encoding.ASCII.GetBytes(jsonString);
         int length = array.Length;
         byte[] prefix = new byte[4];
 
