@@ -36,23 +36,30 @@ class VRConnection
         
         AttachCameraToBike(stream, uuidBike);
 
-        // string uuidPanel = CreateNodeForPanel(stream);
-        // DrawTextOnPanel(stream, "Hello World", uuidPanel);
-        // SwapPanel(stream, uuidPanel);
+        string uuidPanel = CreateNodeForPanel(stream);
+        ChangeNamePanel(stream, uuidPanel, "Name");
+        SwapPanel(stream, uuidPanel);
+        
+        AttachPanelToCamera(stream, uuidPanel, uuidBike);
+    }
+
+    private static void ChangeNamePanel(NetworkStream stream, string uuidPanel, string name)
+    {
+        DrawTextOnPanel(stream, name, uuidPanel,new[] { 10, 25 }, 25);
     }
 
     /**
      * Methode om meegegeven tekst weer te geven op het meegegeven panel.
      */
-    private static void DrawTextOnPanel(NetworkStream stream, string text, string uuidPanel)
+    private static void DrawTextOnPanel(NetworkStream stream, string text, string uuidPanel, int[] position, int size)
     {
         ClearPanel(stream, uuidPanel);
         SendThroughTunnel(stream, "scene/panel/drawtext", new
         {
             id = uuidPanel,
             text = text,
-            position = new[] { 10, 100 },
-            size = 32,
+            position = position,
+            size = size,
             color = new[] { 0, 0, 0, 1 }
         });
         RecievePacket(stream);
@@ -92,7 +99,7 @@ class VRConnection
             {
                 transform = new
                 {
-                    position = new[] { 1, 2, 0 },
+                    position = new[] { 0, 0, 0 },
                     scale = 1,
                     rotation = new[] { 0, 0, 0 },
                 },
@@ -101,7 +108,7 @@ class VRConnection
                     size = new[] { 1, 2 },
                     resolution = new[] { 256, 512 },
                     background = new[] { 1, 1, 1, 1 },
-                    castShadow = true
+                    castShadow = false
                 }
             }
         });
@@ -118,7 +125,6 @@ class VRConnection
     {
         var cameraUuid = SearchNode(stream, "Camera");
 
-        // TODO: Positie verbeteren
         SendThroughTunnel(stream, "scene/node/update", new
         {
             id = cameraUuid,
@@ -126,6 +132,27 @@ class VRConnection
             transform = new
             {
                 position = new[] { -2, 0, 0 },
+                scale = 1,
+                rotation = new[] { 0, 90, 0 }
+            }
+        });
+        RecievePacket(stream);
+    }
+    /**
+     * 1. Deze methode zoekt de camera node.
+     * <p> 2. De node (uuid) die je meegeeft, wordt gekoppeld aan de camera node. </p>
+     */
+    private static void AttachPanelToCamera(NetworkStream stream, string uuidPanel, string uuidBike)
+    {
+        // var cameraUuid = SearchNode(stream, "Panel");
+
+        SendThroughTunnel(stream, "scene/node/update", new
+        {
+            id = uuidPanel,
+            parent = uuidBike,
+            transform = new
+            {
+                position = new[] { -2, 1.1, -2.1 },
                 scale = 1,
                 rotation = new[] { 0, 90, 0 }
             }
