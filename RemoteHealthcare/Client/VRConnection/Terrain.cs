@@ -55,6 +55,20 @@ public class Terrain : VREngine
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
+
+    public static void AddLayerToTerrain(NetworkStream stream, string uuid)
+    {
+        SendThroughTunnel(stream, "scene/node/addlayer", new
+        {
+            id = uuid,
+            diffuse = "data/NetworkEngine/textures/grass_diffuse.png",
+            normal = "data/NetworkEngine/textures/grass_normal.png",
+            minHeight = 0,
+            maxHeight = 10,
+            fadeDist = 1
+        });
+        RecievePacket(stream);
+    }
     
     // private static void GenerateTerrain(int width, int height, int[] terrainMap)
     // {

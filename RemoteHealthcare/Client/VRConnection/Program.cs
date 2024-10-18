@@ -49,6 +49,8 @@ public class VREngine
         
         Panel.AttachPanelToBike(stream, uuidPanel, uuidBike);
 
+        Terrain.AddLayerToTerrain(stream, uuidTerrain);
+
         // Loop voor tijdens de sessie
         while (true)
         {
