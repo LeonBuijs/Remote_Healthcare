@@ -23,33 +23,90 @@ class VRConnection
         // Werkende methodes:
         // SetTime(stream, 0);
 
-        string uuidBike = CreateNodeForBike(stream);
+        // string uuidBike = CreateNodeForBike(stream);
         // string uuidTerrain = CreateNodeForTerrain(stream);
-        
-        string uuidRoute = CreateRoute(stream);
-        CreateRoad(stream, uuidRoute);
-        
-        FollowRoute(stream, uuidRoute, uuidBike);
-        //
-        ChangeFollowRouteSpeed(stream, uuidBike, 50.0);
-        //
-        AttachCameraToBike(stream, uuidBike);
 
+        // string uuidRoute = CreateRoute(stream);
+        // CreateRoad(stream, uuidRoute);
 
-        // SendPacket(stream, "{\"id\" : " +
-        //                    "\"tunnel/send\", " +
-        //                    "\"data\" :" +
-        //                    "{\"dest\" : \"" +
-        //                    SessionID +
-        //                    "\", " +
-        //                    "\"data\" :" +
-        //                    "{\"id\" : \"scene/panel/drawtext\", " +
-        //                    "\"data\" : " +
-        //                    "{\"id\" : " + uuid + ", " +
-        //                    "\"text\" : \"Hello World\", " +
-        //                    "\"position\" : [ 0.0, 0.0 ]" +
-        //                    "}}}}");
-        // RecievePacket(stream);
+        // FollowRoute(stream, uuidRoute, uuidBike);
+        //
+        // ChangeFollowRouteSpeed(stream, uuidBike, 50.0);
+        //
+        // AttachCameraToBike(stream, uuidBike);
+
+        string uuidPanel = CreateNodeForPanel(stream);
+        DrawTextOnPanel(stream, "Hello World", uuidPanel);
+        SwapPanel(stream, uuidPanel);
+    }
+
+    /**
+     * Methode om meegegeven tekst weer te geven op het meegegeven panel.
+     */
+    private static void DrawTextOnPanel(NetworkStream stream, string text, string uuidPanel)
+    {
+        ClearPanel(stream, uuidPanel);
+        SendThroughTunnel(stream, "scene/panel/drawtext", new
+        {
+            id = uuidPanel,
+            text = text,
+            position = new[] { 10, 100 },
+            size = 32,
+            color = new[] { 0, 0, 0, 1 }
+        });
+        RecievePacket(stream);
+    }
+
+    /**
+     * Methode om het meegegeven panel te clearen.
+     */
+    private static void ClearPanel(NetworkStream stream, string uuid)
+    {
+        SendThroughTunnel(stream, "scene/panel/clear", new { id = uuid });
+        RecievePacket(stream);
+    }
+
+    /**
+     * Methode die de buffer wisselt van het panel die je meegeeft,
+     * dit zorgt er eigenlijk voor dat het panel geupdate wordt.
+     */
+    private static void SwapPanel(NetworkStream stream, string uuid)
+    {
+        SendThroughTunnel(stream, "scene/panel/swap", new
+        {
+            id = uuid
+        });
+        RecievePacket(stream);
+    }
+    
+    /**
+     * Methode die een node maakt waardoor het panel weergegeven kan worden.
+     */
+    private static string CreateNodeForPanel(NetworkStream stream)
+    {
+        SendThroughTunnel(stream, "scene/node/add", new
+        {
+            name = "Panel",
+            components = new
+            {
+                transform = new
+                {
+                    position = new[] { 1, 2, 0 },
+                    scale = 1,
+                    rotation = new[] { 0, 0, 0 },
+                },
+                panel = new
+                {
+                    size = new[] { 1, 2 },
+                    resolution = new[] { 256, 512 },
+                    background = new[] { 1, 1, 1, 1 },
+                    castShadow = true
+                }
+            }
+        });
+
+        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
 
     /**
@@ -59,7 +116,7 @@ class VRConnection
     private static void AttachCameraToBike(NetworkStream stream, string uuidBike)
     {
         SendThroughTunnel(stream, "scene/get", null);
-        
+
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         JsonArray dataArray = (JsonArray)jsonObject["data"]["data"]["data"]["children"];
         string cameraUuid = null;
@@ -71,6 +128,7 @@ class VRConnection
                 cameraUuid = child["uuid"].ToString();
             }
         }
+
         // TODO: Positie verbeteren
         SendThroughTunnel(stream, "scene/node/update", new
         {
@@ -78,14 +136,14 @@ class VRConnection
             parent = uuidBike,
             transform = new
             {
-                position = new[] {1,0,2},
+                position = new[] { 1, 0, 2 },
                 scale = 1,
-                rotation = new[] {0, 90, 0}
+                rotation = new[] { 0, 90, 0 }
             }
         });
         RecievePacket(stream);
     }
-    
+
     // private static void GenerateTerrain(int width, int height, int[] terrainMap)
     // {
     //     float scale = 20f;  // Bepaalt hoe "heuvelachtig" het terrein is
@@ -157,7 +215,7 @@ class VRConnection
             rotateOffset = new[] { 0, 0, 0 },
             positionOffset = new[] { 0, 0, 0 }
         });
-        
+
         RecievePacket(stream);
     }
 
@@ -267,7 +325,7 @@ class VRConnection
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
-    
+
     /**
      * Deze methode past de tijd aan in de simulator, je kunt de tijd die je wilt instellen meegeven in uren.
      */
@@ -296,7 +354,7 @@ class VRConnection
                 }
             }
         };
-        
+
         SendPacket(stream, packet);
     }
 
