@@ -52,6 +52,10 @@ class VRConnection
         // RecievePacket(stream);
     }
 
+    /**
+     * 1. Deze methode zoekt de camera node.
+     * <p> 2. De camera node wordt gekoppeld aan de node (uuid) die je meegeeft, bijvoorbeeld de fiets. </p>
+     */
     private static void AttachCameraToBike(NetworkStream stream, string uuidBike)
     {
         SendThroughTunnel(stream, "scene/get", null);
@@ -81,6 +85,7 @@ class VRConnection
         });
         RecievePacket(stream);
     }
+    
     // private static void GenerateTerrain(int width, int height, int[] terrainMap)
     // {
     //     float scale = 20f;  // Bepaalt hoe "heuvelachtig" het terrein is
@@ -124,12 +129,20 @@ class VRConnection
     //     return jsonBuilder.ToString();
     // }
 
+    /**
+     * Deze methode past de snelheid aan waarmee een node een route volgt,
+     * je geeft de uuid van de node mee met de snelheid die je wilt instellen.
+     */
     private static void ChangeFollowRouteSpeed(NetworkStream stream, string uuidBike, double speed)
     {
         SendThroughTunnel(stream, "route/follow/speed", new { node = uuidBike, speed = speed });
         RecievePacket(stream);
     }
 
+    /**
+     * Deze methode laat een node een route volgen,
+     * je geeft de uuid van de route mee en de uuid van de node die deze route moet volgen.
+     */
     private static void FollowRoute(NetworkStream stream, string uuidRoute, string uuidBike)
     {
         SendThroughTunnel(stream, "route/follow", new
@@ -148,12 +161,18 @@ class VRConnection
         RecievePacket(stream);
     }
 
+    /**
+     * Deze methode maakt een road aan op een route, je geeft de uuid van de route mee.
+     */
     private static void CreateRoad(NetworkStream stream, string uuidRoute)
     {
         SendThroughTunnel(stream, "scene/road/add", new { route = uuidRoute });
         RecievePacket(stream);
     }
 
+    /**
+     * Deze methode maakt een route aan door middel van een aantal punten.
+     */
     private static string CreateRoute(NetworkStream stream)
     {
         SendThroughTunnel(stream, "route/add", new
@@ -171,6 +190,9 @@ class VRConnection
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
 
+    /**
+     * Deze methode maakt een terrein aan van 256 x 256 met een bepaalde hoogte.
+     */
     private static void createTerrain(NetworkStream stream)
     {
         // Heuvellandschap
@@ -191,6 +213,9 @@ class VRConnection
         RecievePacket(stream);
     }
 
+    /**
+     * Deze methode maakt een node aan voor een fiets, hierdoor wordt er een fiets weergegeven in de simulator.
+     */
     private static string CreateNodeForBike(NetworkStream stream)
     {
         SendThroughTunnel(stream, "scene/node/add", new
@@ -215,6 +240,9 @@ class VRConnection
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
 
+    /**
+     * Deze methode maakt een node aan voor een terrein, hierdoor kan het terrein weergegeven worden in de simulator.
+     */
     private static string CreateNodeForTerrain(NetworkStream stream)
     {
         createTerrain(stream);
@@ -239,13 +267,20 @@ class VRConnection
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
-
+    
+    /**
+     * Deze methode past de tijd aan in de simulator, je kunt de tijd die je wilt instellen meegeven in uren.
+     */
     private static void SetTime(NetworkStream stream, int time)
     {
         SendThroughTunnel(stream, "scene/skybox/settime", new { time = time });
         RecievePacket(stream);
     }
 
+    /**
+     * Deze methode zorgt ervoor dat je een bericht kunt versturen door de tunnel die is aangemaakt.
+     * Je moet het commando opgeven die je wilt uitvoeren en de bijbehorende data.
+     */
     private static void SendThroughTunnel(NetworkStream stream, string command, object data)
     {
         var packet = new
@@ -261,11 +296,13 @@ class VRConnection
                 }
             }
         };
-
-
+        
         SendPacket(stream, packet);
     }
 
+    /**
+     * Deze methode maakt een tunnel waarmee je vervolgens data er naar toe kunt sturen.
+     */
     private static void CreateTunnel(NetworkStream stream)
     {
         // Stap 2
@@ -315,6 +352,9 @@ class VRConnection
         RecievePacket(stream);
     }
 
+    /**
+     * Deze methode stuurt de json die die meekrijgt naar de sever volgens het protocol.
+     */
     private static void SendPacket(NetworkStream stream, object packetString)
     {
         string jsonString = JsonSerializer.Serialize(packetString);
@@ -336,6 +376,10 @@ class VRConnection
         Console.WriteLine("Bericht verstuurd\n");
     }
 
+    /**
+     * Deze methode zorgt ervoor dat je gegevens kunt ontvangen die je van de server krijgt.
+     * Er wordt eerst gekeken hoelang het bericht gaat zijn en haalt vervolgens deze gegevens op.
+     */
     private static string RecievePacket(NetworkStream stream)
     {
         // Uitlezen van de lengte
