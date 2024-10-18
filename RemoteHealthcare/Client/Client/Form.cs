@@ -1,67 +1,89 @@
 using System;
-using System.Net.Sockets;
-using System.Threading.Tasks;
+using System.Globalization;
+using System.Threading;
 using System.Windows.Forms;
 using ClientGUI;
 
-namespace Client
+namespace Client;
+
+public partial class Form : System.Windows.Forms.Form
 {
-    public partial class Form : System.Windows.Forms.Form
+    private BLEHandler bleHandler = new();
+    private VRHandler vrHandler = new();
+    private MessageHandler messageHandler;
+
+    private Connection connection;
+
+    // TextBox attributen
+    private string serverIp;
+    private string deviceId;
+    private string firstName;
+    private string lastName;
+    private string birthDate;
+
+    public Form()
     {
-        private ClientApplication _clientApp;
-        private TcpClient _tcpClient;
-        
-        public Form()
+        messageHandler = new MessageHandler(bleHandler, vrHandler);
+        InitializeComponent();
+    }
+
+    private void connectButton_Click(object sender, EventArgs e)
+    {
+        serverIp = serverIPTextBox.Text;
+        deviceId = bikeNumberTextBox.Text;
+        firstName = firstNameTextBox.Text;
+        lastName = lastNameTextBox.Text;
+        birthDate = birthDateTextBox.Text;
+
+        // Verification
+        if (CheckTextBoxes())
         {
-            InitializeComponent();
+            MessageBox.Show("Vul alle velden in !", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
         }
-        
-        private async void connectButton_Click(object sender, EventArgs e)
+
+        try
         {
-            string firstName = firstNameTextBox.Text;
-            string lastName = lastNameTextBox.Text;
-            string birthDate = birthDateTextBox.Text;
-            
-            // Verification
-            if (string.IsNullOrWhiteSpace(firstName) || string.IsNullOrWhiteSpace(lastName) || string.IsNullOrWhiteSpace(birthDate))
+            var connected = ConnectToServer(serverIp, deviceId, firstName, lastName, birthDate);
+
+            if (!connected)
             {
-                MessageBox.Show("Vul alle velden in !", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Invalid login details", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
-            
-            try
-            {
-                await ConnectToServer(firstName, lastName, birthDate);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Fout bij het verbinden {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            //Start sending data...
-            await _clientApp.Start();
-            Hide();
         }
-        private async Task ConnectToServer(string firstName, string lastName, string birthDate)
+        catch (Exception ex)
         {
-            string ipAddress = "127.0.0.1";
-            int port = 6666;
-            _clientApp = new ClientApplication(ipAddress, port, null);//todo
-            
-            string identificationMessage = FormatIdentificationMessage(firstName, lastName, birthDate);
-            await _clientApp.SendMessage(identificationMessage); // Send identification to Server
-            
-            // Storage data
-            Storage storage = new Storage();
-            storage.AddData(identificationMessage);
-            
-            // await _clientApp.Start();
-            Console.WriteLine("Connected to server");
+            MessageBox.Show($"Fout bij het verbinden {ex.Message}", "Error", MessageBoxButtons.OK,
+                MessageBoxIcon.Error);
+            return;
         }
-                                    
-        private string FormatIdentificationMessage(string firstName, string lastName, string birthDate)
-        {
-            return $"0 {firstName} {lastName} {birthDate}";
-        }
+        //Start sending data... todo
+
+        Console.WriteLine("Connected!");
+        Hide();
+    }
+
+    private bool ConnectToServer(string ip, string deviceId, string firstName, string lastName, string birthDate)
+    {
+        // bleHandler.Start(deviceId); todo
+
+        connection = new Connection(ip, 6666, messageHandler);
+
+        var loginMessage = $"0 {firstName} {lastName} {birthDate}";
+        connection.SendMessage(loginMessage);
+
+        Thread.Sleep(2500);
+
+        return messageHandler.loggedIn;
+    }
+
+    private bool CheckTextBoxes()
+    {
+        return string.IsNullOrWhiteSpace(serverIp) ||
+               string.IsNullOrWhiteSpace(deviceId) ||
+               string.IsNullOrWhiteSpace(firstName) ||
+               string.IsNullOrWhiteSpace(lastName) ||
+               string.IsNullOrWhiteSpace(birthDate);
     }
 }
