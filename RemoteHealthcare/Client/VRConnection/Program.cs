@@ -25,14 +25,14 @@ class VRConnection
         DeleteStartingNodes(stream);
 
         string uuidBike = CreateNodeForBike(stream);
-        // string uuidTerrain = CreateNodeForTerrain(stream);
+        string uuidTerrain = CreateNodeForTerrain(stream);
 
         string uuidRoute = CreateRoute(stream);
         CreateRoad(stream, uuidRoute);
 
         FollowRoute(stream, uuidRoute, uuidBike);
         
-        ChangeFollowRouteSpeed(stream, uuidBike, 50.0);
+        ChangeFollowRouteSpeed(stream, uuidBike, 5.0);
         
         AttachCameraToBike(stream, uuidBike);
 
@@ -344,7 +344,7 @@ class VRConnection
             {
                 transform = new
                 {
-                    position = new[] { 0, 0, 0 },
+                    position = new[] { -100, 0, -50 },
                     scale = 1,
                     rotation = new[] { 0, 0, 0 }
                 },
