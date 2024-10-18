@@ -15,7 +15,7 @@ class VRConnection
         // Stap 1
         TcpClient tcpClient = new TcpClient();
         tcpClient.Connect("85.145.62.130", 6666);
-        tcpClient.ReceiveTimeout = 10000;
+        tcpClient.ReceiveTimeout = 6000000;
         NetworkStream stream = tcpClient.GetStream();
         Console.WriteLine("Verbonden met de server\n");
 
@@ -37,15 +37,53 @@ class VRConnection
         AttachCameraToBike(stream, uuidBike);
 
         string uuidPanel = CreateNodeForPanel(stream);
+        ClearPanel(stream, uuidPanel);
+
         ChangeNamePanel(stream, uuidPanel, "Name");
+        ChangeSpeedPanel(stream, uuidPanel, 5);
+        ChangeWattPanel(stream, uuidPanel, 100);
+        ChangeRPMPanel(stream, uuidPanel, 25);
+        ChangeHeartRatePanel(stream, uuidPanel, 90);
+        ChangeTimePanel(stream, uuidPanel, "00:00:00");
+        ChangeDistancePanel(stream, uuidPanel, 0);
         SwapPanel(stream, uuidPanel);
         
         AttachPanelToCamera(stream, uuidPanel, uuidBike);
+
+        // Loop voor tijdens de sessie
+        while (true)
+        {
+            RecievePacket(stream);
+        }
     }
 
     private static void ChangeNamePanel(NetworkStream stream, string uuidPanel, string name)
     {
-        DrawTextOnPanel(stream, name, uuidPanel,new[] { 10, 25 }, 25);
+        DrawTextOnPanel(stream, name, uuidPanel,new[] { 10, 30 }, 30);
+    }
+    private static void ChangeSpeedPanel(NetworkStream stream, string uuidPanel, int speed)
+    {
+        DrawTextOnPanel(stream, "Snelheid: " + speed, uuidPanel,new[] { 10, 60 }, 20);
+    }
+    private static void ChangeWattPanel(NetworkStream stream, string uuidPanel, int watt)
+    {
+        DrawTextOnPanel(stream, "Watt: " + watt, uuidPanel,new[] { 10, 80 }, 20);
+    }
+    private static void ChangeRPMPanel(NetworkStream stream, string uuidPanel, int rpm)
+    {
+        DrawTextOnPanel(stream, "RPM: " + rpm, uuidPanel,new[] { 10, 100 }, 20);
+    }
+    private static void ChangeHeartRatePanel(NetworkStream stream, string uuidPanel, int heartRate)
+    {
+        DrawTextOnPanel(stream, "Hartslag: " + heartRate, uuidPanel,new[] { 10, 120 }, 20);
+    }
+    private static void ChangeTimePanel(NetworkStream stream, string uuidPanel, string time)
+    {
+        DrawTextOnPanel(stream, "Tijdsduur: " + time, uuidPanel,new[] { 10, 140 }, 20);
+    }
+    private static void ChangeDistancePanel(NetworkStream stream, string uuidPanel, int distance)
+    {
+        DrawTextOnPanel(stream, "Afstand: " + distance, uuidPanel,new[] { 10, 160 }, 20);
     }
 
     /**
@@ -53,7 +91,6 @@ class VRConnection
      */
     private static void DrawTextOnPanel(NetworkStream stream, string text, string uuidPanel, int[] position, int size)
     {
-        ClearPanel(stream, uuidPanel);
         SendThroughTunnel(stream, "scene/panel/drawtext", new
         {
             id = uuidPanel,
@@ -105,8 +142,8 @@ class VRConnection
                 },
                 panel = new
                 {
-                    size = new[] { 1, 2 },
-                    resolution = new[] { 256, 512 },
+                    size = new[] { 1, 1 },
+                    resolution = new[] { 256, 256 },
                     background = new[] { 1, 1, 1, 1 },
                     castShadow = false
                 }
@@ -152,7 +189,7 @@ class VRConnection
             parent = uuidBike,
             transform = new
             {
-                position = new[] { -2, 1.1, -2.1 },
+                position = new[] { -2, 2.4, -2.1 },
                 scale = 1,
                 rotation = new[] { 0, 90, 0 }
             }
