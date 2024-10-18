@@ -61,7 +61,7 @@ public class Terrain : VREngine
         SendThroughTunnel(stream, "scene/node/addlayer", new
         {
             id = uuid,
-            diffuse = "data/NetworkEngine/textures/grass_diffuse.png",
+            diffuse = "data/NetworkEngine/textures/grass/grass_green_d.jpg",
             normal = "data/NetworkEngine/textures/grass_normal.png",
             minHeight = 0,
             maxHeight = 10,
