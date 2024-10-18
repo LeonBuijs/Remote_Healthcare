@@ -22,6 +22,7 @@ class VRConnection
         CreateTunnel(stream);
         // Werkende methodes:
         // SetTime(stream, 0);
+        DeleteStartingNodes(stream);
 
         string uuidBike = CreateNodeForBike(stream);
         // string uuidTerrain = CreateNodeForTerrain(stream);
@@ -115,19 +116,7 @@ class VRConnection
      */
     private static void AttachCameraToBike(NetworkStream stream, string uuidBike)
     {
-        SendThroughTunnel(stream, "scene/get", null);
-
-        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
-        JsonArray dataArray = (JsonArray)jsonObject["data"]["data"]["data"]["children"];
-        string cameraUuid = null;
-        foreach (JsonObject child in dataArray)
-        {
-            string name = child["name"].ToString();
-            if (name == "Camera")
-            {
-                cameraUuid = child["uuid"].ToString();
-            }
-        }
+        var cameraUuid = SearchNode(stream, "Camera");
 
         // TODO: Positie verbeteren
         SendThroughTunnel(stream, "scene/node/update", new
@@ -142,6 +131,43 @@ class VRConnection
             }
         });
         RecievePacket(stream);
+    }
+
+    private static void DeleteStartingNodes(NetworkStream stream)
+    {
+        DeleteNode(stream, SearchNode(stream, "LeftHand"));
+        DeleteNode(stream, SearchNode(stream, "RightHand"));
+        DeleteNode(stream, SearchNode(stream, "Head"));
+        DeleteNode(stream, SearchNode(stream, "GroundPlane"));
+    }
+
+    private static void DeleteNode(NetworkStream stream, string uuid)
+    {
+        SendThroughTunnel(stream, "scene/node/delete", new
+        {
+            id = uuid
+        });
+        RecievePacket(stream);
+    }
+
+    private static string? SearchNode(NetworkStream stream, string nodeName)
+    {
+        SendThroughTunnel(stream, "scene/get", null);
+
+        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        JsonArray dataArray = (JsonArray)jsonObject["data"]["data"]["data"]["children"];
+        string uuid = null;
+        foreach (JsonObject child in dataArray)
+        {
+            string name = child["name"].ToString();
+            if (name == nodeName)
+            {
+                uuid = child["uuid"].ToString();
+            }
+        }
+
+        Console.WriteLine($"Node {nodeName} : {uuid}");
+        return uuid;
     }
 
     // private static void GenerateTerrain(int width, int height, int[] terrainMap)
