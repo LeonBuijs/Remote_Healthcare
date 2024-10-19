@@ -38,7 +38,7 @@ public class VREngine
         Route.CreateRoad(uuidRoute);
         Route.FollowRoute(uuidRoute, uuidBike);
         Route.ChangeFollowRouteSpeed(uuidBike, 5.0);
-        
+
         AttachCameraToBike(uuidBike);
 
         uuidPanelData = Panel.CreateNodeForPanel();
@@ -53,7 +53,7 @@ public class VREngine
         Panel.ChangeDistancePanel(uuidPanelData, 0);
         Panel.SwapPanel(uuidPanelData);
         Panel.AttachPanelToBike(uuidPanelData, uuidBike, new[] { -2, 2.4, -2.1 });
-        
+
         uuidPanelChats = Panel.CreateNodeForPanel();
         Panel.ClearPanel(uuidPanelChats);
         // Panel.ChangeChatsPanel(uuidPanelChats, new List<string>() { "Hallo", "Allemaal", "Welkom", "Hallo", "Allemaal", "Welkom" });
@@ -62,13 +62,20 @@ public class VREngine
 
         Terrain.AddLayerToTerrain(uuidTerrain);
 
+        ConnectionClient.StartServer();
+
+
         // Loop voor tijdens de sessie
-        while (true)
+        Thread loopThread = new Thread(() =>
         {
-            RecievePacket();
-        }
+            while (true)
+            {
+                RecievePacket();
+            }
+        });
+        loopThread.Start();
     }
-    
+
     /**
      * Methode die de camera zoekt en deze vervolgens koppelt aan de uuid van de node die je meegeeft.
      */
@@ -89,7 +96,7 @@ public class VREngine
         });
         RecievePacket();
     }
-    
+
     /**
      * Methode die een aantal nodes verwijderd die we niet nodig hebben.
      */
@@ -112,7 +119,7 @@ public class VREngine
         });
         RecievePacket();
     }
-    
+
     /**
      * Methode om een node te zoeken in de scene, je moet de naam van de node meegeven en je krijgt de uuid terug.
      */
@@ -135,7 +142,7 @@ public class VREngine
         Console.WriteLine($"Node {nodeName} : {uuid}");
         return uuid;
     }
-    
+
     /**
      * Methode die een node aanmaakt voor een fiets, hierdoor wordt er een fiets weergegeven in de simulator.
      */
@@ -162,7 +169,7 @@ public class VREngine
         JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
-    
+
     /**
      * Methode die de tijd aanpast in de simulator, je kunt de tijd die je wilt instellen meegeven in uren.
      */
