@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Client;
+using Client.Handlers;
 
 namespace ClientGUI;
 
@@ -10,10 +11,10 @@ public class MessageHandler
     private VRHandler vrHandler;
     public bool loggedIn { get; set; }
 
-    public MessageHandler(BLEHandler bleHandler, VRHandler vrHandler)
+    public MessageHandler(BLEHandler bleHandler)
     {
         this.bleHandler = bleHandler;
-        this.vrHandler = vrHandler;
+        // this.vrHandler = vrHandler; // TODO deze initten als de doctor een sessie start
     }
 
 
@@ -94,5 +95,10 @@ public class MessageHandler
             Console.WriteLine("Wrong username or password");
             loggedIn = false;
         }
+    }
+
+    public void OnReceivedBikeData(string message)
+    {
+        // TODO
     }
 }

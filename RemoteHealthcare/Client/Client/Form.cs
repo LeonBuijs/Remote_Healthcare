@@ -4,14 +4,14 @@ using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
+using Client.Handlers;
 using ClientGUI;
 
 namespace Client;
 
-public partial class Form : System.Windows.Forms.Form
+public partial class Form : System.Windows.Forms.Form, IBLECallback
 {
-    private BLEHandler bleHandler = new();
-    private VRHandler vrHandler = new();
+    private BLEHandler bleHandler;
     private MessageHandler messageHandler;
 
     private Connection connection;
@@ -25,7 +25,8 @@ public partial class Form : System.Windows.Forms.Form
 
     public Form()
     {
-        messageHandler = new MessageHandler(bleHandler, vrHandler);
+        bleHandler = new BLEHandler(this);
+        messageHandler = new MessageHandler(bleHandler);
         InitializeComponent();
     }
 
@@ -35,7 +36,7 @@ public partial class Form : System.Windows.Forms.Form
         deviceId = bikeNumberTextBox.Text;
         firstName = firstNameTextBox.Text;
         lastName = lastNameTextBox.Text;
-        birthDate = birthDateTextBox.Text;
+        birthDate = GetBirthDate();
 
         // Verification
         if (CheckTextBoxes())
@@ -92,5 +93,15 @@ public partial class Form : System.Windows.Forms.Form
                string.IsNullOrWhiteSpace(firstName) ||
                string.IsNullOrWhiteSpace(lastName) ||
                string.IsNullOrWhiteSpace(birthDate);
+    }
+
+    private string GetBirthDate()
+    {
+        return dayTextBox.Text + monthTextBox.Text + yearTextBox.Text;
+    }
+
+    public void OnReceivedBikeData(string message)
+    {
+        // todo
     }
 }

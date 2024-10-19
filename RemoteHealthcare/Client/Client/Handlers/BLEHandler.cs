@@ -9,13 +9,16 @@ using Form = Client.Form;
 
 public class BLEHandler
     {
-        private static BikeData bikeData = new();
+        private Form form;
+        
+        public BikeData bikeData { get; } = new();
         private static BLE bleBike = new();
         private static BLE bleHeart = new ();
         private static bool simulationMode;
 
-        public BLEHandler()
+        public BLEHandler(Form form)
         {
+            this.form = form;
             TrySimulationMode();
         }
 
@@ -42,7 +45,7 @@ public class BLEHandler
             return false;
         }
 
-        private static async Task StartBLE()
+        private async Task StartBLE()
         {
             int errorCode;
             // Connecting
@@ -110,7 +113,7 @@ public class BLEHandler
         /**
          * Methode om te controleren of het ingevoerde framenummer beschikbaar is
          */
-        private static bool DeviceAvailable(string frameNumber)
+        private bool DeviceAvailable(string frameNumber)
         {
             var deviceAvailable = false;
 
@@ -134,9 +137,10 @@ public class BLEHandler
          * Aangeleverde klasse
          * Print waarde ontvangen uit fiets naar console
          */
-        private static void BleBike_SubscriptionValueChanged(object Sender, BLESubscriptionValueChangedEventArgs e)
+        private void BleBike_SubscriptionValueChanged(object Sender, BLESubscriptionValueChangedEventArgs e)
         {
             bikeData.UpdateData(BitConverter.ToString(e.Data).Replace("-", " "));
+            form.OnReceivedBikeData(bikeData);
             Console.WriteLine(
                 $"Speed: {bikeData.Speed} RPM: {bikeData.Rpm} Distance: {bikeData.Distance} Watts: {bikeData.Watt} Time: {bikeData.Time} HeartRate: {bikeData.HeartRate}");
         }
@@ -144,7 +148,7 @@ public class BLEHandler
         /**
          * Hoofdmethode om data naar een fiets te sturen
          */
-        private static async void SendMessageToBike(byte[] payload)
+        private async void SendMessageToBike(byte[] payload)
         {
             byte sync = 0xA4;
             byte length = 0x09;
@@ -196,7 +200,7 @@ public class BLEHandler
          * Methode om verbinding te maken met de simulator applicatie
          * Als de sim niet live is, returnen
          */
-        private static void TrySimulationMode()
+        private void TrySimulationMode()
         {
             TcpClient tcpClient;
             try

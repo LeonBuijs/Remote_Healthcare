@@ -15,7 +15,12 @@ namespace Client
         private System.Windows.Forms.Label lastNameLabel;
         private System.Windows.Forms.TextBox lastNameTextBox;
         private System.Windows.Forms.Label birthDateLabel;
-        private System.Windows.Forms.TextBox birthDateTextBox;
+        private System.Windows.Forms.Label dayLabel;
+        private System.Windows.Forms.Label monthLabel;
+        private System.Windows.Forms.Label yearLabel;
+        private System.Windows.Forms.TextBox dayTextBox;
+        private System.Windows.Forms.TextBox monthTextBox;
+        private System.Windows.Forms.TextBox yearTextBox;
         private System.Windows.Forms.Button connectButton;
 
         protected override void Dispose(bool disposing)
@@ -41,7 +46,12 @@ namespace Client
             this.lastNameLabel = new System.Windows.Forms.Label();
             this.lastNameTextBox = new System.Windows.Forms.TextBox();
             this.birthDateLabel = new System.Windows.Forms.Label();
-            this.birthDateTextBox = new System.Windows.Forms.TextBox();
+            this.dayLabel = new System.Windows.Forms.Label();
+            this.monthLabel = new System.Windows.Forms.Label();
+            this.yearLabel = new System.Windows.Forms.Label();
+            this.dayTextBox = new System.Windows.Forms.TextBox();
+            this.monthTextBox = new System.Windows.Forms.TextBox();
+            this.yearTextBox = new System.Windows.Forms.TextBox();
             this.connectButton = new System.Windows.Forms.Button();
             this.SuspendLayout();
             
@@ -117,26 +127,67 @@ namespace Client
             this.birthDateLabel.Size = new System.Drawing.Size(76, 17);
             this.birthDateLabel.TabIndex = 9;
             this.birthDateLabel.Text = "Birth Date:";
-            
-            // birthDateTextBox
-            this.birthDateTextBox.Location = new System.Drawing.Point(150, 220);
-            this.birthDateTextBox.Name = "birthDateTextBox";
-            this.birthDateTextBox.Size = new System.Drawing.Size(200, 22);
-            this.birthDateTextBox.TabIndex = 10;
+
+            // dayLabel
+            this.dayLabel.AutoSize = true;
+            this.dayLabel.Location = new System.Drawing.Point(150, 220);
+            this.dayLabel.Name = "dayLabel";
+            this.dayLabel.Size = new System.Drawing.Size(34, 17);
+            this.dayLabel.TabIndex = 10;
+            this.dayLabel.Text = "Day";
+
+            // dayTextBox
+            this.dayTextBox.Location = new System.Drawing.Point(150, 240);
+            this.dayTextBox.Name = "dayTextBox";
+            this.dayTextBox.Size = new System.Drawing.Size(50, 22);
+            this.dayTextBox.TabIndex = 11;
+
+            // monthLabel
+            this.monthLabel.AutoSize = true;
+            this.monthLabel.Location = new System.Drawing.Point(210, 220);
+            this.monthLabel.Name = "monthLabel";
+            this.monthLabel.Size = new System.Drawing.Size(47, 17);
+            this.monthLabel.TabIndex = 12;
+            this.monthLabel.Text = "Month";
+
+            // monthTextBox
+            this.monthTextBox.Location = new System.Drawing.Point(210, 240);
+            this.monthTextBox.Name = "monthTextBox";
+            this.monthTextBox.Size = new System.Drawing.Size(50, 22);
+            this.monthTextBox.TabIndex = 13;
+
+            // yearLabel
+            this.yearLabel.AutoSize = true;
+            this.yearLabel.Location = new System.Drawing.Point(270, 220);
+            this.yearLabel.Name = "yearLabel";
+            this.yearLabel.Size = new System.Drawing.Size(38, 17);
+            this.yearLabel.TabIndex = 14;
+            this.yearLabel.Text = "Year";
+
+            // yearTextBox
+            this.yearTextBox.Location = new System.Drawing.Point(270, 240);
+            this.yearTextBox.Name = "yearTextBox";
+            this.yearTextBox.Size = new System.Drawing.Size(80, 22);
+            this.yearTextBox.TabIndex = 15;
              
             // connectButton
-            this.connectButton.Location = new System.Drawing.Point(150, 260);
+            this.connectButton.Location = new System.Drawing.Point(150, 280);
             this.connectButton.Name = "_connectButton";
             this.connectButton.Size = new System.Drawing.Size(100, 30);
-            this.connectButton.TabIndex = 11;
+            this.connectButton.TabIndex = 16;
             this.connectButton.Text = "Connect";
             this.connectButton.UseVisualStyleBackColor = true;
             this.connectButton.Click += new System.EventHandler(this.connectButton_Click);
             
-            this.ClientSize = new System.Drawing.Size(400, 320);
+            this.ClientSize = new System.Drawing.Size(400, 340);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Controls.Add(this.connectButton);
-            this.Controls.Add(this.birthDateTextBox);
+            this.Controls.Add(this.yearTextBox);
+            this.Controls.Add(this.yearLabel);
+            this.Controls.Add(this.monthTextBox);
+            this.Controls.Add(this.monthLabel);
+            this.Controls.Add(this.dayTextBox);
+            this.Controls.Add(this.dayLabel);
             this.Controls.Add(this.birthDateLabel);
             this.Controls.Add(this.lastNameTextBox);
             this.Controls.Add(this.lastNameLabel);
@@ -155,5 +206,9 @@ namespace Client
 
         #endregion
 
+        public void OnReceivedBikeData(BikeData bikeData)
+        {
+            // moest implementeren, niet van gebruik hier
+        }
     }
 }

@@ -1,3 +1,5 @@
+using System.Net.Sockets;
+
 namespace Client;
 
 /**
@@ -6,8 +8,14 @@ namespace Client;
 public class VRHandler
 {
     private bool inSession;
+    private TcpClient tcpClient;
 
-    public void SendSpeedToVr(int speed)
+    public VRHandler()
+    {
+        ConnectToVrConnection();
+    }
+
+    public void SendBikeDataToVr(int speed)
     {
         //todo
     }
@@ -33,5 +41,14 @@ public class VRHandler
     {
         //todo
         inSession = false;
+    }
+
+    /**
+     * Methode om een TCP-verbinding op localhost op te zetten om met de VRConnection applicatie te praten
+     */
+    private void ConnectToVrConnection()
+    {
+        tcpClient = new TcpClient();
+        tcpClient.Connect("127.0.0.1", 9999);
     }
 }

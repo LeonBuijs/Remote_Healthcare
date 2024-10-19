@@ -58,6 +58,7 @@
       <DependentUpon>Form.cs</DependentUpon>
     </Compile>
     <Compile Include="Handlers\BLEHandler.cs" />
+    <Compile Include="Handlers\IBLECallback.cs" />
     <Compile Include="Handlers\MessageHandler.cs" />
     <Compile Include="Handlers\VRHandler.cs" />
     <Compile Include="Program.cs" />
