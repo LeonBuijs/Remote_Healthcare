@@ -128,6 +128,5 @@ public partial class DeviceConnection : Form
     private void CloseForm(object sender, FormClosingEventArgs e)
     {
         messageHandler.Disconnect();
-        bleHandler.Disconnect();
     }
 }

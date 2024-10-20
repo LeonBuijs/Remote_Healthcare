@@ -41,7 +41,7 @@ public partial class ServerLogin : Form
 
         try
         {
-            var connected = ConnectToServer(serverIp, "fixme", firstName, lastName, birthDate);
+            var connected = ConnectToServer(serverIp, firstName, lastName, birthDate);
 
             if (!connected)
             {
@@ -61,13 +61,12 @@ public partial class ServerLogin : Form
         Hide();
     }
 
-    private bool ConnectToServer(string ip, string deviceId, string firstName, string lastName, string birthDate)
+    private bool ConnectToServer(string ip, string firstName, string lastName, string birthDate)
     {
-        // bleHandler.ConnectDevices(deviceId); todo
+        // TEST CODE
         
         // Process firstProc = new Process();
         // firstProc.StartInfo.FileName = "C:\\Users\\jaspe\\RiderProjects\\Remote_Healthcare\\RemoteHealthcare\\Client\\VRConnection\\bin\\Debug\\net8.0\\VRConnection.exe";
-        //
         // firstProc.ConnectDevices();
 
         connection = new Connection(ip, 6666, messageHandler);

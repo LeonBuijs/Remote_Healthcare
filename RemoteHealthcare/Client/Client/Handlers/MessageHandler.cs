@@ -16,8 +16,10 @@ public class MessageHandler : IBLECallback
         this.bleHandler = bleHandler;
         // this.vrHandler = vrHandler; // TODO deze initten als de doctor een sessie start
     }
-
-
+    
+    /**
+     * Methode om inkomende berichten te verwerken
+     */
     public void ProcessMessage(string message)
     {
         Console.WriteLine($"Received message: {message}");
@@ -53,12 +55,18 @@ public class MessageHandler : IBLECallback
         }
     }
 
+    /**
+     * Helper methode om een chatbericht door te sturen naar de vr-omgeving
+     */
     private void HandleChatMessage(string message)
     {
         Console.WriteLine($"Chat message from doctor: {message}");
         vrHandler.SendChatToVr(message);
     }
 
+    /**
+     * Helper methode om aan de hand van een commando de weerstand van een fiets in te stellen
+     */
     private void HandleBikeResistanceSettings(string settings)
     {
         Console.WriteLine($"Bike resistance settings: {settings}");
@@ -68,21 +76,33 @@ public class MessageHandler : IBLECallback
         bleHandler.SetResistance(resistance[0]);
     }
 
+    /**
+     * Helper methode om een startcommando uit te voeren
+     */
     private void HandleStartCommand()
     {
         vrHandler.StartSession();
     }
 
+    /**
+     * Helper methode om een stopcommando uit te voeren
+     */
     private void HandleStopCommand()
     {
         vrHandler.StopSession();
     }
 
+    /**
+     * Helper methode om een emergency-stop commando uit te voeren
+     */
     private void HandleEmergencyStopCommand()
     {
         vrHandler.EmergencyStop();
     }
 
+    /**
+     * Helper methode om de login-bevestiging te verwerken
+     */
     private void HandleLoginConfirmation(string confirmation)
     {
         if (confirmation == "1")
@@ -97,12 +117,18 @@ public class MessageHandler : IBLECallback
         }
     }
 
+    /**
+     * Methode om alles netjes af te sluiten
+     */
     public void Disconnect()
     {
-        // TODO
+        bleHandler.Disconnect();
     }
+    
     public void OnReceivedBikeData(BikeData bikeData)
     {
         // TODO   
+        Console.WriteLine(
+            $"Speed: {bikeData.Speed} RPM: {bikeData.Rpm} Distance: {bikeData.Distance} Watts: {bikeData.Watt} Time: {bikeData.Time} HeartRate: {bikeData.HeartRate}");
     }
 }
