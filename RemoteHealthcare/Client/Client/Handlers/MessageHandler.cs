@@ -96,6 +96,11 @@ public class MessageHandler : IBLECallback
             loggedIn = false;
         }
     }
+
+    public void Disconnect()
+    {
+        // TODO
+    }
     public void OnReceivedBikeData(BikeData bikeData)
     {
         // TODO   

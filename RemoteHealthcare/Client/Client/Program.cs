@@ -11,8 +11,6 @@ class Program
     {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new ServerLogin());
-
-        Console.Read();
+        Application.Run(new DeviceConnection());
     }
 }

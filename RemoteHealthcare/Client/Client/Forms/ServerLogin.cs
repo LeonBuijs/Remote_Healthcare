@@ -18,9 +18,10 @@ public partial class ServerLogin : Form
     private string lastName;
     private string birthDate;
 
-    public ServerLogin()
+    public ServerLogin(BLEHandler bleHandler, MessageHandler messageHandler)
     {
-        // messageHandler = new MessageHandler();
+        this.bleHandler = bleHandler;
+        this.messageHandler = messageHandler;
         InitializeComponent();
     }
 
