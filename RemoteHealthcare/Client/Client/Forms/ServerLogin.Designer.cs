@@ -2,14 +2,12 @@ using System.ComponentModel;
 
 namespace Client
 {
-    partial class Form
+    partial class ServerLogin
     {
         private System.ComponentModel.IContainer components = null;
         private System.Windows.Forms.Label titleLabel;
         private System.Windows.Forms.Label serverIPLabel;
         private System.Windows.Forms.TextBox serverIPTextBox;
-        private System.Windows.Forms.Label bikeNumberLabel;
-        private System.Windows.Forms.TextBox bikeNumberTextBox;
         private System.Windows.Forms.Label firstNameLabel;
         private System.Windows.Forms.TextBox firstNameTextBox;
         private System.Windows.Forms.Label lastNameLabel;
@@ -39,8 +37,6 @@ namespace Client
             this.titleLabel = new System.Windows.Forms.Label();
             this.serverIPLabel = new System.Windows.Forms.Label();
             this.serverIPTextBox = new System.Windows.Forms.TextBox();
-            this.bikeNumberLabel = new System.Windows.Forms.Label();
-            this.bikeNumberTextBox = new System.Windows.Forms.TextBox();
             this.firstNameLabel = new System.Windows.Forms.Label();
             this.firstNameTextBox = new System.Windows.Forms.TextBox();
             this.lastNameLabel = new System.Windows.Forms.Label();
@@ -77,20 +73,6 @@ namespace Client
             this.serverIPTextBox.Name = "serverIPTextBox";
             this.serverIPTextBox.Size = new System.Drawing.Size(200, 22);
             this.serverIPTextBox.TabIndex = 2;
-            
-            // bikeNumberLabel
-            this.bikeNumberLabel.AutoSize = true;
-            this.bikeNumberLabel.Location = new System.Drawing.Point(50, 100);
-            this.bikeNumberLabel.Name = "bikeNumberLabel";
-            this.bikeNumberLabel.Size = new System.Drawing.Size(90, 17);
-            this.bikeNumberLabel.TabIndex = 3;
-            this.bikeNumberLabel.Text = "Bike Number:";
-            
-            // bikeNumberTextBox
-            this.bikeNumberTextBox.Location = new System.Drawing.Point(150, 100);
-            this.bikeNumberTextBox.Name = "bikeNumberTextBox";
-            this.bikeNumberTextBox.Size = new System.Drawing.Size(200, 22);
-            this.bikeNumberTextBox.TabIndex = 4;
             
             // firstNameLabel 
             this.firstNameLabel.AutoSize = true;
@@ -181,34 +163,27 @@ namespace Client
             
             this.ClientSize = new System.Drawing.Size(400, 340);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Controls.Add(this.connectButton);
-            this.Controls.Add(this.yearTextBox);
-            this.Controls.Add(this.yearLabel);
-            this.Controls.Add(this.monthTextBox);
-            this.Controls.Add(this.monthLabel);
-            this.Controls.Add(this.dayTextBox);
-            this.Controls.Add(this.dayLabel);
-            this.Controls.Add(this.birthDateLabel);
-            this.Controls.Add(this.lastNameTextBox);
-            this.Controls.Add(this.lastNameLabel);
             this.Controls.Add(this.firstNameTextBox);
-            this.Controls.Add(this.firstNameLabel);
-            this.Controls.Add(this.bikeNumberTextBox);
-            this.Controls.Add(this.bikeNumberLabel);
+            this.Controls.Add(this.lastNameTextBox);
             this.Controls.Add(this.serverIPTextBox);
+            this.Controls.Add(this.birthDateLabel);
+            this.Controls.Add(this.firstNameLabel);
+            this.Controls.Add(this.connectButton);
+            this.Controls.Add(this.lastNameLabel);
             this.Controls.Add(this.serverIPLabel);
+            this.Controls.Add(this.monthTextBox);
+            this.Controls.Add(this.yearTextBox);
             this.Controls.Add(this.titleLabel);
-            this.Name = "Form1";
+            this.Controls.Add(this.dayTextBox);
+            this.Controls.Add(this.monthLabel);
+            this.Controls.Add(this.yearLabel);
+            this.Controls.Add(this.dayLabel);
+            this.Name = "Connect To Server";
             this.Text = "Remote Healthcare Client";
             this.ResumeLayout(false);
             this.PerformLayout();
         }
 
         #endregion
-
-        public void OnReceivedBikeData(BikeData bikeData)
-        {
-            // moest implementeren, niet van gebruik hier
-        }
     }
 }

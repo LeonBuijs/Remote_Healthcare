@@ -1,15 +1,11 @@
 using System;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
 using System.Threading;
 using System.Windows.Forms;
-using Client.Handlers;
 using ClientGUI;
 
 namespace Client;
 
-public partial class Form : System.Windows.Forms.Form, IBLECallback
+public partial class ServerLogin : Form
 {
     private BLEHandler bleHandler;
     private MessageHandler messageHandler;
@@ -18,22 +14,19 @@ public partial class Form : System.Windows.Forms.Form, IBLECallback
 
     // TextBox attributen
     private string serverIp;
-    private string deviceId;
     private string firstName;
     private string lastName;
     private string birthDate;
 
-    public Form()
+    public ServerLogin()
     {
-        bleHandler = new BLEHandler(this);
-        messageHandler = new MessageHandler(bleHandler);
+        // messageHandler = new MessageHandler();
         InitializeComponent();
     }
 
     private void connectButton_Click(object sender, EventArgs e)
     {
         serverIp = serverIPTextBox.Text;
-        deviceId = bikeNumberTextBox.Text;
         firstName = firstNameTextBox.Text;
         lastName = lastNameTextBox.Text;
         birthDate = GetBirthDate();
@@ -47,7 +40,7 @@ public partial class Form : System.Windows.Forms.Form, IBLECallback
 
         try
         {
-            var connected = ConnectToServer(serverIp, deviceId, firstName, lastName, birthDate);
+            var connected = ConnectToServer(serverIp, "fixme", firstName, lastName, birthDate);
 
             if (!connected)
             {
@@ -89,7 +82,6 @@ public partial class Form : System.Windows.Forms.Form, IBLECallback
     private bool CheckTextBoxes()
     {
         return string.IsNullOrWhiteSpace(serverIp) ||
-               string.IsNullOrWhiteSpace(deviceId) ||
                string.IsNullOrWhiteSpace(firstName) ||
                string.IsNullOrWhiteSpace(lastName) ||
                string.IsNullOrWhiteSpace(birthDate);
@@ -98,10 +90,5 @@ public partial class Form : System.Windows.Forms.Form, IBLECallback
     private string GetBirthDate()
     {
         return dayTextBox.Text + monthTextBox.Text + yearTextBox.Text;
-    }
-
-    public void OnReceivedBikeData(string message)
-    {
-        // todo
     }
 }

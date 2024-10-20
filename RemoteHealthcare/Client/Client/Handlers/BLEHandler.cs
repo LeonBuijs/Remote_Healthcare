@@ -5,20 +5,20 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Avans.TI.BLE;
 using Client;
-using Form = Client.Form;
+using ClientGUI;
 
 public class BLEHandler
     {
-        private Form form;
+        private MessageHandler messageHandler;
         
         public BikeData bikeData { get; } = new();
         private static BLE bleBike = new();
         private static BLE bleHeart = new ();
         private static bool simulationMode;
 
-        public BLEHandler(Form form)
+        public BLEHandler(MessageHandler messageHandler)
         {
-            this.form = form;
+            this.messageHandler = messageHandler;
             TrySimulationMode();
         }
 
@@ -140,7 +140,7 @@ public class BLEHandler
         private void BleBike_SubscriptionValueChanged(object Sender, BLESubscriptionValueChangedEventArgs e)
         {
             bikeData.UpdateData(BitConverter.ToString(e.Data).Replace("-", " "));
-            form.OnReceivedBikeData(bikeData);
+            messageHandler.OnReceivedBikeData(bikeData);
             Console.WriteLine(
                 $"Speed: {bikeData.Speed} RPM: {bikeData.Rpm} Distance: {bikeData.Distance} Watts: {bikeData.Watt} Time: {bikeData.Time} HeartRate: {bikeData.HeartRate}");
         }

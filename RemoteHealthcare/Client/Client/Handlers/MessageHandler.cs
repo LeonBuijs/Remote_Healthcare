@@ -5,7 +5,7 @@ using Client.Handlers;
 
 namespace ClientGUI;
 
-public class MessageHandler
+public class MessageHandler : IBLECallback
 {
     private BLEHandler bleHandler;
     private VRHandler vrHandler;
@@ -96,9 +96,8 @@ public class MessageHandler
             loggedIn = false;
         }
     }
-
-    public void OnReceivedBikeData(string message)
+    public void OnReceivedBikeData(BikeData bikeData)
     {
-        // TODO
+        // TODO   
     }
 }
