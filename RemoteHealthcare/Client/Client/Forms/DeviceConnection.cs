@@ -11,6 +11,7 @@ public partial class DeviceConnection : Form
     public DeviceConnection()
     {
         InitializeComponent();
+        messageHandler = new MessageHandler(bleHandler);
     }
 
     private void connectButton_Click(object sender, EventArgs e)

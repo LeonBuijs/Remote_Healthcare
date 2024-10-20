@@ -62,12 +62,12 @@ public partial class ServerLogin : Form
 
     private bool ConnectToServer(string ip, string deviceId, string firstName, string lastName, string birthDate)
     {
-        // bleHandler.Start(deviceId); todo
+        // bleHandler.ConnectDevices(deviceId); todo
         
         // Process firstProc = new Process();
         // firstProc.StartInfo.FileName = "C:\\Users\\jaspe\\RiderProjects\\Remote_Healthcare\\RemoteHealthcare\\Client\\VRConnection\\bin\\Debug\\net8.0\\VRConnection.exe";
         //
-        // firstProc.Start();
+        // firstProc.ConnectDevices();
 
         connection = new Connection(ip, 6666, messageHandler);
 
