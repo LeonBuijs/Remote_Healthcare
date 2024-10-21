@@ -1,7 +1,4 @@
-using System.ComponentModel;
-using System.Security.AccessControl;
-
-namespace Client
+namespace Client.Forms
 {
     partial class DeviceConnection
     {

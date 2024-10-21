@@ -1,9 +1,7 @@
-using System.Net.Sockets;
-
-namespace Client;
+namespace Client.Handlers;
 
 /**
- * Dummy klasse waarmee berichten naar de VR-Server gestuurd kunnen worden
+ * Klasse waarmee berichten naar de VR-omgeving gestuurd kunnen worden
  */
 public class VRHandler
 {
@@ -15,12 +13,17 @@ public class VRHandler
         this.connection = connection;
     }
 
+    /**
+     * Methode om chats van de arts naar de VR-omgeving te sturen
+     */
     public void SendChatToVr(string chat)
     {
-        //todo
         connection.SendMessage($"0 {chat}");
     }
 
+    /**
+     * Methode om data vanuit de fiets naar de VR-omgeving te sturen
+     */
     public void SendBikeDataToVr(BikeData bikeData)
     {
         if (!inSession)// todo
@@ -29,24 +32,36 @@ public class VRHandler
         }
     }
 
+    /**
+     * Methode om een startcommando naar de VR-omgeving te sturen
+     */
     public void StartSession()
     {
         connection.SendMessage("2");
         inSession = true;
     }
 
+    /**
+     * Methode om een stopcommando naar de VR-omgeving te sturen
+     */
     public void StopSession()
     {
         connection.SendMessage("3");
         inSession = false;
     }
 
+    /**
+     * Methode om een noodstopcommando naar de VR-omgeving te sturen
+     */
     public void EmergencyStop()
     {
         connection.SendMessage("4");
         inSession = false;
     }
 
+    /**
+     * Methode om de client naam naar de VR-omgeving te sturen
+     */
     public void SendNameToVr(string firstName, string lastName)
     {
         connection.SendMessage($"5 {firstName} {lastName}");

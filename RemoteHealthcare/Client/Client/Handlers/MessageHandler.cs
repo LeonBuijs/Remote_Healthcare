@@ -1,15 +1,13 @@
 using System;
 using System.Text;
-using Client;
-using Client.Handlers;
 
-namespace ClientGUI;
+namespace Client.Handlers;
 
 public class MessageHandler : IBLECallback
 {
     private BLEHandler bleHandler;
-    public VRHandler vrHandler { get; set; }
-    public bool loggedIn { get; set; }
+    public VRHandler VrHandler { get; set; }
+    public bool LoggedIn { get; set; }
 
     public MessageHandler(BLEHandler bleHandler)
     {
@@ -61,7 +59,7 @@ public class MessageHandler : IBLECallback
     private void HandleChatMessage(string message)
     {
         Console.WriteLine($"Chat message from doctor: {message}");
-        vrHandler.SendChatToVr(message);
+        VrHandler.SendChatToVr(message);
     }
 
     /**
@@ -81,7 +79,7 @@ public class MessageHandler : IBLECallback
      */
     private void HandleStartCommand()
     {
-        vrHandler.StartSession();
+        VrHandler.StartSession();
     }
 
     /**
@@ -89,7 +87,7 @@ public class MessageHandler : IBLECallback
      */
     private void HandleStopCommand()
     {
-        vrHandler.StopSession();
+        VrHandler.StopSession();
     }
 
     /**
@@ -97,7 +95,7 @@ public class MessageHandler : IBLECallback
      */
     private void HandleEmergencyStopCommand()
     {
-        vrHandler.EmergencyStop();
+        VrHandler.EmergencyStop();
     }
 
     /**
@@ -108,12 +106,12 @@ public class MessageHandler : IBLECallback
         if (confirmation == "1")
         {
             Console.WriteLine("Logging in");
-            loggedIn = true;
+            LoggedIn = true;
         }
         else
         {
             Console.WriteLine("Wrong username or password");
-            loggedIn = false;
+            LoggedIn = false;
         }
     }
 
@@ -127,9 +125,7 @@ public class MessageHandler : IBLECallback
 
     public void OnReceivedBikeData(BikeData bikeData)
     {
-        // TODO   
-        vrHandler.SendBikeDataToVr(bikeData);
-
+        VrHandler.SendBikeDataToVr(bikeData);
         Console.WriteLine(bikeData);
     }
 }

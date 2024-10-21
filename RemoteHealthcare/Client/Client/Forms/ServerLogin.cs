@@ -1,15 +1,13 @@
 using System;
-using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Windows.Forms;
-using ClientGUI;
+using Client.Handlers;
 
-namespace Client;
+namespace Client.Forms;
 
 public partial class ServerLogin : Form
 {
-    private MessageHandler messageHandler;
+    private readonly MessageHandler messageHandler;
 
     private Connection connection;
 
@@ -41,7 +39,7 @@ public partial class ServerLogin : Form
 
         try
         {
-            var connected = ConnectToServer(serverIp, firstName, lastName, birthDate);
+            var connected = ConnectToServer(serverIp);
 
             if (!connected)
             {
@@ -49,14 +47,14 @@ public partial class ServerLogin : Form
                 return;
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             MessageBox.Show("Unable to connect to server", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
 
         // Wanneer er verbinding is met de server, VR opstarten en verbinden
-        ConnectToVR();
+        ConnectToVr();
         
         Console.WriteLine("Connected!");
         Hide();
@@ -66,7 +64,7 @@ public partial class ServerLogin : Form
      * Methode om verbinding te maken met de server
      * Returnt false als er geen toegang is, true zo wel
      */
-    private bool ConnectToServer(string ip, string firstName, string lastName, string birthDate)
+    private bool ConnectToServer(string ip)
     {
         connection = new Connection(ip, 6666, messageHandler);
 
@@ -75,13 +73,13 @@ public partial class ServerLogin : Form
         
         Thread.Sleep(1000);
         
-        return messageHandler.loggedIn;
+        return messageHandler.LoggedIn;
     }
 
     /**
-     * Methode om de VR connectie op te zetten
+     * Methode om de VR-connectie op te zetten
      */
-    private void ConnectToVR()
+    private void ConnectToVr()
     {
         // TEST CODE
         
@@ -112,8 +110,8 @@ public partial class ServerLogin : Form
             try
             {
                 connection = new Connection("127.0.0.1", 9999, messageHandler);
-                messageHandler.vrHandler = new VRHandler(connection);
-                messageHandler.vrHandler.SendNameToVr(firstName, lastName);
+                messageHandler.VrHandler = new VRHandler(connection);
+                messageHandler.VrHandler.SendNameToVr(firstName, lastName);
             }
             catch (Exception e)
             {
@@ -137,6 +135,9 @@ public partial class ServerLogin : Form
                string.IsNullOrWhiteSpace(birthDate);
     }
 
+    /**
+     * Methode om een string met de geboortedatum te verkrijgen
+     */
     private string GetBirthDate()
     {
         return dayTextBox.Text + monthTextBox.Text + yearTextBox.Text;

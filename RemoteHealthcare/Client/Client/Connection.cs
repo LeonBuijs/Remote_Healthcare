@@ -2,7 +2,7 @@ using System;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
-using ClientGUI;
+using Client.Handlers;
 
 namespace Client;
 
@@ -14,19 +14,18 @@ public class Connection
     private TcpClient client;
     private NetworkStream stream;
     private MessageHandler messageHandler;
-        
+
     public Connection(string ipAddress, int port, MessageHandler messageHandler)
     {
         // Verbind met server
         client = new TcpClient(ipAddress, port);
         stream = client.GetStream();
-        
+
         this.messageHandler = messageHandler;
-            
+
         StartThreadReceive();
     }
 
-    // TODO: wanneer verbinding met de server verloren wordt, netjes afsluiten
     /**
      * Methode om de thread te starten die alle berichten ontvangt
      */
@@ -38,10 +37,10 @@ public class Connection
             {
                 var buffer = new byte[1024];
                 var bytesRead = stream.Read(buffer, 0, buffer.Length);
-                
+
                 try
                 {
-                    var received=  Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    var received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
                     messageHandler.ProcessMessage(received);
                 }
                 catch (Exception)
@@ -54,14 +53,19 @@ public class Connection
         });
         threadReceive.Start();
     }
-    
 
+    /**
+     * Methode om een bericht naar de verbonden TCP-client te sturen
+     */
     public void SendMessage(string message)
     {
         var data = Encoding.ASCII.GetBytes(message);
         stream.Write(data, 0, data.Length);
     }
 
+    /**
+     * Methode om alle verbonden zaken af te sluiten
+     */
     private void Disconnect()
     {
         stream.Close();

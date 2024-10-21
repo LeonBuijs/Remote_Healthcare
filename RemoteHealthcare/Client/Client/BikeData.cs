@@ -4,23 +4,27 @@ public class BikeData
 {
     private bool initialized;
 
-    public int Speed { get; set; }
-    public int Watt { get; set; }
-    public int Rpm { get; set; }
-    public int HeartRate { get; set; }
+    private int Speed;
+    private int Watt;
+    private int Rpm;
+
+    private int HeartRate;
 
     //attributen voor tijd
-    public double Time { get; set; } //todo mogelijk implementeren nog
+    private double Time;
     private double lastTime;
     private int timeFlip;
     private double timeOffset;
 
     //attributen voor afstanden
-    public int Distance { get; set; }
+    private int Distance { get; set; }
     private int lastDistance;
     private int distanceFlip;
     private int distanceOffset;
 
+    /**
+     * Methode om het bikeData object te updaten
+     */
     public void UpdateData(string data)
     {
         var split = data.Split(' ');
@@ -31,15 +35,15 @@ public class BikeData
                 // heartRate = data[2];
                 HeartRate = int.Parse(split[1], System.Globalization.NumberStyles.HexNumber);
                 break;
-            case 6:
-                //todo andere data van hartslagmeter, mogelijk nog extra data implementeren.
-                break;
             case 13:
                 ChangeBikeData(split);
                 break;
         }
     }
 
+    /**
+     * Methode om data van de fiets aan te passen
+     */
     private void ChangeBikeData(string[] split)
     {
         var pageNumber = int.Parse(split[4], System.Globalization.NumberStyles.HexNumber);
@@ -68,9 +72,12 @@ public class BikeData
         }
     }
 
+    /**
+     * Helper methode om de afstand te berekenen
+     * Databyte van afstand flipt na 255
+     */
     private void CalculateDistance(string[] split)
     {
-        //distance flipt na 255
         Distance = int.Parse(split[7], System.Globalization.NumberStyles.HexNumber);
         if (lastDistance > 200 && Distance < 100)
         {
@@ -82,6 +89,11 @@ public class BikeData
         Distance += distanceFlip * 256 - distanceOffset;
     }
 
+    /**
+    * Helper methode om de tijd te berekenen
+    * Databyte van tijd flipt na 255
+    * 1 tijdseenheid = 0.25 seconden vanuit datapakketje
+    */
     private void CalculateTime(string[] split)
     {
         //time flipt na 255

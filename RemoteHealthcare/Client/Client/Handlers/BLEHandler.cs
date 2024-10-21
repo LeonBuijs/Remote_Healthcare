@@ -3,19 +3,18 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using Avans.TI.BLE;
-using Client;
-using ClientGUI;
 
-public class BLEHandler
+namespace Client.Handlers;
+
+public class BLEHandler(MessageHandler messageHandler)
 {
     private static bool running = true;
     private static bool simulationMode;
 
-    private BikeData bikeData { get; } = new();
-    private MessageHandler messageHandler;
-    
+    private BikeData BikeData { get; } = new();
+    private MessageHandler messageHandler = messageHandler;
+
     private static BLE bleBike = new();
     private static BLE bleHeart = new();
     private static string BikeCharacteristic = "6e40fec2-b5a3-f393-e0a9-e50e24dcca9e";
@@ -23,19 +22,14 @@ public class BLEHandler
     public int ErrorCodeBike { get; set; } = 1;
     public int ErrorCodeHeart { get; set; } = 1;
 
-    public BLEHandler(MessageHandler messageHandler)
-    {
-        this.messageHandler = messageHandler;
-    }
-
     /**
-     * Methode om de BLE-devices te starten na invoeren van deviceID
-     * Bij ongeldig deviceID false returnen en apparaten niet verbinden
-     */
+    * Methode om de BLE-devices te starten na invoeren van deviceID
+    * Bij ongeldig deviceID false returnen en apparaten niet verbinden
+    */
     public bool ConnectDevices(string bikeNumber)
     {
         TrySimulationMode();
-        
+
         if (simulationMode)
         {
             ErrorCodeBike = 0;
@@ -56,8 +50,8 @@ public class BLEHandler
     }
 
     /**
-     * Methode om alle apparaten te starten en te verbinden
-     */
+    * Methode om alle apparaten te starten en te verbinden
+    */
     private async Task StartBLE(string bikeNumber)
     {
         await ConnectBike(bikeNumber);
@@ -65,8 +59,8 @@ public class BLEHandler
     }
 
     /**
-     * Helper methode om met de fiets te verbinden
-     */
+    * Helper methode om met de fiets te verbinden
+    */
     private async Task ConnectBike(string bikeNumber)
     {
         // Als fiets al verbonden is, returnen
@@ -74,7 +68,7 @@ public class BLEHandler
         {
             return;
         }
-        
+
         // Connecting
         ErrorCodeBike = await bleBike.OpenDevice($"Tacx Flux {bikeNumber}");
         // Set service
@@ -85,8 +79,8 @@ public class BLEHandler
     }
 
     /**
-     * Helper methode om met de hartslagmonitor te verbinden
-     */
+    * Helper methode om met de hartslagmonitor te verbinden
+    */
     private async Task ConnectHeart()
     {
         // Als hartslagmonitor al verbonden is, returnen
@@ -94,7 +88,7 @@ public class BLEHandler
         {
             return;
         }
-        
+
         // Connecting
         ErrorCodeHeart = await bleHeart.OpenDevice("Decathlon Dual HR");
         // Set service
@@ -105,8 +99,8 @@ public class BLEHandler
     }
 
     /**
-     * Methode om te controleren of het ingevoerde framenummer beschikbaar is
-     */
+    * Methode om te controleren of het ingevoerde framenummer beschikbaar is
+    */
     private bool DeviceAvailable(string frameNumber)
     {
         var deviceAvailable = false;
@@ -128,18 +122,18 @@ public class BLEHandler
 
 
     /**
-     * Aangeleverde klasse
-     * Print waarde ontvangen uit fiets naar console
-     */
+    * Aangeleverde klasse
+    * Print waarde ontvangen uit fiets naar console
+    */
     private void BleBike_SubscriptionValueChanged(object Sender, BLESubscriptionValueChangedEventArgs e)
     {
-        bikeData.UpdateData(BitConverter.ToString(e.Data).Replace("-", " "));
-        messageHandler.OnReceivedBikeData(bikeData);
+        BikeData.UpdateData(BitConverter.ToString(e.Data).Replace("-", " "));
+        messageHandler.OnReceivedBikeData(BikeData);
     }
 
     /**
-     * Hoofdmethode om data naar een fiets te sturen
-     */
+    * Hoofdmethode om data naar een fiets te sturen
+    */
     private async void SendMessageToBike(byte[] payload)
     {
         byte sync = 0xA4;
@@ -173,8 +167,8 @@ public class BLEHandler
     }
 
     /**
-     * Specifieke methode om de weerstand van de fiets aan te passen
-     */
+    * Specifieke methode om de weerstand van de fiets aan te passen
+    */
     public void SetResistance(byte resistance)
     {
         if (simulationMode)
@@ -189,9 +183,9 @@ public class BLEHandler
     }
 
     /**
-     * Methode om verbinding te maken met de simulator applicatie
-     * Als de sim niet live is, returnen
-     */
+    * Methode om verbinding te maken met de simulator applicatie
+    * Als de sim niet live is, returnen
+    */
     [SuppressMessage("ReSharper.DPA", "DPA0000: DPA issues")]
     private void TrySimulationMode()
     {
@@ -215,20 +209,20 @@ public class BLEHandler
                 var buffer = new byte[32];
                 var bytesRead = stream.Read(buffer, 0, buffer.Length);
 
-                bikeData.UpdateData(BitConverter.ToString(buffer, 0, bytesRead).Replace("-", " "));
-                messageHandler.OnReceivedBikeData(bikeData);
+                BikeData.UpdateData(BitConverter.ToString(buffer, 0, bytesRead).Replace("-", " "));
+                messageHandler.OnReceivedBikeData(BikeData);
             }
         });
         simThread.Start();
     }
 
     /**
-     * Methode om de BLE-verbindingen te onderbreken
-     */
+    * Methode om de BLE-verbindingen te onderbreken
+    */
     public void Disconnect()
     {
         running = false;
-        
+
         bleBike.Unsubscribe(BikeCharacteristic);
         bleBike.CloseDevice();
         bleHeart.Unsubscribe("HeartRateMeasurement");
