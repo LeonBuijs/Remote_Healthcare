@@ -212,7 +212,7 @@ public class BLEHandler
             while (running)
             {
                 var stream = tcpClient.GetStream();
-                var buffer = new byte[1024];
+                var buffer = new byte[32];
                 var bytesRead = stream.Read(buffer, 0, buffer.Length);
 
                 bikeData.UpdateData(BitConverter.ToString(buffer, 0, bytesRead).Replace("-", " "));

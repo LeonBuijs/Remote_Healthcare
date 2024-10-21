@@ -69,7 +69,7 @@ public partial class DeviceConnection : Form
         Console.WriteLine("ServerLogin Started!");
         
         Hide();
-        var serverLogin = new ServerLogin(bleHandler, messageHandler);
+        var serverLogin = new ServerLogin(messageHandler);
         serverLogin.Closed += (s, args) => Close(); 
         serverLogin.Show();
     }

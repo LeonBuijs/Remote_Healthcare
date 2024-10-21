@@ -9,7 +9,6 @@ namespace Client;
 
 public partial class ServerLogin : Form
 {
-    private BLEHandler bleHandler;
     private MessageHandler messageHandler;
 
     private Connection connection;
@@ -20,9 +19,8 @@ public partial class ServerLogin : Form
     private string lastName;
     private string birthDate;
 
-    public ServerLogin(BLEHandler bleHandler, MessageHandler messageHandler)
+    public ServerLogin(MessageHandler messageHandler)
     {
-        this.bleHandler = bleHandler;
         this.messageHandler = messageHandler;
         InitializeComponent();
     }
@@ -64,6 +62,10 @@ public partial class ServerLogin : Form
         Hide();
     }
 
+    /**
+     * Methode om verbinding te maken met de server
+     * Returnt false als er geen toegang is, true zo wel
+     */
     private bool ConnectToServer(string ip, string firstName, string lastName, string birthDate)
     {
         connection = new Connection(ip, 6666, messageHandler);
@@ -96,9 +98,12 @@ public partial class ServerLogin : Form
         // Process firstProc = new Process();
         // firstProc.StartInfo.FileName = "C:\\Users\\jaspe\\RiderProjects\\Remote_Healthcare\\RemoteHealthcare\\Client\\VRConnection\\bin\\Debug\\net8.0\\VRConnection.exe";
         // firstProc.ConnectDevices();
+        
         // var vrProcess = new Process();
         // vrProcess.StartInfo.FileName = @"C:\Users\jaspe\RiderProjects\Remote_Healthcare\RemoteHealthcare\Client\VRConnection\bin\Debug\net8.0\VRConnection.exe";
         // vrProcess.Start();
+        
+        // TEST CODE
 
         var connected = false;
 
@@ -114,13 +119,16 @@ public partial class ServerLogin : Form
             {
                 Console.WriteLine(e);
                 Thread.Sleep(1000);
-                return;
+                continue;
             }
             
             connected = true;
         }
     }
 
+    /**
+     * Methode om te controleren of alle velden ingevuld zijn
+     */
     private bool CheckTextBoxes()
     {
         return string.IsNullOrWhiteSpace(serverIp) ||
