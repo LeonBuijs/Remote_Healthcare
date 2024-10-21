@@ -11,7 +11,7 @@ public class VREngine
 {
     private static string SessionID;
     private static NetworkStream stream;
-    private static string uuidBike;
+    public static string uuidBike;
     private static string uuidTerrain;
     private static string uuidRoute;
     public static string uuidPanelData;
