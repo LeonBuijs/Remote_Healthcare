@@ -23,10 +23,9 @@ public class VRHandler
 
     public void SendBikeDataToVr(BikeData bikeData)
     {
-        if (inSession)
+        if (!inSession)// todo
         {
             connection.SendMessage($"1 {bikeData}");
-
         }
     }
 

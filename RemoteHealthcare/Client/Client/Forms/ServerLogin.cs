@@ -1,4 +1,6 @@
 using System;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Windows.Forms;
 using ClientGUI;
@@ -81,13 +83,42 @@ public partial class ServerLogin : Form
     {
         // TEST CODE
         
+        // var simProcess = new Process();
+        // simProcess.StartInfo.FileName =
+        //     @"C:\Users\jaspe\RiderProjects\Remote_Healthcare\RemoteHealthcare\Client\VRConnection\bin\Debug\net8.0\NetworkEngine.24.9.26\NetworkEngine\sim.bat";
+        // simProcess.Start();
+        
+        // var processStartInfo = new ProcessStartInfo("cmd.exe", "/c " + @"C:\Users\jaspe\RiderProjects\Remote_Healthcare\RemoteHealthcare\Client\VRConnection\bin\Debug\net8.0\NetworkEngine.24.9.26\NetworkEngine\sim.bat");
+        // simProcess = Process.Start(processStartInfo);
+        //
+        // Thread.Sleep(5000);
+        
         // Process firstProc = new Process();
         // firstProc.StartInfo.FileName = "C:\\Users\\jaspe\\RiderProjects\\Remote_Healthcare\\RemoteHealthcare\\Client\\VRConnection\\bin\\Debug\\net8.0\\VRConnection.exe";
         // firstProc.ConnectDevices();
-        
-        connection = new Connection("127.0.0.1", 9999, messageHandler);
-        messageHandler.vrHandler = new VRHandler(connection);
-        messageHandler.vrHandler.SendNameToVr(firstName, lastName);
+        // var vrProcess = new Process();
+        // vrProcess.StartInfo.FileName = @"C:\Users\jaspe\RiderProjects\Remote_Healthcare\RemoteHealthcare\Client\VRConnection\bin\Debug\net8.0\VRConnection.exe";
+        // vrProcess.Start();
+
+        var connected = false;
+
+        while (!connected)
+        {
+            try
+            {
+                connection = new Connection("127.0.0.1", 9999, messageHandler);
+                messageHandler.vrHandler = new VRHandler(connection);
+                messageHandler.vrHandler.SendNameToVr(firstName, lastName);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                Thread.Sleep(1000);
+                return;
+            }
+            
+            connected = true;
+        }
     }
 
     private bool CheckTextBoxes()

@@ -217,8 +217,6 @@ public class BLEHandler
 
                 bikeData.UpdateData(BitConverter.ToString(buffer, 0, bytesRead).Replace("-", " "));
                 messageHandler.OnReceivedBikeData(bikeData);
-                Console.WriteLine(
-                    $"Speed: {bikeData.Speed} RPM: {bikeData.Rpm} Distance: {bikeData.Distance} Watts: {bikeData.Watt} Time: {bikeData.Time} HeartRate: {bikeData.HeartRate}");
             }
         });
         simThread.Start();
