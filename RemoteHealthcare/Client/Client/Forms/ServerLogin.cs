@@ -1,39 +1,36 @@
 using System;
-using System.Globalization;
 using System.Threading;
 using System.Windows.Forms;
 using ClientGUI;
 
 namespace Client;
 
-public partial class Form : System.Windows.Forms.Form
+public partial class ServerLogin : Form
 {
-    private BLEHandler bleHandler = new();
-    private VRHandler vrHandler = new();
+    private BLEHandler bleHandler;
     private MessageHandler messageHandler;
 
     private Connection connection;
 
     // TextBox attributen
     private string serverIp;
-    private string deviceId;
     private string firstName;
     private string lastName;
     private string birthDate;
 
-    public Form()
+    public ServerLogin(BLEHandler bleHandler, MessageHandler messageHandler)
     {
-        messageHandler = new MessageHandler(bleHandler, vrHandler);
+        this.bleHandler = bleHandler;
+        this.messageHandler = messageHandler;
         InitializeComponent();
     }
 
     private void connectButton_Click(object sender, EventArgs e)
     {
         serverIp = serverIPTextBox.Text;
-        deviceId = bikeNumberTextBox.Text;
         firstName = firstNameTextBox.Text;
         lastName = lastNameTextBox.Text;
-        birthDate = birthDateTextBox.Text;
+        birthDate = GetBirthDate();
 
         // Verification
         if (CheckTextBoxes())
@@ -44,7 +41,7 @@ public partial class Form : System.Windows.Forms.Form
 
         try
         {
-            var connected = ConnectToServer(serverIp, deviceId, firstName, lastName, birthDate);
+            var connected = ConnectToServer(serverIp, firstName, lastName, birthDate);
 
             if (!connected)
             {
@@ -64,9 +61,13 @@ public partial class Form : System.Windows.Forms.Form
         Hide();
     }
 
-    private bool ConnectToServer(string ip, string deviceId, string firstName, string lastName, string birthDate)
+    private bool ConnectToServer(string ip, string firstName, string lastName, string birthDate)
     {
-        // bleHandler.Start(deviceId); todo
+        // TEST CODE
+        
+        // Process firstProc = new Process();
+        // firstProc.StartInfo.FileName = "C:\\Users\\jaspe\\RiderProjects\\Remote_Healthcare\\RemoteHealthcare\\Client\\VRConnection\\bin\\Debug\\net8.0\\VRConnection.exe";
+        // firstProc.ConnectDevices();
 
         connection = new Connection(ip, 6666, messageHandler);
 
@@ -81,9 +82,13 @@ public partial class Form : System.Windows.Forms.Form
     private bool CheckTextBoxes()
     {
         return string.IsNullOrWhiteSpace(serverIp) ||
-               string.IsNullOrWhiteSpace(deviceId) ||
                string.IsNullOrWhiteSpace(firstName) ||
                string.IsNullOrWhiteSpace(lastName) ||
                string.IsNullOrWhiteSpace(birthDate);
+    }
+
+    private string GetBirthDate()
+    {
+        return dayTextBox.Text + monthTextBox.Text + yearTextBox.Text;
     }
 }

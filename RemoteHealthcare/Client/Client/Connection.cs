@@ -38,9 +38,18 @@ public class Connection
             {
                 var buffer = new byte[1024];
                 var bytesRead = stream.Read(buffer, 0, buffer.Length);
-                var received=  Encoding.ASCII.GetString(buffer, 0, bytesRead);
                 
-                messageHandler.ProcessMessage(received);
+                try
+                {
+                    var received=  Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    messageHandler.ProcessMessage(received);
+                }
+                catch (Exception)
+                {
+                    messageHandler.Disconnect();
+                    Disconnect();
+                    return;
+                }
             }
         });
         threadReceive.Start();
@@ -52,8 +61,8 @@ public class Connection
         var data = Encoding.ASCII.GetBytes(message);
         stream.Write(data, 0, data.Length);
     }
-        
-    public void CloseConnection()
+
+    private void Disconnect()
     {
         stream.Close();
         client.Close();
