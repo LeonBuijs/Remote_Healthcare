@@ -1,9 +1,9 @@
 using System;
 using System.Threading;
 using System.Windows.Forms;
-using ClientGUI;
+using Client.Handlers;
 
-namespace Client;
+namespace Client.Forms;
 
 public partial class DeviceConnection : Form
 {
@@ -101,7 +101,7 @@ public partial class DeviceConnection : Form
     /**
      * Methode om een waarschuwing-popup te maken
      */
-    private void CreateWarningPopup(string title, string message)
+    private static void CreateWarningPopup(string title, string message)
     {
         MessageBox.Show($"{title}\n{message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
