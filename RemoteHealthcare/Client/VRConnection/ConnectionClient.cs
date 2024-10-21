@@ -24,16 +24,7 @@ public class ConnectionClient
     }
 
     private static void WaitForCommand()
-
-
-
     {
-        var b = "";
-        Thread t = new Thread(() =>
-        {
-            b = "1";
-        });
-        t.Start();
         while (true)
         {
             var buffer = new byte[1024];
@@ -57,15 +48,9 @@ public class ConnectionClient
                     // Data
                     string[] data = content.Split(' ');
                     Panel.ClearPanel(VREngine.uuidPanelData);
-                    
-                    Panel.ChangeSpeedPanel(VREngine.uuidPanelData, $"{data[0]}\n{data[1]}");
+                    Panel.ChangeSpeedPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]), 
+                        Convert.ToInt32(data[5]), data[3], Convert.ToInt32(data[1]));
                     Route.ChangeFollowRouteSpeed(VREngine.uuidBike, Convert.ToInt32(data[0]));
-
-                    Panel.ChangeDistancePanel(VREngine.uuidPanelData, Convert.ToInt32(data[1]));
-                    // Panel.ChangeWattPanel(VREngine.uuidPanelData, Convert.ToInt32(data[2]));
-                    // Panel.ChangeTimePanel(VREngine.uuidPanelData, data[3]);
-                    // Panel.ChangeRPMPanel(VREngine.uuidPanelData, Convert.ToInt32(data[4]));
-                    // Panel.ChangeHeartRatePanel(VREngine.uuidPanelData, Convert.ToInt32(data[5]));
                     Panel.SwapPanel(VREngine.uuidPanelData);
                     break;
                 case '2':

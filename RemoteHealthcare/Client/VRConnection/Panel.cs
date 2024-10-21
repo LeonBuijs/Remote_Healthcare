@@ -12,53 +12,20 @@ public class Panel : VREngine
     {
         DrawTextOnPanel(name, uuidPanel,new[] { 10, 30 }, 30);
     }
+    
+    public static void SetDataText(string uuidPanel)
+    {
+        DrawTextOnPanel("Snelheid | Hartslag | Tijdsduur | Afstand", uuidPanel,new[] { 10, 20 }, 18);
+    }
 
     /**
      * Methode om de snelheid aan te passen op het panel, je geeft de uuid van het panel mee en de snelheid.
      */
-    public static void ChangeSpeedPanel(string uuidPanel, string speed)
+    public static void ChangeSpeedPanel(string uuidPanel, int speed, int heartRate, string time, int distance)
     {
-        DrawTextOnPanel("Snelheid: " + speed, uuidPanel,new[] { 10, 60 }, 20);
-    }
-
-    /**
-     * Methode om het wattage aan te passen op het panel, je geeft de uuid van het panel mee en het wattage.
-     */
-    public static void ChangeWattPanel(string uuidPanel, int watt)
-    {
-        DrawTextOnPanel("Watt: " + watt, uuidPanel,new[] { 10, 80 }, 20);
-    }
-
-    /**
-     * Methode om de RPM aan te passen op het panel, je geeft de uuid van het panel mee en de RPM.
-     */
-    public static void ChangeRPMPanel(string uuidPanel, int rpm)
-    {
-        DrawTextOnPanel("RPM: " + rpm, uuidPanel,new[] { 10, 100 }, 20);
-    }
-
-    /**
-     * Methode om de hartslag aan te passen op het panel, je geeft de uuid van het panel mee en de hartslag.
-     */
-    public static void ChangeHeartRatePanel(string uuidPanel, int heartRate)
-    {
-        DrawTextOnPanel("Hartslag: " + heartRate, uuidPanel,new[] { 10, 120 }, 20);
-    }
-
-    /**
-     * Methode om de tijd aan te passen op het panel, je geeft de uuid van het panel mee en de tijd.
-     */
-    public static void ChangeTimePanel(string uuidPanel, string time)
-    {
-        DrawTextOnPanel("Tijdsduur: " + time, uuidPanel,new[] { 10, 140 }, 20);
-    }
-
-    /**
-     * Methode om de afstand aan te passen op het panel, je geeft de uuid van het panel mee en de afstand.
-     */
-    public static void ChangeDistancePanel(string uuidPanel, int distance)
-    {
-        DrawTextOnPanel("Afstand: " + distance, uuidPanel,new[] { 10, 160 }, 20);
+        // TODO: Mooier uitlijnen voor elke waarde
+        DrawTextOnPanel("" + speed + "           " + heartRate + "          " + time + "         " + distance, 
+            uuidPanel,new[] {25, 10 }, 18);
     }
     
     /**
@@ -70,7 +37,7 @@ public class Panel : VREngine
         {
             for (int i = 5; i > 0; i--)
             {
-                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (5 - i) * 20 + 30 }, 20);
+                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (5 - i) * 20 + 60 }, 20);
             }
         }
         else

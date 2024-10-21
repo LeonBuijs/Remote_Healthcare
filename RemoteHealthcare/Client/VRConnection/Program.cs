@@ -16,6 +16,7 @@ public class VREngine
     private static string uuidRoute;
     public static string uuidPanelData;
     public static string uuidPanelChats;
+    public static string uuidPanelDataText;
 
     public static void Main(string[] args)
     {
@@ -42,21 +43,22 @@ public class VREngine
         AttachCameraToBike(uuidBike);
 
         uuidPanelData = Panel.CreateNodeForPanel();
+        uuidPanelDataText = Panel.CreateNodeForPanel();
+        Panel.ClearPanel(uuidPanelDataText);
+        Panel.SetDataText(uuidPanelDataText);
+        Panel.SwapPanel(uuidPanelDataText);
+        Panel.AttachPanelToBike(uuidPanelDataText, uuidBike, new[] { -2, 2.4, -2.1 });
+        
         Panel.ClearPanel(uuidPanelData);
 
-        Panel.ChangeNamePanel(uuidPanelData, "Name");
-        Panel.ChangeSpeedPanel(uuidPanelData, "5");
-        Panel.ChangeWattPanel(uuidPanelData, 100);
-        Panel.ChangeRPMPanel(uuidPanelData, 25);
-        Panel.ChangeHeartRatePanel(uuidPanelData, 90);
-        Panel.ChangeTimePanel(uuidPanelData, "00:00:00");
-        Panel.ChangeDistancePanel(uuidPanelData, 0);
+        Panel.ChangeSpeedPanel(uuidPanelData, 15, 190, "00:00", 20000);
         Panel.SwapPanel(uuidPanelData);
-        Panel.AttachPanelToBike(uuidPanelData, uuidBike, new[] { -2, 2.4, -2.1 });
-
+        Panel.AttachPanelToBike(uuidPanelData, uuidBike, new[] { -2, 2.2, -2.1 });
+        
         uuidPanelChats = Panel.CreateNodeForPanel();
         Panel.ClearPanel(uuidPanelChats);
-        
+        Panel.ChangeNamePanel(uuidPanelChats, "Name");
+
         Panel.SwapPanel(uuidPanelChats);
         Panel.AttachPanelToBike(uuidPanelChats, uuidBike, new[] { -2, 2.4, 2.1 });
 
