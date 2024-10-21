@@ -8,47 +8,48 @@ namespace Client;
 public class VRHandler
 {
     private bool inSession;
-    private TcpClient tcpClient;
+    private Connection connection;
 
-    public VRHandler()
+    public VRHandler(Connection connection)
     {
-        ConnectToVrConnection();
-    }
-
-    public void SendBikeDataToVr(int speed)
-    {
-        //todo
+        this.connection = connection;
     }
 
     public void SendChatToVr(string chat)
     {
         //todo
+        connection.SendMessage($"0 {chat}");
+    }
+
+    public void SendBikeDataToVr(BikeData bikeData)
+    {
+        if (inSession)
+        {
+            connection.SendMessage($"1 {bikeData}");
+
+        }
     }
 
     public void StartSession()
     {
-        //todo
+        connection.SendMessage("2");
         inSession = true;
     }
 
     public void StopSession()
     {
-        //todo
+        connection.SendMessage("3");
         inSession = false;
     }
 
     public void EmergencyStop()
     {
-        //todo
+        connection.SendMessage("4");
         inSession = false;
     }
 
-    /**
-     * Methode om een TCP-verbinding op localhost op te zetten om met de VRConnection applicatie te praten
-     */
-    private void ConnectToVrConnection()
+    public void SendNameToVr(string firstName, string lastName)
     {
-        tcpClient = new TcpClient();
-        tcpClient.Connect("127.0.0.1", 9999);
+        connection.SendMessage($"5 {firstName} {lastName}");
     }
 }

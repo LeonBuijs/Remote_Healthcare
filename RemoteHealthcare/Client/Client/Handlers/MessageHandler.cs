@@ -8,7 +8,7 @@ namespace ClientGUI;
 public class MessageHandler : IBLECallback
 {
     private BLEHandler bleHandler;
-    private VRHandler vrHandler;
+    public VRHandler vrHandler { get; set; }
     public bool loggedIn { get; set; }
 
     public MessageHandler(BLEHandler bleHandler)
@@ -16,14 +16,14 @@ public class MessageHandler : IBLECallback
         this.bleHandler = bleHandler;
         // this.vrHandler = vrHandler; // TODO deze initten als de doctor een sessie start
     }
-    
+
     /**
      * Methode om inkomende berichten te verwerken
      */
     public void ProcessMessage(string message)
     {
         Console.WriteLine($"Received message: {message}");
-        
+
         if (string.IsNullOrWhiteSpace(message))
         {
             return;
@@ -124,11 +124,12 @@ public class MessageHandler : IBLECallback
     {
         bleHandler.Disconnect();
     }
-    
+
     public void OnReceivedBikeData(BikeData bikeData)
     {
         // TODO   
-        Console.WriteLine(
-            $"Speed: {bikeData.Speed} RPM: {bikeData.Rpm} Distance: {bikeData.Distance} Watts: {bikeData.Watt} Time: {bikeData.Time} HeartRate: {bikeData.HeartRate}");
+        vrHandler.SendBikeDataToVr(bikeData);
+
+        Console.WriteLine(bikeData);
     }
 }

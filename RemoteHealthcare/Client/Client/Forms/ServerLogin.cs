@@ -35,7 +35,7 @@ public partial class ServerLogin : Form
         // Verification
         if (CheckTextBoxes())
         {
-            MessageBox.Show("Vul alle velden in !", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show("Enter all text areas", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -51,32 +51,43 @@ public partial class ServerLogin : Form
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Fout bij het verbinden {ex.Message}", "Error", MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
+            MessageBox.Show("Unable to connect to server", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             return;
         }
-        //Start sending data... todo
 
+        // Wanneer er verbinding is met de server, VR opstarten en verbinden
+        ConnectToVR();
+        
         Console.WriteLine("Connected!");
         Hide();
     }
 
     private bool ConnectToServer(string ip, string firstName, string lastName, string birthDate)
     {
+        connection = new Connection(ip, 6666, messageHandler);
+
+        var loginMessage = $"0 {firstName} {lastName} {birthDate}";
+        connection.SendMessage(loginMessage);
+        
+        Thread.Sleep(1000);
+        
+        return messageHandler.loggedIn;
+    }
+
+    /**
+     * Methode om de VR connectie op te zetten
+     */
+    private void ConnectToVR()
+    {
         // TEST CODE
         
         // Process firstProc = new Process();
         // firstProc.StartInfo.FileName = "C:\\Users\\jaspe\\RiderProjects\\Remote_Healthcare\\RemoteHealthcare\\Client\\VRConnection\\bin\\Debug\\net8.0\\VRConnection.exe";
         // firstProc.ConnectDevices();
-
-        connection = new Connection(ip, 6666, messageHandler);
-
-        var loginMessage = $"0 {firstName} {lastName} {birthDate}";
-        connection.SendMessage(loginMessage);
-
-        Thread.Sleep(2500);
-
-        return messageHandler.loggedIn;
+        
+        connection = new Connection("127.0.0.1", 9999, messageHandler);
+        messageHandler.vrHandler = new VRHandler(connection);
+        messageHandler.vrHandler.SendNameToVr(firstName, lastName);
     }
 
     private bool CheckTextBoxes()

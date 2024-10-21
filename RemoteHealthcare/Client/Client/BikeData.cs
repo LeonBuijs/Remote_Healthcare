@@ -105,4 +105,9 @@ public class BikeData
 
         lastTime = tempTime;
     }
+
+    public override string ToString()
+    {
+        return $"{Speed} {Distance} {Watt} {Time} {Rpm} {HeartRate}";
+    }
 }

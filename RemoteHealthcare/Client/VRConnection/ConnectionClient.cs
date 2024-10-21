@@ -51,12 +51,12 @@ public class ConnectionClient
 
                     Panel.ChangeSpeedPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]));
                     Route.ChangeFollowRouteSpeed(VREngine.uuidBike, Convert.ToInt32(data[0]));
-                    
-                    Panel.ChangeWattPanel(VREngine.uuidPanelData, Convert.ToInt32(data[1]));
-                    Panel.ChangeRPMPanel(VREngine.uuidPanelData, Convert.ToInt32(data[2]));
-                    Panel.ChangeHeartRatePanel(VREngine.uuidPanelData, Convert.ToInt32(data[3]));
-                    Panel.ChangeTimePanel(VREngine.uuidPanelData, data[4]);
-                    Panel.ChangeDistancePanel(VREngine.uuidPanelData, Convert.ToInt32(data[5]));
+
+                    Panel.ChangeDistancePanel(VREngine.uuidPanelData, Convert.ToInt32(data[1]));
+                    Panel.ChangeWattPanel(VREngine.uuidPanelData, Convert.ToInt32(data[2]));
+                    Panel.ChangeTimePanel(VREngine.uuidPanelData, data[3]);
+                    Panel.ChangeRPMPanel(VREngine.uuidPanelData, Convert.ToInt32(data[4]));
+                    Panel.ChangeHeartRatePanel(VREngine.uuidPanelData, Convert.ToInt32(data[5]));
                     Panel.SwapPanel(VREngine.uuidPanelData);
                     break;
                 case '2':
