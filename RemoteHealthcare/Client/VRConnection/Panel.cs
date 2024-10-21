@@ -16,7 +16,7 @@ public class Panel : VREngine
     /**
      * Methode om de snelheid aan te passen op het panel, je geeft de uuid van het panel mee en de snelheid.
      */
-    public static void ChangeSpeedPanel(string uuidPanel, int speed)
+    public static void ChangeSpeedPanel(string uuidPanel, string speed)
     {
         DrawTextOnPanel("Snelheid: " + speed, uuidPanel,new[] { 10, 60 }, 20);
     }

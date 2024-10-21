@@ -45,7 +45,7 @@ public class VREngine
         Panel.ClearPanel(uuidPanelData);
 
         Panel.ChangeNamePanel(uuidPanelData, "Name");
-        Panel.ChangeSpeedPanel(uuidPanelData, 5);
+        Panel.ChangeSpeedPanel(uuidPanelData, "5");
         Panel.ChangeWattPanel(uuidPanelData, 100);
         Panel.ChangeRPMPanel(uuidPanelData, 25);
         Panel.ChangeHeartRatePanel(uuidPanelData, 90);
@@ -63,17 +63,6 @@ public class VREngine
         Terrain.AddLayerToTerrain(uuidTerrain);
 
         ConnectionClient.StartServer();
-
-
-        // Loop voor tijdens de sessie
-        Thread loopThread = new Thread(() =>
-        {
-            while (true)
-            {
-                RecievePacket();
-            }
-        });
-        loopThread.Start();
     }
 
     /**

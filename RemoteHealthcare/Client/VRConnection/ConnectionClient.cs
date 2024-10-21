@@ -24,16 +24,25 @@ public class ConnectionClient
     }
 
     private static void WaitForCommand()
+
+
+
     {
+        var b = "";
+        Thread t = new Thread(() =>
+        {
+            b = "1";
+        });
+        t.Start();
         while (true)
         {
             var buffer = new byte[1024];
             var bytesRead = networkStream.Read(buffer, 0, buffer.Length);
             var received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-            
+
             var identifier = received[0];
             var content = received.Substring(2);
-            
+
             switch (identifier)
             {
                 case '0':
@@ -41,22 +50,22 @@ public class ConnectionClient
                     dokterMessages.Add(content);
                     Panel.ClearPanel(VREngine.uuidPanelChats);
                     Panel.ChangeChatsPanel(VREngine.uuidPanelChats, dokterMessages);
+                    Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
                     Panel.SwapPanel(VREngine.uuidPanelChats);
                     break;
                 case '1':
                     // Data
                     string[] data = content.Split(' ');
                     Panel.ClearPanel(VREngine.uuidPanelData);
-                    Panel.ChangeNamePanel(VREngine.uuidPanelData, name);
-
-                    Panel.ChangeSpeedPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]));
+                    
+                    Panel.ChangeSpeedPanel(VREngine.uuidPanelData, $"{data[0]}\n{data[1]}");
                     Route.ChangeFollowRouteSpeed(VREngine.uuidBike, Convert.ToInt32(data[0]));
 
                     Panel.ChangeDistancePanel(VREngine.uuidPanelData, Convert.ToInt32(data[1]));
-                    Panel.ChangeWattPanel(VREngine.uuidPanelData, Convert.ToInt32(data[2]));
-                    Panel.ChangeTimePanel(VREngine.uuidPanelData, data[3]);
-                    Panel.ChangeRPMPanel(VREngine.uuidPanelData, Convert.ToInt32(data[4]));
-                    Panel.ChangeHeartRatePanel(VREngine.uuidPanelData, Convert.ToInt32(data[5]));
+                    // Panel.ChangeWattPanel(VREngine.uuidPanelData, Convert.ToInt32(data[2]));
+                    // Panel.ChangeTimePanel(VREngine.uuidPanelData, data[3]);
+                    // Panel.ChangeRPMPanel(VREngine.uuidPanelData, Convert.ToInt32(data[4]));
+                    // Panel.ChangeHeartRatePanel(VREngine.uuidPanelData, Convert.ToInt32(data[5]));
                     Panel.SwapPanel(VREngine.uuidPanelData);
                     break;
                 case '2':
@@ -71,11 +80,10 @@ public class ConnectionClient
                 case '5':
                     // Naam
                     name = content;
-                    Panel.ClearPanel(VREngine.uuidPanelData);
-                    Panel.ChangeNamePanel(VREngine.uuidPanelData, name);
-                    Panel.SwapPanel(VREngine.uuidPanelData);
+                    Panel.ClearPanel(VREngine.uuidPanelChats);
+                    Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
+                    Panel.SwapPanel(VREngine.uuidPanelChats);
                     break;
-
             }
         }
     }
