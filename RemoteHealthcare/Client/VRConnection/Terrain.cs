@@ -41,7 +41,7 @@ public class Terrain : VREngine
             {
                 transform = new
                 {
-                    position = new[] { -100, 0, -50 },
+                    position = new[] { -25, 0, -50 },
                     scale = 1,
                     rotation = new[] { 0, 0, 0 }
                 },
