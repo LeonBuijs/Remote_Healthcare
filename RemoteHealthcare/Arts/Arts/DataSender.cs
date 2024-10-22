@@ -50,7 +50,6 @@ public class DataSender
     
     public void SendMessageToSession(string session, string message)
     {
-        //todo hoe willen we de sessie splitsen van message?
         Write($"4 {session} {message}");
     }
 

@@ -29,7 +29,6 @@ public partial class ClientWindow : Window, IDataUpdateCallback
     {
         if (this.clientId.Equals(clientId))
         {
-            //todo handle data
             string[] dataSplit = data.Split(" ");
             //verwerk de data uit de array
             string speed = dataSplit[0];
@@ -47,19 +46,18 @@ public partial class ClientWindow : Window, IDataUpdateCallback
                 RpmValueTextBlock.Text = rpm;
                 HeartRateValueTextBlock.Text = heartRate;
             });
-
         }
     }
-    private void StartClientSessie(object sender, RoutedEventArgs e)
+    private void StartClientSession(object sender, RoutedEventArgs e)
     {
         Console.WriteLine("Starting session!");
-        networkProcessor.StartClientSessie(clientId);
+        networkProcessor.StartClientSession(clientId);
         networkProcessor.AddActiveClient(clientId);
 
     }
-    private void StopClientSessie(object sender, RoutedEventArgs e)
+    private void StopClientSession(object sender, RoutedEventArgs e)
     {
-        networkProcessor.StopClientSessie(clientId);
+        networkProcessor.StopClientSession(clientId);
         Dispatcher.Invoke(() =>
             {
                 SpeedValueTextBlock.Text = null;
@@ -69,9 +67,9 @@ public partial class ClientWindow : Window, IDataUpdateCallback
                 HeartRateValueTextBlock.Text = null;
             });
     }
-    private void EmergencyStopClientSessie(object sender, RoutedEventArgs e)
+    private void EmergencyStopClientSession(object sender, RoutedEventArgs e)
     {
-        networkProcessor.EmergencyStopClientSessie(clientId);
+        networkProcessor.EmergencyStopClientSession(clientId);
     }
     private void SendPressed(object sender, RoutedEventArgs e)
     {

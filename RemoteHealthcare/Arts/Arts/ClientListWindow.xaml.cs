@@ -97,7 +97,7 @@ public partial class ClientListWindow : Window, IListWindowCallback
     /**
      * <summary>
      * Methode die een client verwijdert van de lijst
-     * Als de client niet bestaat zal hij returnen.
+     * Als de client niet bestaat, zal hij returnen.
      * </summary>
      * <param name="clientId">De client naam en geboortedatum</param>
      */

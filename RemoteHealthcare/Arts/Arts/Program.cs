@@ -2,24 +2,24 @@
 
 namespace Arts;
 
+/**
+ * <summary>
+ * Default klasse voor het opstarten van de applicatie
+ * Start de loginwindow.
+ * </summary>
+ */
 public partial class Program : Application
 {
     /**
      * <summary>
      * Methode om een aantal verrichtingen te maken voordat de app is opgestart
-     * Zet een connectie op met de server via networkProcessor
      * Laadt het login window in.
      * </summary>
      */
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        
-        
         LoginWindowWindow loginWindowWindow = new LoginWindowWindow();
-        
-        //Zet een callback voor het antwoord op de login.
-        
         loginWindowWindow.Show();
     }
 

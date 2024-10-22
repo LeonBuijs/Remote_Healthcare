@@ -1,6 +1,5 @@
 using System.Net.Sockets;
 using System.Text;
-using System.Windows;
 
 
 namespace Arts;
@@ -13,25 +12,25 @@ public class NetworkProcessor
     private byte[] artsBuffer = new byte[128];
     private string totalBuffer;
 
-    private String ipAdress;
-    
-    public ILoginWindowCallback LoginWindowCallback { set; get; }
+    private string ipAdress;
+
+    private readonly ILoginWindowCallback LoginWindowCallback;
     public IListWindowCallback ListWindowCallback { set; get; }
     
     private List<IDataUpdateCallback> dataUpdateCallbacks = new List<IDataUpdateCallback>();
     private List<string> clientsWhoRecieveData = new List<string>();
     private bool isAskingData = false;
 
-    public NetworkProcessor(string ipAdres)
+    public NetworkProcessor(string ipAddress, ILoginWindowCallback loginWindowWindowCallback)
     {
         artsClient = new TcpClient();
-        ipAdress = ipAdres;
+        ipAdress = ipAddress;
+        LoginWindowCallback = loginWindowWindowCallback;
         ConnectToServer();
     }
     
     public void ConnectToServer()
     {
-        //todo verander de host en poortnummer
         try
         {
             artsClient.Connect(ipAdress, 7777);
@@ -42,6 +41,7 @@ public class NetworkProcessor
         catch (SocketException exception)
         {
             //Notificeert het inlog scherm dat de connectie is gefaald.
+            Console.WriteLine("loginCallback");
             LoginWindowCallback.ConnectionFailed();
         }
     }
@@ -108,7 +108,6 @@ public class NetworkProcessor
                 break;
             default:
                 Console.WriteLine("Unknown Packet Page");
-                //todo better error handling
                 break;
         }
     }
@@ -156,6 +155,11 @@ public class NetworkProcessor
     }
     
     public void TryLogin(string username, string password){
+        if (!IsConnected())
+        {
+            return;
+        }
+        
         artsSender.SendLogin(username, password);
     }
     
@@ -169,7 +173,7 @@ public class NetworkProcessor
         artsSender.MakeClient(clientInfo);
     }
 
-    public void GetRealtimeData(string clientInfo)
+    private void GetRealtimeData(string clientInfo)
     {
         artsSender.ChosenClient(clientInfo);
     }
@@ -179,13 +183,13 @@ public class NetworkProcessor
         artsSender.GetClients();
     }
 
-    public void StartClientSessie(string clientInfo)
+    public void StartClientSession(string clientInfo)
     {
         Console.WriteLine($"telling server {clientInfo} started");
         artsSender.StartSession(clientInfo);
     }
 
-    public void StopClientSessie(string clientInfo)
+    public void StopClientSession(string clientInfo)
     {
         lock (clientsWhoRecieveData)
         {
@@ -194,7 +198,7 @@ public class NetworkProcessor
         artsSender.StopSession(clientInfo);
     }
 
-    public void EmergencyStopClientSessie(string clientInfo)
+    public void EmergencyStopClientSession(string clientInfo)
     {
         artsSender.EmergencyStopSession(clientInfo);
     }

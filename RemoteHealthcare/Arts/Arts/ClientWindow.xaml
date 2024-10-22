@@ -103,10 +103,10 @@
         
         <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal" Margin="5,15,5,5">
 
-            <Button Name="StartSessie" Content="Start Sessie" Width="100" Click="StartClientSessie"/>
+            <Button Name="StartSessie" Content="Start Sessie" Width="100" Click="StartClientSession"/>
             <StackPanel >
-                <Button Name="StopButton" Content="Stop Sessie" Height="61" Click="StopClientSessie"/>
-                <Button Name ="EmergencyStop" Content="EmergencyStop Sessie" Height="62" Click="EmergencyStopClientSessie"/>
+                <Button Name="StopButton" Content="Stop Sessie" Height="61" Click="StopClientSession"/>
+                <Button Name ="EmergencyStop" Content="EmergencyStop Sessie" Height="62" Click="EmergencyStopClientSession"/>
             </StackPanel>
         </StackPanel>
         
