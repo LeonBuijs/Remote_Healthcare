@@ -52,7 +52,7 @@ public class VREngine
 
             Panel.ClearPanel(uuidPanelData);
 
-            Panel.ChangeSpeedPanel(uuidPanelData, 15, 190, "00:00", 20000);
+            Panel.ChangeDataPanel(uuidPanelData, 15, 190, "00:00", 20000);
             Panel.SwapPanel(uuidPanelData);
             Panel.AttachPanelToBike(uuidPanelData, uuidBike, new[] { -2, 2.2, -2.1 });
 

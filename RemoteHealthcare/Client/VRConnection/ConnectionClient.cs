@@ -55,7 +55,7 @@ public class ConnectionClient
                     }
                     
                     Panel.ClearPanel(VREngine.uuidPanelData);
-                    Panel.ChangeSpeedPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]), 
+                    Panel.ChangeDataPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]), 
                         Convert.ToInt32(data[5]), data[3], Convert.ToInt32(data[1]));
                     Panel.SwapPanel(VREngine.uuidPanelData);
                     break;

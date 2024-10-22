@@ -19,9 +19,9 @@ public class Panel : VREngine
     }
 
     /**
-     * Methode om de snelheid aan te passen op het panel, je geeft de uuid van het panel mee en de snelheid.
+     * Methode om de data aan te passen op het panel, je geeft de uuid van het panel mee en de data.
      */
-    public static void ChangeSpeedPanel(string uuidPanel, int speed, int heartRate, string time, int distance)
+    public static void ChangeDataPanel(string uuidPanel, int speed, int heartRate, string time, int distance)
     {
         // TODO: Mooier uitlijnen voor elke waarde
         DrawTextOnPanel("" + speed + "           " + heartRate + "          " + time + "         " + distance, 
