@@ -27,44 +27,46 @@ public class VREngine
         stream = tcpClient.GetStream();
         Console.WriteLine("Verbonden met de server\n");
 
-        CreateTunnel();
-        // Werkende methodes:
-        // SetTime(stream, 0);
-        DeleteStartingNodes();
+        if (CreateTunnel())
+        {
+            // Werkende methodes:
+            // SetTime(stream, 0);
+            DeleteStartingNodes();
 
-        uuidBike = CreateNodeForBike();
-        uuidTerrain = Terrain.CreateNodeForTerrain();
+            uuidBike = CreateNodeForBike();
+            uuidTerrain = Terrain.CreateNodeForTerrain();
 
-        uuidRoute = Route.CreateRoute();
-        Route.CreateRoad(uuidRoute);
-        Route.FollowRoute(uuidRoute, uuidBike);
-        Route.ChangeFollowRouteSpeed(uuidBike, 50.0);
+            uuidRoute = Route.CreateRoute();
+            Route.CreateRoad(uuidRoute);
+            Route.FollowRoute(uuidRoute, uuidBike);
+            Route.ChangeFollowRouteSpeed(uuidBike, 50.0);
 
-        AttachCameraToBike(uuidBike);
+            AttachCameraToBike(uuidBike);
 
-        uuidPanelData = Panel.CreateNodeForPanel();
-        uuidPanelDataText = Panel.CreateNodeForPanel();
-        Panel.ClearPanel(uuidPanelDataText);
-        Panel.SetDataText(uuidPanelDataText);
-        Panel.SwapPanel(uuidPanelDataText);
-        Panel.AttachPanelToBike(uuidPanelDataText, uuidBike, new[] { -2, 2.4, -2.1 });
-        
-        Panel.ClearPanel(uuidPanelData);
+            uuidPanelData = Panel.CreateNodeForPanel();
+            uuidPanelDataText = Panel.CreateNodeForPanel();
+            Panel.ClearPanel(uuidPanelDataText);
+            Panel.SetDataText(uuidPanelDataText);
+            Panel.SwapPanel(uuidPanelDataText);
+            Panel.AttachPanelToBike(uuidPanelDataText, uuidBike, new[] { -2, 2.4, -2.1 });
 
-        Panel.ChangeSpeedPanel(uuidPanelData, 15, 190, "00:00", 20000);
-        Panel.SwapPanel(uuidPanelData);
-        Panel.AttachPanelToBike(uuidPanelData, uuidBike, new[] { -2, 2.2, -2.1 });
-        
-        uuidPanelChats = Panel.CreateNodeForPanel();
-        Panel.ClearPanel(uuidPanelChats);
-        Panel.ChangeNamePanel(uuidPanelChats, "Name");
+            Panel.ClearPanel(uuidPanelData);
 
-        Panel.SwapPanel(uuidPanelChats);
-        Panel.AttachPanelToBike(uuidPanelChats, uuidBike, new[] { -2, 2.4, 2.1 });
+            Panel.ChangeSpeedPanel(uuidPanelData, 15, 190, "00:00", 20000);
+            Panel.SwapPanel(uuidPanelData);
+            Panel.AttachPanelToBike(uuidPanelData, uuidBike, new[] { -2, 2.2, -2.1 });
 
-        Terrain.AddLayerToTerrain(uuidTerrain);
+            uuidPanelChats = Panel.CreateNodeForPanel();
+            Panel.ClearPanel(uuidPanelChats);
+            Panel.ChangeNamePanel(uuidPanelChats, "Name");
 
-        ConnectionClient.StartServer();
+            Panel.SwapPanel(uuidPanelChats);
+            Panel.AttachPanelToBike(uuidPanelChats, uuidBike, new[] { -2, 2.4, 2.1 });
+
+            Terrain.AddLayerToTerrain(uuidTerrain);
+
+            ConnectionClient.StartServer();
+        }
     }
 
     /**
@@ -196,53 +198,63 @@ public class VREngine
     /**
      * Methode die een tunnel maakt waarmee je vervolgens data er naar toe kunt sturen.
      */
-    private static void CreateTunnel()
+    private static bool CreateTunnel()
     {
-        // Stap 2
-        SendPacket(new { id = "session/list" });
-
-        // Stap 3
-        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
-        JsonArray dataArray = (JsonArray)jsonObject["data"];
-
-        string ID = null;
-        foreach (JsonObject session in dataArray)
+        try
         {
-            string user = session["clientinfo"]["user"].ToString();
-            if (user == System.Environment.UserName)
-            {
-                ID = session["id"].ToString();
-            }
-        }
+            // Stap 2
+            SendPacket(new { id = "session/list" });
 
-        // Stap 4
-        SendPacket(new
-        {
-            id = "tunnel/create",
-            data = new
-            {
-                session = ID,
-            }
-        });
+            // Stap 3
+            JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
+            JsonArray dataArray = (JsonArray)jsonObject["data"];
 
-        jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
-        SessionID = jsonObject["data"]["id"].ToString();
-
-        // Stap 5
-        SendPacket(new
-        {
-            id = "tunnel/send",
-            data = new
+            string ID = null;
+            foreach (JsonObject session in dataArray)
             {
-                dest = SessionID,
-                data = new
+                string user = session["clientinfo"]["user"].ToString();
+                if (user == System.Environment.UserName)
                 {
-                    id = "scene/reset",
-                    data = new { }
+                    ID = session["id"].ToString();
                 }
             }
-        });
-        RecievePacket();
+
+            // Stap 4
+            SendPacket(new
+            {
+                id = "tunnel/create",
+                data = new
+                {
+                    session = ID,
+                }
+            });
+
+            jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
+            SessionID = jsonObject["data"]["id"].ToString();
+
+            // Stap 5
+            SendPacket(new
+            {
+                id = "tunnel/send",
+                data = new
+                {
+                    dest = SessionID,
+                    data = new
+                    {
+                        id = "scene/reset",
+                        data = new { }
+                    }
+                }
+            });
+            RecievePacket();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Can't create a tunnel.");
+            return false;
+        }
+
+        return true;
     }
 
     /**
