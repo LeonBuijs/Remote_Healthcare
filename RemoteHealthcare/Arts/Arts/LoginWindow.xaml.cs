@@ -5,8 +5,7 @@ namespace Arts;
 
 public partial class LoginWindowWindow : Window, ILoginWindowCallback
 {
-    public NetworkProcessor networkProcessor;
-    private string ipAddress;
+    public NetworkProcessor? networkProcessor;
 
     public LoginWindowWindow()
     {
@@ -22,14 +21,21 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
      */
     private void OnLoginClick(object sender, RoutedEventArgs e)
     {
-        if (ipAddress != IpAdressBox.Text)
+        Console.WriteLine("\nOnloginClick start");
+        if (networkProcessor == null || !networkProcessor.IsConnected())
         {
-            ipAddress = IpAdressBox.Text;
-            NetworkProcessor networkProcessor = new NetworkProcessor(ipAddress);
+            Console.WriteLine("\nOnloginClick making network connection");
+            string ipAdress = IpAdressBox.Text.Trim();
+            if (string.IsNullOrEmpty(ipAdress))
+            {
+                MessageBox.Show("Please enter a valid IP address.");
+                return;
+            }
+            networkProcessor = new NetworkProcessor(ipAdress);
             networkProcessor.LoginWindowCallback = this;
         }
-        
-        
+
+        Console.WriteLine("\nOnloginClick making login try");
         string username = UsernameBox.Text;
         string password = PasswordBox.Password;
         Console.WriteLine($"Username: {username}\nPassword: {password}");
@@ -37,6 +43,7 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
       
         //Stuur aanzoek voor inloggen
         networkProcessor.TryLogin(username, password);
+        Console.WriteLine("OnloginClick finished\n");
     }
 
     
@@ -66,7 +73,6 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
                     Console.WriteLine("Logged in!");
                     ClientListWindow clientListWindow = new ClientListWindow(networkProcessor);
                     clientListWindow.Show();
-                    Close();
                 }
             );
 
@@ -101,7 +107,7 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
             MessageBoxButton.YesNo, MessageBoxImage.Question);
         if (result == MessageBoxResult.Yes)
         {
-            networkProcessor.ConnectToServer(ipAddress);
+            networkProcessor.ConnectToServer();
         } else
         {
             Close();

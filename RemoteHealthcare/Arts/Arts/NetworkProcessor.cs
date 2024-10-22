@@ -12,6 +12,8 @@ public class NetworkProcessor
     private DataSender artsSender;
     private byte[] artsBuffer = new byte[128];
     private string totalBuffer;
+
+    private String ipAdress;
     
     public ILoginWindowCallback LoginWindowCallback { set; get; }
     public IListWindowCallback ListWindowCallback { set; get; }
@@ -23,15 +25,16 @@ public class NetworkProcessor
     public NetworkProcessor(string ipAdres)
     {
         artsClient = new TcpClient();
-        ConnectToServer(ipAdres);
+        ipAdress = ipAdres;
+        ConnectToServer();
     }
     
-    public async void ConnectToServer(string ipAdres)
+    public void ConnectToServer()
     {
         //todo verander de host en poortnummer
         try
         {
-            await artsClient.ConnectAsync(ipAdres, 7777);
+            artsClient.Connect(ipAdress, 7777);
             //won't come here until it has connection.
             new Thread(OnConnect).Start(); 
             artsSender = new DataSender(artsClient.GetStream());
@@ -145,6 +148,11 @@ public class NetworkProcessor
             isAskingData = false;
         }).Start();
 
+    }
+
+    public bool IsConnected()
+    {
+        return artsClient.Connected;
     }
     
     public void TryLogin(string username, string password){
