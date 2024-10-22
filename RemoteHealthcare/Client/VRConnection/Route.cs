@@ -29,7 +29,7 @@ public class Route : VREngine
             offset = 0.0,
             rotate = "XZ",
             smoothing = 1.0,
-            followHeight = false,
+            followHeight = true,
             rotateOffset = new[] { 0, 0, 0 },
             positionOffset = new[] { 0, 0, 0 }
         });
@@ -103,8 +103,6 @@ public class Route : VREngine
                 // Bocht 14
                 new { pos = new[] { 20, 0, 155 }, dir = new[] { -10, 0, 0 }},
                 new { pos = new[] { 0, 0, 130 }, dir = new[] { 0, 0, -20 }},
-                
-              
             }
         });
 

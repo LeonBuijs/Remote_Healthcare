@@ -39,7 +39,7 @@ public class VREngine
             uuidRoute = Route.CreateRoute();
             Route.CreateRoad(uuidRoute);
             Route.FollowRoute(uuidRoute, uuidBike);
-            Route.ChangeFollowRouteSpeed(uuidBike, 50.0);
+            Route.ChangeFollowRouteSpeed(uuidBike, 10.0);
 
             AttachCameraToBike(uuidBike);
 

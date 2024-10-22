@@ -11,6 +11,7 @@ public class ConnectionClient
     private static TcpClient client;
     private static List<string> dokterMessages = [];
     private static string name;
+    private static double previousSpeed = 0;
 
     public static void StartServer()
     {
@@ -47,10 +48,15 @@ public class ConnectionClient
                 case '1':
                     // Data
                     string[] data = content.Split(' ');
+                    if (Convert.ToInt32(data[0]) != previousSpeed)
+                    {
+                        Route.ChangeFollowRouteSpeed(VREngine.uuidBike, Convert.ToInt32(data[0])/3.6);
+                        previousSpeed = Convert.ToInt32(data[0]);
+                    }
+                    
                     Panel.ClearPanel(VREngine.uuidPanelData);
                     Panel.ChangeSpeedPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]), 
                         Convert.ToInt32(data[5]), data[3], Convert.ToInt32(data[1]));
-                    Route.ChangeFollowRouteSpeed(VREngine.uuidBike, Convert.ToInt32(data[0]));
                     Panel.SwapPanel(VREngine.uuidPanelData);
                     break;
                 case '2':
