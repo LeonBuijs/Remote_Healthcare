@@ -70,6 +70,7 @@ public partial class ServerLogin : Form
 
         var loginMessage = $"0 {firstName} {lastName} {birthDate}";
         connection.SendMessage(loginMessage);
+        messageHandler.BleHandler.serverConnection = connection;
         
         Thread.Sleep(1000);
         

@@ -81,7 +81,7 @@ public class MessageHandler : IBLECallback
      */
     private void HandleStartCommand()
     {
-        VrHandler.StartSession();
+        // VrHandler.StartSession(); todo
     }
 
     /**
@@ -130,6 +130,7 @@ public class MessageHandler : IBLECallback
         // Sleep om te voorkomen dat er teveel data gestuurd wordt en door TCP samengevoegd wordt
         Thread.Sleep(100);
         VrHandler.SendBikeDataToVr(bikeData);
+        
         Console.WriteLine(bikeData);
     }
 }

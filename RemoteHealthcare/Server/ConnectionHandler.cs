@@ -66,9 +66,14 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
             try
             {
                 var received = connection.Receive();
-                doctorCallback.OnReceivedMessage(received, connection);
+                received = received.Trim();
 
-                Console.WriteLine("Doctor sent: " + received);
+                if (received.Length > 0)
+                {
+                    doctorCallback.OnReceivedMessage(received, connection);
+
+                    Console.WriteLine("Doctor sent: " + received);
+                }
             }
             catch (Exception)
             {
@@ -89,9 +94,14 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
             try
             {
                 var received = connection.Receive();
-                clientCallback.OnReceivedMessage(received, connection);
+                received = received.Trim();
 
-                Console.WriteLine("Client sent: " + received);
+                if (received.Length > 0)
+                {
+                    clientCallback.OnReceivedMessage(received, connection);
+
+                    Console.WriteLine("Client sent: " + received);
+                }
             }
             catch (Exception e)
             {

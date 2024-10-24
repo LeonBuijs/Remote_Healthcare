@@ -14,6 +14,7 @@ public class BLEHandler(MessageHandler messageHandler)
 
     private BikeData BikeData { get; } = new();
     private MessageHandler messageHandler = messageHandler;
+    public Connection? serverConnection;
 
     private static BLE bleBike = new();
     private static BLE bleHeart = new();
@@ -133,6 +134,11 @@ public class BLEHandler(MessageHandler messageHandler)
     {
         BikeData.UpdateData(BitConverter.ToString(e.Data).Replace("-", " "));
         messageHandler.OnReceivedBikeData(BikeData);
+        
+        if (serverConnection != null)
+        {
+            serverConnection.SendMessage($"1 {BikeData}");
+        }
     }
 
     /**
@@ -190,7 +196,6 @@ public class BLEHandler(MessageHandler messageHandler)
     * Methode om verbinding te maken met de simulator applicatie
     * Als de sim niet live is, returnen
     */
-    [SuppressMessage("ReSharper.DPA", "DPA0000: DPA issues")]
     private void TrySimulationMode()
     {
         TcpClient tcpClient;
@@ -215,6 +220,11 @@ public class BLEHandler(MessageHandler messageHandler)
 
                 BikeData.UpdateData(BitConverter.ToString(buffer, 0, bytesRead).Replace("-", " "));
                 messageHandler.OnReceivedBikeData(BikeData);
+                
+                if (serverConnection != null)
+                {
+                    serverConnection.SendMessage($"1 {BikeData}");
+                }
             }
         });
         simThread.Start();

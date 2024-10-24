@@ -99,6 +99,7 @@ public class Server : IDoctorCallback, IClientCallback
             return;
         }
 
+        
         Console.WriteLine("messageparts: " + messageParts[0]);
         
         switch ((ClientDataIndex) int.Parse(messageParts[0]))
@@ -330,10 +331,10 @@ public class Server : IDoctorCallback, IClientCallback
         }
 
         // Bij ongeldige fietsData, returnen
-        if (messageParts.Length < 7)
-        {
-            return;
-        }
+        // if (messageParts.Length < 7)
+        // {
+        //     return;
+        // }
 
         var bikeData = $"{messageParts[1]} {messageParts[2]} {messageParts[3]} {messageParts[4]} " +
                        $"{messageParts[5]} {messageParts[6]}";
