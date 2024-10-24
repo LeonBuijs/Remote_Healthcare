@@ -33,6 +33,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
         
                     <TextBlock Text="Speed:" Grid.Row="0" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
@@ -40,15 +41,18 @@
 
                     <TextBlock Text="Distance:" Grid.Row="1" HorizontalAlignment="Left" FontWeight="Bold"/>
                     <TextBlock Name="DistanceValueTextBlock" Grid.Row="1" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+                   
+                    <TextBlock Text="Time:" Grid.Row="2" HorizontalAlignment="Left" FontWeight="Bold"/>
+                    <TextBlock Name="TimeValueTextBlock" Grid.Row="2" HorizontalAlignment="Right" Margin="10,0,0,3"/>
 
-                    <TextBlock Text="Power:" Grid.Row="2" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
-                    <TextBlock Name="PowerValueTextBlock" Grid.Row="2" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+                    <TextBlock Text="Power:" Grid.Row="3" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
+                    <TextBlock Name="PowerValueTextBlock" Grid.Row="3" HorizontalAlignment="Right" Margin="10,0,0,3"/>
                     
-                    <TextBlock Text="RPM:" Grid.Row="3" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
-                    <TextBlock Name="RpmValueTextBlock" Grid.Row="3" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+                    <TextBlock Text="RPM:" Grid.Row="4" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
+                    <TextBlock Name="RpmValueTextBlock" Grid.Row="4" HorizontalAlignment="Right" Margin="10,0,0,3"/>
                     
-                    <TextBlock Text="HeartRate:" Grid.Row="4" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
-                    <TextBlock Name="HeartRateValueTextBlock" Grid.Row="4" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+                    <TextBlock Text="HeartRate:" Grid.Row="5" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
+                    <TextBlock Name="HeartRateValueTextBlock" Grid.Row="5" HorizontalAlignment="Right" Margin="10,0,0,3"/>
                 </Grid>
         </GroupBox>
         
