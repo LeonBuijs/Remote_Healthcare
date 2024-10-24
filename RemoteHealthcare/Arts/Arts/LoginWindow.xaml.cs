@@ -5,7 +5,7 @@ namespace Arts;
 
 public partial class LoginWindowWindow : Window, ILoginWindowCallback
 {
-    public NetworkProcessor networkProcessor { get; set; }
+    private NetworkProcessor? networkProcessor;
 
     public LoginWindowWindow()
     {
@@ -21,6 +21,30 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
      */
     private void OnLoginClick(object sender, RoutedEventArgs e)
     {
+        Console.WriteLine("\nOnLoginClick start");
+        string ipAddress = IpAdressBox.Text.Trim();
+        
+        //Controleert of er überhaupt een ip adres is ingevoerd
+        if (string.IsNullOrEmpty(ipAddress))
+        {
+            ShowMissingIpAddressMessage();
+            return;
+        }
+        
+        //Controleert of het een geldig ip adres is (qua format)
+        if (!CheckIpAddress(ipAddress))
+        {
+            ShowInvalidIpAddressMessage();
+            return;
+        }
+                
+        if (networkProcessor == null || !networkProcessor.IsConnected())
+        {
+            Console.WriteLine("\nOnLoginClick making network connection");
+            networkProcessor = new NetworkProcessor(ipAddress, this);
+        }
+
+        Console.WriteLine("\nOnLoginClick making login try");
         string username = UsernameBox.Text;
         string password = PasswordBox.Password;
         Console.WriteLine($"Username: {username}\nPassword: {password}");
@@ -28,6 +52,7 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
       
         //Stuur aanzoek voor inloggen
         networkProcessor.TryLogin(username, password);
+        Console.WriteLine("OnLoginClick finished\n");
     }
 
     
@@ -81,7 +106,12 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
     {
         ShowRetryConnectionMessage();
     }
-    
+
+    private bool CheckIpAddress(string ipAddress)
+    {
+        return System.Net.IPAddress.TryParse(ipAddress, out _);
+    }
+
     #region MessageBoxes
     
     private void ShowRetryConnectionMessage()
@@ -90,13 +120,30 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
         string content = "Connection failed, do you want to retry?";
         MessageBoxResult result = MessageBox.Show(content, title, 
             MessageBoxButton.YesNo, MessageBoxImage.Question);
+        
         if (result == MessageBoxResult.Yes)
         {
+            if (networkProcessor == null)
+            {
+                MessageBox.Show("Can't access network, please check the ip-address");
+                return;
+            }
             networkProcessor.ConnectToServer();
-        } else
-        {
-            Close();
         }
+    }
+
+    private void ShowMissingIpAddressMessage()
+    {
+        string title = "No IP address provided";
+        string content = "Please fill in an IP address.";
+        MessageBox.Show(content, title);
+    }
+
+    private void ShowInvalidIpAddressMessage()
+    {
+        string title = "INVALID IP ADDRESS";
+        string content = "IP Address is not valid.";
+        MessageBox.Show(content, title);
     }
     
     /**

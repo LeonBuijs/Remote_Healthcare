@@ -8,32 +8,41 @@
         Title="LoginWindow" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="216*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="2*"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Label Content="Welcome doctor" HorizontalAlignment="Left" Margin="10,8,0,0" VerticalAlignment="Top" Height="60" Width="751" FontSize="36" Grid.Row="1"/>
-
-        <Border BorderBrush="Black" BorderThickness="1" Grid.Row="1" Margin="239,111,230,87">
-            <Canvas Margin="-1,-21,290,229">
-                <Button
-                    Click="OnLoginClick" Width="52" Height="19" Content="Login" HorizontalAlignment="Left" Canvas.Left="140" Canvas.Top="197" VerticalAlignment="Top"/>
-                <TextBox Name="UsernameBox" TextWrapping="Wrap" Text="" Width="120" HorizontalAlignment="Left" Canvas.Left="106" Canvas.Top="124" VerticalAlignment="Top"/>
-                <PasswordBox Name="PasswordBox" Width="120" HorizontalAlignment="Left" Canvas.Left="106" Canvas.Top="162" VerticalAlignment="Top" />
-                <Label Content="Enter password&#xA;" RenderTransformOrigin="0.521,0.61" Height="29" Width="120" FontSize="10" HorizontalAlignment="Left" Canvas.Left="106" Canvas.Top="142" VerticalAlignment="Top"/>
-                <Label Content="Enter username" FontSize="10" HorizontalAlignment="Left" Canvas.Left="106" Canvas.Top="106" VerticalAlignment="Top"/>
-                <Label Content="To continue please login" FontWeight="Bold" FontSize="15" HorizontalAlignment="Left" Canvas.Left="75" Canvas.Top="48" VerticalAlignment="Top"/>
-            </Canvas>
-        </Border>
-         
-        <Grid>
-            
-            <Popup Name="MyPopup" StaysOpen="False" Placement="Mouse" AllowsTransparency="True">
-                <Border Background="LightGray" BorderBrush="Black" BorderThickness="1" Padding="10">
-                    <TextBlock Text="Dit is een Popup!" />
-                </Border>
-            </Popup>
-        </Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Label Content="Welcome doctor" Grid.Row="0" Grid.ColumnSpan="3"
+               FontSize="40" FontWeight="Bold" HorizontalAlignment="Center"/>
         
+        <Border Grid.Row="1" Grid.Column="1" BorderBrush="Black" BorderThickness="2" Padding="5" CornerRadius="5">
+            <Grid HorizontalAlignment="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                
+                <Label Grid.Row="0" Content="To continue please login" FontWeight="Bold" FontSize="15"/>
+                <Label Grid.Row="1" Content="Enter Ip-Adress" FontSize="10" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="2" Name="IpAdressBox" Margin="0,0,0,5" HorizontalAlignment="Stretch"/>
+                <Label Grid.Row="3" Content="Enter username" FontSize="10" HorizontalAlignment="Center"/>
+                <TextBox Grid.Row="4" Name="UsernameBox" Margin="0,0,0,5" HorizontalContentAlignment="Stretch"/>
+                <Label Grid.Row="5" Content="Enter password" FontSize="10" HorizontalAlignment="Center"/>
+                <PasswordBox Grid.Row="6" Name="PasswordBox" HorizontalContentAlignment="Stretch"/>
+                <Button Grid.Row="7" Click="OnLoginClick" Margin="0,5,0,0" Content="Login" />
+            </Grid>
+            </Border>
     </Grid>
 </Window>
 

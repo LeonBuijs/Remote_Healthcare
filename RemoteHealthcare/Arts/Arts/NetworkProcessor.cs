@@ -1,6 +1,5 @@
 using System.Net.Sockets;
 using System.Text;
-using System.Windows;
 
 
 namespace Arts;
@@ -12,24 +11,29 @@ public class NetworkProcessor
     private DataSender artsSender;
     private byte[] artsBuffer = new byte[128];
     private string totalBuffer;
-    private ILoginWindowCallback loginWindowCallback;
+
+    private string ipAdress;
+
+    private readonly ILoginWindowCallback LoginWindowCallback;
+    public IListWindowCallback ListWindowCallback { set; get; }
+    
     private List<IDataUpdateCallback> dataUpdateCallbacks = new List<IDataUpdateCallback>();
-    private List<string> clients = new List<string>();
     private List<string> clientsWhoRecieveData = new List<string>();
     private bool isAskingData = false;
 
-    public NetworkProcessor()
+    public NetworkProcessor(string ipAddress, ILoginWindowCallback loginWindowWindowCallback)
     {
         artsClient = new TcpClient();
+        ipAdress = ipAddress;
+        LoginWindowCallback = loginWindowWindowCallback;
         ConnectToServer();
     }
     
-    public async void ConnectToServer()
+    public void ConnectToServer()
     {
-        //todo verander de host en poortnummer
         try
         {
-            await artsClient.ConnectAsync("127.0.0.1", 7777);
+            artsClient.Connect(ipAdress, 7777);
             //won't come here until it has connection.
             new Thread(OnConnect).Start(); 
             artsSender = new DataSender(artsClient.GetStream());
@@ -37,7 +41,8 @@ public class NetworkProcessor
         catch (SocketException exception)
         {
             //Notificeert het inlog scherm dat de connectie is gefaald.
-            loginWindowCallback.ConnectionFailed();
+            Console.WriteLine("loginCallback");
+            LoginWindowCallback.ConnectionFailed();
         }
     }
     
@@ -63,8 +68,7 @@ public class NetworkProcessor
         int receivedBytes = artsStream.EndRead(ar);
         string receivedText = Encoding.ASCII.GetString(artsBuffer, 0, receivedBytes);
         totalBuffer += receivedText;
-
-        //todo: pakket opsplitsen
+        
         string[] packetSplit = receivedText.Split(" ");
         HandleData(packetSplit);
 
@@ -86,10 +90,9 @@ public class NetworkProcessor
             case 0:
                 string argument = packetData[1];
                 Console.WriteLine($"Got login answer with argument {argument}");
-                loginWindowCallback.OnLogin(argument);
+                LoginWindowCallback.OnLogin(argument);
                 break;
             case 1:
-                //todo make parameters
                 string clientId = packetData[1].Replace(";", " ");
                 string data = packetData[2].Replace(";", " ");
                 Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");
@@ -97,24 +100,24 @@ public class NetworkProcessor
                 dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
                 break;
             case 2:
-                if (!clients.Contains(packetData[1].Replace(";", " ")))
-                {
-                    clients.Add(packetData[1].Replace(";", " "));
-                }
+                string newClientId = packetData[1].Replace(";", " ");
+                Console.WriteLine($"Kreeg clientId {newClientId}");
+                ListWindowCallback.AddNewClient(newClientId);
                 break;
             case 3:
                 break;
             default:
                 Console.WriteLine("Unknown Packet Page");
-                //todo better error handling
                 break;
         }
     }
 
     public void AddActiveClient(string clientId)
     {
+        Console.WriteLine($"adding {clientId} to active clients");
         lock (clientsWhoRecieveData)
         {
+            Console.WriteLine($"{clientId} added to clients list!");
             if (!clientsWhoRecieveData.Contains(clientId))
             {
                 clientsWhoRecieveData.Add(clientId);
@@ -139,13 +142,24 @@ public class NetworkProcessor
                     clientsWhoRecieveData.ForEach(GetRealtimeData);
                     count = clientsWhoRecieveData.Count;
                 }
+                Thread.Sleep(500);
             }
             isAskingData = false;
         }).Start();
 
     }
+
+    public bool IsConnected()
+    {
+        return artsClient.Connected;
+    }
     
     public void TryLogin(string username, string password){
+        if (!IsConnected())
+        {
+            return;
+        }
+        
         artsSender.SendLogin(username, password);
     }
     
@@ -159,45 +173,48 @@ public class NetworkProcessor
         artsSender.MakeClient(clientInfo);
     }
 
-    public void SetLoginCallback(ILoginWindowCallback windowCallback)
+    private void GetRealtimeData(string clientInfo)
     {
-        loginWindowCallback = windowCallback;
-    }
-    
-    public List<string> GetClientList()
-    {
-        return clients;
+        artsSender.ChosenClient(clientInfo);
     }
 
-    public void GetRealtimeData(string clientInfo)
+    public void RefreshClientList()
     {
-            artsSender.ChosenClient(clientInfo);
-    }
-
-    public void refreshClientList()
-    {
-        clients.Clear();
         artsSender.GetClients();
     }
 
-    public void StartClientSessie(string clientInfo)
+    public void StartClientSession(string clientInfo)
     {
+        Console.WriteLine($"telling server {clientInfo} started");
         artsSender.StartSession(clientInfo);
     }
 
-    public void StopClientSessie(string clientInfo)
+    public void StopClientSession(string clientInfo)
     {
+        lock (clientsWhoRecieveData)
+        {
+            clientsWhoRecieveData.Remove(clientInfo);
+        }
         artsSender.StopSession(clientInfo);
     }
 
-    public void EmergencyStopClientSessie(string clientInfo)
+    public void EmergencyStopClientSession(string clientInfo)
     {
         artsSender.EmergencyStopSession(clientInfo);
     }
 
-    public void SendMessage(string clientInfo, string text)
+    public void SendConfigs(string session, string resistance)
     {
-        artsSender.SendMessageToSession(clientInfo, text);
-        
+        artsSender.SendBikeConfigs(session, resistance);
+    }
+    
+    public void SendMessage(string clientInfo, string messege)
+    {
+        artsSender.SendMessageToSession(clientInfo, messege);
+    }
+
+    public void SendMessageToAll(string message)
+    {
+        artsSender.SendMessageToAllSessions(message);
     }
 }

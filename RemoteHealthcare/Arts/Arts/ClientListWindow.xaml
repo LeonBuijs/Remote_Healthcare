@@ -11,25 +11,23 @@
         <StackPanel Margin="10">
             <Label Content="Selecteer een item:" Margin="0,0,0,10"/>
             <ListBox Name="ItemList" Margin="0,0,0,10" Height="150" SelectionChanged="ChosenClient">
-                <ListBoxItem Content="Item 1"/>
-                <ListBoxItem Content="Item 2"/>
-                <ListBoxItem Content="Item 3"/>
-                <ListBoxItem Content="Item 4"/>
-                <ListBoxItem Content="Item 5"/>
-                <ListBoxItem Content="Item 6"/>
-                <ListBoxItem Content="Item 7"/>
-                <ListBoxItem Content="Item 8"/>
-                <ListBoxItem Content="Item 9"/>
-                <ListBoxItem Content="Item 10"/>
-                <ListBoxItem Content="Item 11"/>
-                <ListBoxItem Content="Item 12"/>
             </ListBox>
-            <Button Name="refreshButton" Content="Refresh" Click="RefreshClientsPressed"/>
-                <StackPanel Orientation="horizontal" Margin="10">
-                    <TextBox Name="ClientName" ></TextBox>
-                    <TextBox Name="ClientdateOfBirth" ></TextBox>
-                    <Button Name="MakeClientButton" Content="Create Client" Click="MakeClientPressed"></Button>
-                </StackPanel>
+            <Button Name="refreshButton" Content="Refresh" HorizontalAlignment="Left" Width="200" Click="RefreshClientsPressed"/>
+            
+            <StackPanel Orientation="Horizontal">
+                <TextBox Name="ChatTextBox" Width="200" Margin="0,10,5,0"></TextBox>
+                <Button Name="ChatButton" Content="Send to all" Width="200" Height="20" Margin="0,10,0,0" Click="ChatButtonPressed"></Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Client full Name" Margin="10,10,5,0"></Label>
+                <Label  Content="Client date of birth" Margin="100,10,0,0"></Label>
+                <Label Name="invalidDob" Content="(DD-MM-YYYY)" Foreground="Red" Margin="0,10,0,0" Visibility="Hidden"></Label>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,10,0">
+                    <TextBox Name="ClientName" Width="200" Margin="0,0,5,0"></TextBox>
+                    <TextBox Name="ClientdateOfBirth" Width="200" Margin="0,0,5,0" ></TextBox>
+                    <Button Name="MakeClientButton" Content="Create Client" Width="200" Margin="0,0,5,0" Click="MakeClientPressed"></Button>
+            </StackPanel>
         </StackPanel>
         
     </Grid>

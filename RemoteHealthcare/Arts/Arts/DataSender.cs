@@ -16,8 +16,16 @@ public class DataSender
 
     private void Write(string finalString)
     {
-        stream.Write(Encoding.ASCII.GetBytes(finalString));
-        stream.Flush();
+        try
+        {
+            stream.Write(Encoding.ASCII.GetBytes(finalString));
+            stream.Flush();
+        }
+        catch (Exception exception)
+        {
+            Console.WriteLine($"Couldn't write to server with exception: {exception}");
+        }
+        
     }
 
     public void SendLogin(string username, string password)
@@ -42,7 +50,6 @@ public class DataSender
     
     public void SendMessageToSession(string session, string message)
     {
-        //todo hoe willen we de sessie splitsen van message?
         Write($"4 {session} {message}");
     }
 

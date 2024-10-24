@@ -52,9 +52,18 @@
                 </Grid>
         </GroupBox>
         
-        <GroupBox Header="Data History" Grid.Row="1" Grid.Column="2" Margin="5">
+        <Grid Grid.Row="1" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <GroupBox Header="Data History" Grid.Row="0" Margin="5">
             
-        </GroupBox>
+            </GroupBox>
+            <Button Grid.Row="1" Height="20" Margin="5,0,5,5" Content="Get history" 
+                    Click="GetHistoryClicked"></Button>
+        </Grid>
+
 
         <!-- Chat section -->
         <GroupBox Header="Chat" Grid.Row="1" Grid.Column="1" Margin="5">
@@ -81,15 +90,23 @@
         <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Header="Settings" Margin="5">
             
             <!-- Add settings controls here -->
-           
+            <StackPanel HorizontalAlignment="Left">
+                <TextBlock Text="{Binding ElementName=ResistanceSlider, Path=Value, Mode=TwoWay, StringFormat=Resistance: {0}}"
+                           Margin="0,5,0,0"/>
+                <Slider Name="ResistanceSlider" Minimum="0" Maximum="100" Value="0" 
+                        TickFrequency="2.5" IsSnapToTickEnabled="True" Width="200" 
+                        TickPlacement="BottomRight" Background="White" Foreground="Black"/>
+                <Button Name="ConfirmResistance" Content="Confirm" Click="ConfirmResistancePressed"
+                        Margin="0,5,0,0"/>
+            </StackPanel>
         </GroupBox>
         
-        <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal">
+        <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal" Margin="5,15,5,5">
 
-            <Button Name="StartSessie" Content="Start Sessie" Click="StartClientSessie"/>
+            <Button Name="StartSessie" Content="Start Sessie" Width="100" Click="StartClientSession"/>
             <StackPanel >
-                <Button Name="StopButton" Content="Stop Sessie" Click="StopClientSessie"/>
-                <Button Name ="EmergencyStop" Content="EmergencyStop Sessie" Click="EmergencyStopClientSessie"/>
+                <Button Name="StopButton" Content="Stop Sessie" Height="61" Click="StopClientSession"/>
+                <Button Name ="EmergencyStop" Content="EmergencyStop Sessie" Height="62" Click="EmergencyStopClientSession"/>
             </StackPanel>
         </StackPanel>
         
