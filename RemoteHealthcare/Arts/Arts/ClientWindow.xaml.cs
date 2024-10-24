@@ -34,14 +34,16 @@ public partial class ClientWindow : Window, IDataUpdateCallback
             string speed = dataSplit[0];
             string distance = dataSplit[1];
             string power = dataSplit[2];
-            string rpm = dataSplit[3];
-            string heartRate = dataSplit[4];
+            string time = dataSplit[3];
+            string rpm = dataSplit[4];
+            string heartRate = dataSplit[5];
             
             //werk de bijbehorende tekstblokken bij
             Dispatcher.Invoke(() =>
             {
                 SpeedValueTextBlock.Text = speed;
                 DistanceValueTextBlock.Text = distance;
+                TimeValueTextBlock.Text = time;
                 PowerValueTextBlock.Text = power;
                 RpmValueTextBlock.Text = rpm;
                 HeartRateValueTextBlock.Text = heartRate;
@@ -62,6 +64,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback
             {
                 SpeedValueTextBlock.Text = null;
                 DistanceValueTextBlock.Text = null;
+                TimeValueTextBlock.Text = null;
                 PowerValueTextBlock.Text = null;
                 RpmValueTextBlock.Text = null;
                 HeartRateValueTextBlock.Text = null;
@@ -76,7 +79,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback
         if (ChatInputTextBox.Text.Length > 0)
         {
             networkProcessor.SendMessage(clientId, ChatInputTextBox.Text);
-            ChatHistoryBox.Text += ChatInputTextBox.Text + "\n\n";
+            ChatHistoryBox.Text += ChatInputTextBox.Text + "\n";
         }
     }
 

@@ -94,8 +94,8 @@ public class NetworkProcessor
                 break;
             case 1:
                 string clientId = $"{packetData[1]} {packetData[2]} {packetData[3]}";
-                string data = $"{packetData[4]} {packetData[5]} {packetData[6]} {packetData[7]} {packetData[8]}";
-                Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");
+                string data = $"{packetData[4]} {packetData[5]} {packetData[6]} {packetData[7]} {packetData[8]} {packetData[9]}";
+                Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");   
                 
                 dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
                 break;
@@ -216,5 +216,10 @@ public class NetworkProcessor
     public void SendMessageToAll(string message)
     {
         artsSender.SendMessageToAllSessions(message);
+    }
+
+    public void GetDataHistory(string session)
+    {
+        artsSender.RetrievePreviousSessions(session);
     }
 }

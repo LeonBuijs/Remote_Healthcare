@@ -28,56 +28,74 @@ public class ConnectionClient
     {
         while (true)
         {
-            var buffer = new byte[1024];
-            var bytesRead = networkStream.Read(buffer, 0, buffer.Length);
-            var received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-
-            Console.WriteLine($"----------\nReceived: {received}\n----------");
+            var indexBuffer = new byte[1];
+            var indexBytesRead = networkStream.Read(indexBuffer, 0, indexBuffer.Length);
+            var indexReceived = Encoding.ASCII.GetString(indexBuffer, 0, indexBytesRead);
             
-            var identifier = received[0];
-            var content = received.Substring(2);
-
-            switch (identifier)
+            switch (indexReceived)
             {
-                case '0':
+                case "0":
                     // Message dokter
-                    dokterMessages.Add(content);
-                    Panel.ClearPanel(VREngine.uuidPanelChats);
-                    Panel.ChangeChatsPanel(VREngine.uuidPanelChats, dokterMessages);
-                    Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
-                    Panel.SwapPanel(VREngine.uuidPanelChats);
+                    HandleDokterMessage(ReceiveMessage(1024));
                     break;
-                case '1':
+                case "1":
                     // Data
-                    string[] data = content.Split(' ');
-                    if (Convert.ToInt32(data[0]) != previousSpeed)
-                    {
-                        Route.ChangeFollowRouteSpeed(VREngine.uuidBike, Convert.ToInt32(data[0])/3.6);
-                        previousSpeed = Convert.ToInt32(data[0]);
-                    }
-                    
-                    Panel.ClearPanel(VREngine.uuidPanelData);
-                    Panel.ChangeDataPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]), 
-                        Convert.ToInt32(data[5]), data[3], Convert.ToInt32(data[1]));
-                    Panel.SwapPanel(VREngine.uuidPanelData);
+                    HandleData(ReceiveMessage(6));
                     break;
-                case '2':
+                case "2":
                     // Start command
                     break;
-                case '3':
+                case "3":
                     // Stop command
                     break;
-                case '4':
+                case "4":
                     // Emergency stop command
                     break;
-                case '5':
+                case "5":
                     // Naam
-                    name = content;
-                    Panel.ClearPanel(VREngine.uuidPanelChats);
-                    Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
-                    Panel.SwapPanel(VREngine.uuidPanelChats);
+                    HandleName(ReceiveMessage(1024));
                     break;
             }
         }
+    }
+
+    private static string ReceiveMessage(int bufferSize)
+    {
+        var buffer = new byte[bufferSize];
+        var bytesRead = networkStream.Read(buffer, 0, buffer.Length);
+        var received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+        return received;
+    }
+
+    private static void HandleDokterMessage(string received)
+    {
+        dokterMessages.Add(received);
+        Panel.ClearPanel(VREngine.uuidPanelChats);
+        Panel.ChangeChatsPanel(VREngine.uuidPanelChats, dokterMessages);
+        Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
+        Panel.SwapPanel(VREngine.uuidPanelChats);
+    }
+
+    private static void HandleData(string received)
+    {
+        string[] data = received.Split(' ');
+        if (Convert.ToInt32(data[0]) != previousSpeed)
+        {
+            Route.ChangeFollowRouteSpeed(VREngine.uuidBike, Convert.ToInt32(data[0])/3.6);
+            previousSpeed = Convert.ToInt32(data[0]);
+        }
+                    
+        Panel.ClearPanel(VREngine.uuidPanelData);
+        Panel.ChangeDataPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]), 
+            Convert.ToInt32(data[5]), data[3], Convert.ToInt32(data[1]));
+        Panel.SwapPanel(VREngine.uuidPanelData);
+    }
+
+    private static void HandleName(string received)
+    {
+        name = received;
+        Panel.ClearPanel(VREngine.uuidPanelChats);
+        Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
+        Panel.SwapPanel(VREngine.uuidPanelChats);
     }
 }
