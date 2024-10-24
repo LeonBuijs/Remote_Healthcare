@@ -1,18 +1,18 @@
 using System;
 using System.Text;
+using System.Threading;
 
 namespace Client.Handlers;
 
 public class MessageHandler : IBLECallback
 {
-    private BLEHandler bleHandler;
+    public BLEHandler BleHandler;
     public VRHandler VrHandler { get; set; }
-    public bool LoggedIn { get; set; }
+    public bool LoggedIn;
 
-    public MessageHandler(BLEHandler bleHandler)
+    public MessageHandler()
     {
-        this.bleHandler = bleHandler;
-        // this.vrHandler = vrHandler; // TODO deze initten als de doctor een sessie start
+        BleHandler = new BLEHandler(this);
     }
 
     /**
@@ -68,10 +68,12 @@ public class MessageHandler : IBLECallback
     private void HandleBikeResistanceSettings(string settings)
     {
         Console.WriteLine($"Bike resistance settings: {settings}");
-
-        var resistance = Encoding.UTF8.GetBytes(settings);
+        
+        var resistance = int.Parse(settings);
+        resistance *= 2;
+        
         // TODO: kijken of dit echt werkt
-        bleHandler.SetResistance(resistance[0]);
+        BleHandler.SetResistance(resistance);
     }
 
     /**
@@ -120,11 +122,13 @@ public class MessageHandler : IBLECallback
      */
     public void Disconnect()
     {
-        bleHandler.Disconnect();
+        BleHandler.Disconnect();
     }
 
     public void OnReceivedBikeData(BikeData bikeData)
     {
+        // Sleep om te voorkomen dat er teveel data gestuurd wordt en door TCP samengevoegd wordt
+        Thread.Sleep(100);
         VrHandler.SendBikeDataToVr(bikeData);
         Console.WriteLine(bikeData);
     }

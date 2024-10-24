@@ -8,12 +8,12 @@ namespace Client.Forms;
 public partial class DeviceConnection : Form
 {
     private MessageHandler messageHandler;
-    private BLEHandler bleHandler;
+    // private BLEHandler bleHandler;
     public DeviceConnection()
     {
         InitializeComponent();
-        messageHandler = new MessageHandler(bleHandler);
-        bleHandler = new BLEHandler(messageHandler);
+        messageHandler = new MessageHandler();
+        // bleHandler = new BLEHandler(ref messageHandler);
 
         FormClosing += CloseForm;
     }
@@ -28,14 +28,14 @@ public partial class DeviceConnection : Form
             return;
         }
 
-        if (!bleHandler.ConnectDevices(bikeNumber))
+        if (!messageHandler.BleHandler.ConnectDevices(bikeNumber))
         {
             CreateWarningPopup("Selected Bike Not Available", "Make sure you are connected with the bike");
             return;
         }
 
         // Check voor sim mode, wanneer sim mode aan is, verbind deel overslaan
-        if (bleHandler.ErrorCodeBike == 0 && bleHandler.ErrorCodeHeart == 0)
+        if (messageHandler.BleHandler.ErrorCodeBike == 0 && messageHandler.BleHandler.ErrorCodeHeart == 0)
         {
             StartServerLogin();
             return;
@@ -47,8 +47,8 @@ public partial class DeviceConnection : Form
         // Timeout om de bleHandler tijd te geven om te verbinden
         Thread.Sleep(5000);
 
-        var bikeConnected = bleHandler.ErrorCodeBike;
-        var heartRateConnected = bleHandler.ErrorCodeHeart;
+        var bikeConnected = messageHandler.BleHandler.ErrorCodeBike;
+        var heartRateConnected = messageHandler.BleHandler.ErrorCodeHeart;
 
         if (bikeConnected == 0 && heartRateConnected == 0)
         {
@@ -79,7 +79,7 @@ public partial class DeviceConnection : Form
      */
     private void UpdateConnectionStatus()
     {
-        if (bleHandler.ErrorCodeBike == 0)
+        if (messageHandler.BleHandler.ErrorCodeBike == 0)
         {
             BikeConnectedStatusLabel.Text = "Connected!";
         }
@@ -88,7 +88,7 @@ public partial class DeviceConnection : Form
             BikeConnectedStatusLabel.Text = "NOT CONNECTED";
         }
 
-        if (bleHandler.ErrorCodeHeart == 0)
+        if (messageHandler.BleHandler.ErrorCodeHeart == 0)
         {
             HeartRateConnectedStatusLabel.Text = "Connected!";
         }

@@ -32,7 +32,7 @@ public class ConnectionClient
             var bytesRead = networkStream.Read(buffer, 0, buffer.Length);
             var received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
-            Console.WriteLine(received);
+            Console.WriteLine($"----------\nReceived: {received}\n----------");
             
             var identifier = received[0];
             var content = received.Substring(2);

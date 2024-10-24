@@ -268,7 +268,7 @@ public class Server : IDoctorCallback, IClientCallback
             return;
         }
 
-        connection.Send(clients[clientIndex].LiveData);
+        connection.Send($"1 {clients[clientIndex].LiveData}");
     }
 
 

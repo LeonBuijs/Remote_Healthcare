@@ -173,7 +173,7 @@ public class BLEHandler(MessageHandler messageHandler)
     /**
     * Specifieke methode om de weerstand van de fiets aan te passen
     */
-    public void SetResistance(byte resistance)
+    public void SetResistance(int resistance)
     {
         if (simulationMode)
         {
@@ -182,7 +182,7 @@ public class BLEHandler(MessageHandler messageHandler)
 
         byte resistancePage = 0x30;
         byte zero = 0x00;
-        byte[] payload = [resistancePage, zero, zero, zero, zero, zero, zero, resistance];
+        byte[] payload = [resistancePage, zero, zero, zero, zero, zero, zero, (byte)resistance];
         SendMessageToBike(payload);
     }
 

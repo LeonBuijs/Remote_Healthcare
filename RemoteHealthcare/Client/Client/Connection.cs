@@ -43,9 +43,10 @@ public class Connection
                     var received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
                     messageHandler.ProcessMessage(received);
                 }
-                catch (Exception)
+                catch (Exception e)
                 {
-                    messageHandler.Disconnect();
+                    Console.WriteLine($"Error: \n{e}");
+                    // messageHandler.Disconnect();
                     Disconnect();
                     return;
                 }
@@ -59,6 +60,7 @@ public class Connection
      */
     public void SendMessage(string message)
     {
+        Console.WriteLine($"Sending message: {message}");
         var data = Encoding.ASCII.GetBytes(message);
         stream.Write(data, 0, data.Length);
     }

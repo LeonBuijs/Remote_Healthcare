@@ -120,6 +120,6 @@ public class BikeData
 
     public override string ToString()
     {
-        return $"{Speed} {Distance} {Watt} {Time} {Rpm} {HeartRate}";
+        return $"{Speed} {Distance} {Watt} {Time} {Rpm} {HeartRate} ";
     }
 }

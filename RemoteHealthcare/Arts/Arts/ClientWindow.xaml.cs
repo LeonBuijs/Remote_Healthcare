@@ -84,7 +84,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback
     {
         //Pak de slider waarde en stuur het door naar de server
         //InvariantCulture zorgt voor een punt ("10.0") en niet een comma ("10,0")
-        string resistanceValue = ResistanceSlider.Value.ToString("0.0", CultureInfo.InvariantCulture);
+        string resistanceValue = ResistanceSlider.Value.ToString("0", CultureInfo.InvariantCulture);
         networkProcessor.SendConfigs(clientId, resistanceValue);
     }
 
