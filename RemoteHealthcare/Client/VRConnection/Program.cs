@@ -10,6 +10,13 @@ using VRConnection;
 public class VREngine
 {
     private static string SessionID;
+    private static NetworkStream stream;
+    public static string uuidBike;
+    private static string uuidTerrain;
+    private static string uuidRoute;
+    public static string uuidPanelData;
+    public static string uuidPanelChats;
+    public static string uuidPanelDataText;
 
     public static void Main(string[] args)
     {
@@ -17,55 +24,59 @@ public class VREngine
         TcpClient tcpClient = new TcpClient();
         tcpClient.Connect("85.145.62.130", 6666);
         tcpClient.ReceiveTimeout = 6000000;
-        NetworkStream stream = tcpClient.GetStream();
+        stream = tcpClient.GetStream();
         Console.WriteLine("Verbonden met de server\n");
 
-        CreateTunnel(stream);
-        // Werkende methodes:
-        // SetTime(stream, 0);
-        DeleteStartingNodes(stream);
-
-        string uuidBike = CreateNodeForBike(stream);
-        string uuidTerrain = Terrain.CreateNodeForTerrain(stream);
-
-        string uuidRoute = Route.CreateRoute(stream);
-        Route.CreateRoad(stream, uuidRoute);
-        Route.FollowRoute(stream, uuidRoute, uuidBike);
-        Route.ChangeFollowRouteSpeed(stream, uuidBike, 5.0);
-        
-        AttachCameraToBike(stream, uuidBike);
-
-        string uuidPanel = Panel.CreateNodeForPanel(stream);
-        Panel.ClearPanel(stream, uuidPanel);
-
-        Panel.ChangeNamePanel(stream, uuidPanel, "Name");
-        Panel.ChangeSpeedPanel(stream, uuidPanel, 5);
-        Panel.ChangeWattPanel(stream, uuidPanel, 100);
-        Panel.ChangeRPMPanel(stream, uuidPanel, 25);
-        Panel.ChangeHeartRatePanel(stream, uuidPanel, 90);
-        Panel.ChangeTimePanel(stream, uuidPanel, "00:00:00");
-        Panel.ChangeDistancePanel(stream, uuidPanel, 0);
-        Panel.SwapPanel(stream, uuidPanel);
-        
-        Panel.AttachPanelToBike(stream, uuidPanel, uuidBike);
-
-        Terrain.AddLayerToTerrain(stream, uuidTerrain);
-
-        // Loop voor tijdens de sessie
-        while (true)
+        if (CreateTunnel())
         {
-            RecievePacket(stream);
+            // Werkende methodes:
+            // SetTime(stream, 0);
+            DeleteStartingNodes();
+
+            uuidBike = CreateNodeForBike();
+            uuidTerrain = Terrain.CreateNodeForTerrain();
+
+            uuidRoute = Route.CreateRoute();
+            Route.CreateRoad(uuidRoute);
+            Route.FollowRoute(uuidRoute, uuidBike);
+            Route.ChangeFollowRouteSpeed(uuidBike, 10.0);
+
+            AttachCameraToBike(uuidBike);
+
+            uuidPanelData = Panel.CreateNodeForPanel();
+            uuidPanelDataText = Panel.CreateNodeForPanel();
+            Panel.ClearPanel(uuidPanelDataText);
+            Panel.SetDataText(uuidPanelDataText);
+            Panel.SwapPanel(uuidPanelDataText);
+            Panel.AttachPanelToBike(uuidPanelDataText, uuidBike, new[] { -2, 2.4, -2.1 });
+
+            Panel.ClearPanel(uuidPanelData);
+
+            Panel.ChangeDataPanel(uuidPanelData, 15, 190, "00:00", 20000);
+            Panel.SwapPanel(uuidPanelData);
+            Panel.AttachPanelToBike(uuidPanelData, uuidBike, new[] { -2, 2.2, -2.1 });
+
+            uuidPanelChats = Panel.CreateNodeForPanel();
+            Panel.ClearPanel(uuidPanelChats);
+            Panel.ChangeNamePanel(uuidPanelChats, "Name");
+
+            Panel.SwapPanel(uuidPanelChats);
+            Panel.AttachPanelToBike(uuidPanelChats, uuidBike, new[] { -2, 2.4, 2.1 });
+
+            Terrain.AddLayerToTerrain(uuidTerrain);
+
+            ConnectionClient.StartServer();
         }
     }
-    
+
     /**
      * Methode die de camera zoekt en deze vervolgens koppelt aan de uuid van de node die je meegeeft.
      */
-    private static void AttachCameraToBike(NetworkStream stream, string uuidBike)
+    private static void AttachCameraToBike(string uuidBike)
     {
-        var cameraUuid = SearchNode(stream, "Camera");
+        var cameraUuid = SearchNode("Camera");
 
-        SendThroughTunnel(stream, "scene/node/update", new
+        SendThroughTunnel("scene/node/update", new
         {
             id = cameraUuid,
             parent = uuidBike,
@@ -76,40 +87,40 @@ public class VREngine
                 rotation = new[] { 0, 90, 0 }
             }
         });
-        RecievePacket(stream);
+        RecievePacket();
     }
-    
+
     /**
      * Methode die een aantal nodes verwijderd die we niet nodig hebben.
      */
-    private static void DeleteStartingNodes(NetworkStream stream)
+    private static void DeleteStartingNodes()
     {
-        DeleteNode(stream, SearchNode(stream, "LeftHand"));
-        DeleteNode(stream, SearchNode(stream, "RightHand"));
-        DeleteNode(stream, SearchNode(stream, "Head"));
-        DeleteNode(stream, SearchNode(stream, "GroundPlane"));
+        DeleteNode(SearchNode("LeftHand"));
+        DeleteNode(SearchNode("RightHand"));
+        DeleteNode(SearchNode("Head"));
+        DeleteNode(SearchNode("GroundPlane"));
     }
 
     /**
      * Methode om een node te verwijderen, je moet de uuid van de node meegeven die je wilt verwijderen.
      */
-    private static void DeleteNode(NetworkStream stream, string uuid)
+    private static void DeleteNode(string uuid)
     {
-        SendThroughTunnel(stream, "scene/node/delete", new
+        SendThroughTunnel("scene/node/delete", new
         {
             id = uuid
         });
-        RecievePacket(stream);
+        RecievePacket();
     }
-    
+
     /**
      * Methode om een node te zoeken in de scene, je moet de naam van de node meegeven en je krijgt de uuid terug.
      */
-    private static string? SearchNode(NetworkStream stream, string nodeName)
+    private static string? SearchNode(string nodeName)
     {
-        SendThroughTunnel(stream, "scene/get", null);
+        SendThroughTunnel("scene/get", null);
 
-        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
         JsonArray dataArray = (JsonArray)jsonObject["data"]["data"]["data"]["children"];
         string uuid = null;
         foreach (JsonObject child in dataArray)
@@ -124,13 +135,13 @@ public class VREngine
         Console.WriteLine($"Node {nodeName} : {uuid}");
         return uuid;
     }
-    
+
     /**
      * Methode die een node aanmaakt voor een fiets, hierdoor wordt er een fiets weergegeven in de simulator.
      */
-    private static string CreateNodeForBike(NetworkStream stream)
+    private static string CreateNodeForBike()
     {
-        SendThroughTunnel(stream, "scene/node/add", new
+        SendThroughTunnel("scene/node/add", new
         {
             name = "Bike",
             components = new
@@ -148,24 +159,24 @@ public class VREngine
             }
         });
 
-        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
+        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
         return jsonObject["data"]["data"]["data"]["uuid"].ToString();
     }
-    
+
     /**
      * Methode die de tijd aanpast in de simulator, je kunt de tijd die je wilt instellen meegeven in uren.
      */
-    private static void SetTime(NetworkStream stream, int time)
+    private static void SetTime(int time)
     {
-        SendThroughTunnel(stream, "scene/skybox/settime", new { time = time });
-        RecievePacket(stream);
+        SendThroughTunnel("scene/skybox/settime", new { time = time });
+        RecievePacket();
     }
 
     /**
      * Methode die er voor zorgt dat je een bericht kunt versturen door de tunnel die is aangemaakt.
      * Je moet het commando opgeven die je wilt uitvoeren en de bijbehorende data.
      */
-    protected static void SendThroughTunnel(NetworkStream stream, string command, object data)
+    protected static void SendThroughTunnel(string command, object data)
     {
         var packet = new
         {
@@ -181,65 +192,75 @@ public class VREngine
             }
         };
 
-        SendPacket(stream, packet);
+        SendPacket(packet);
     }
 
     /**
      * Methode die een tunnel maakt waarmee je vervolgens data er naar toe kunt sturen.
      */
-    private static void CreateTunnel(NetworkStream stream)
+    private static bool CreateTunnel()
     {
-        // Stap 2
-        SendPacket(stream, new { id = "session/list" });
-
-        // Stap 3
-        JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
-        JsonArray dataArray = (JsonArray)jsonObject["data"];
-
-        string ID = null;
-        foreach (JsonObject session in dataArray)
+        try
         {
-            string user = session["clientinfo"]["user"].ToString();
-            if (user == System.Environment.UserName)
-            {
-                ID = session["id"].ToString();
-            }
-        }
+            // Stap 2
+            SendPacket(new { id = "session/list" });
 
-        // Stap 4
-        SendPacket(stream, new
-        {
-            id = "tunnel/create",
-            data = new
-            {
-                session = ID,
-            }
-        });
+            // Stap 3
+            JsonObject jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
+            JsonArray dataArray = (JsonArray)jsonObject["data"];
 
-        jsonObject = (JsonObject)JsonObject.Parse(RecievePacket(stream));
-        SessionID = jsonObject["data"]["id"].ToString();
-
-        // Stap 5
-        SendPacket(stream, new
-        {
-            id = "tunnel/send",
-            data = new
+            string ID = null;
+            foreach (JsonObject session in dataArray)
             {
-                dest = SessionID,
-                data = new
+                string user = session["clientinfo"]["user"].ToString();
+                if (user == System.Environment.UserName)
                 {
-                    id = "scene/reset",
-                    data = new { }
+                    ID = session["id"].ToString();
                 }
             }
-        });
-        RecievePacket(stream);
+
+            // Stap 4
+            SendPacket(new
+            {
+                id = "tunnel/create",
+                data = new
+                {
+                    session = ID,
+                }
+            });
+
+            jsonObject = (JsonObject)JsonObject.Parse(RecievePacket());
+            SessionID = jsonObject["data"]["id"].ToString();
+
+            // Stap 5
+            SendPacket(new
+            {
+                id = "tunnel/send",
+                data = new
+                {
+                    dest = SessionID,
+                    data = new
+                    {
+                        id = "scene/reset",
+                        data = new { }
+                    }
+                }
+            });
+            RecievePacket();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("Can't create a tunnel.");
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * Methode die de json die die meekrijgt, stuurt naar de server volgens het protocol.
      */
-    private static void SendPacket(NetworkStream stream, object packetString)
+    private static void SendPacket(object packetString)
     {
         string jsonString = JsonSerializer.Serialize(packetString);
         var array = Encoding.ASCII.GetBytes(jsonString);
@@ -264,7 +285,7 @@ public class VREngine
      * Methode die er voor zorgt dat je gegevens kunt ontvangen die je van de server krijgt.
      * Er wordt eerst gekeken hoelang het bericht gaat zijn en haalt vervolgens deze gegevens op.
      */
-    protected static string RecievePacket(NetworkStream stream)
+    protected static string RecievePacket()
     {
         // Uitlezen van de lengte
         var lengthBuffer = new byte[4];

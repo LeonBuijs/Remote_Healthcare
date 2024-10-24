@@ -13,12 +13,12 @@ public class Simulation
     public Simulation(int speed, int watt, int rpm, int heartRate)
     {
         this.speed = speed;
-        this.time = 0;
         this.watt = watt;
         this.rpm = rpm;
         this.heartRate = heartRate;
-        this.distance = 0;
-        this.counter = 0;
+        time = 0;
+        distance = 0;
+        counter = 0;
         Thread thread = new Thread(UpdateTime);
         thread.Start();
     }

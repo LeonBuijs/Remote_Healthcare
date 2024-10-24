@@ -1,18 +1,14 @@
-using System;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using Client.Forms;
 
 namespace Client;
 
 class Program
 {
-    // private static BLEHandler ble;
     static void Main(string[] args)
     {
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
-        Application.Run(new Form());
-
-        Console.Read();
+        Application.Run(new DeviceConnection());
     }
 }

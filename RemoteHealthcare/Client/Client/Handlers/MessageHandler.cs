@@ -1,26 +1,27 @@
 using System;
 using System.Text;
-using Client;
 
-namespace ClientGUI;
+namespace Client.Handlers;
 
-public class MessageHandler
+public class MessageHandler : IBLECallback
 {
     private BLEHandler bleHandler;
-    private VRHandler vrHandler;
-    public bool loggedIn { get; set; }
+    public VRHandler VrHandler { get; set; }
+    public bool LoggedIn { get; set; }
 
-    public MessageHandler(BLEHandler bleHandler, VRHandler vrHandler)
+    public MessageHandler(BLEHandler bleHandler)
     {
         this.bleHandler = bleHandler;
-        this.vrHandler = vrHandler;
+        // this.vrHandler = vrHandler; // TODO deze initten als de doctor een sessie start
     }
 
-
+    /**
+     * Methode om inkomende berichten te verwerken
+     */
     public void ProcessMessage(string message)
     {
         Console.WriteLine($"Received message: {message}");
-        
+
         if (string.IsNullOrWhiteSpace(message))
         {
             return;
@@ -52,12 +53,18 @@ public class MessageHandler
         }
     }
 
+    /**
+     * Helper methode om een chatbericht door te sturen naar de vr-omgeving
+     */
     private void HandleChatMessage(string message)
     {
         Console.WriteLine($"Chat message from doctor: {message}");
-        vrHandler.SendChatToVr(message);
+        VrHandler.SendChatToVr(message);
     }
 
+    /**
+     * Helper methode om aan de hand van een commando de weerstand van een fiets in te stellen
+     */
     private void HandleBikeResistanceSettings(string settings)
     {
         Console.WriteLine($"Bike resistance settings: {settings}");
@@ -67,32 +74,58 @@ public class MessageHandler
         bleHandler.SetResistance(resistance[0]);
     }
 
+    /**
+     * Helper methode om een startcommando uit te voeren
+     */
     private void HandleStartCommand()
     {
-        vrHandler.StartSession();
+        VrHandler.StartSession();
     }
 
+    /**
+     * Helper methode om een stopcommando uit te voeren
+     */
     private void HandleStopCommand()
     {
-        vrHandler.StopSession();
+        VrHandler.StopSession();
     }
 
+    /**
+     * Helper methode om een emergency-stop commando uit te voeren
+     */
     private void HandleEmergencyStopCommand()
     {
-        vrHandler.EmergencyStop();
+        VrHandler.EmergencyStop();
     }
 
+    /**
+     * Helper methode om de login-bevestiging te verwerken
+     */
     private void HandleLoginConfirmation(string confirmation)
     {
         if (confirmation == "1")
         {
             Console.WriteLine("Logging in");
-            loggedIn = true;
+            LoggedIn = true;
         }
         else
         {
             Console.WriteLine("Wrong username or password");
-            loggedIn = false;
+            LoggedIn = false;
         }
+    }
+
+    /**
+     * Methode om alles netjes af te sluiten
+     */
+    public void Disconnect()
+    {
+        bleHandler.Disconnect();
+    }
+
+    public void OnReceivedBikeData(BikeData bikeData)
+    {
+        VrHandler.SendBikeDataToVr(bikeData);
+        Console.WriteLine(bikeData);
     }
 }

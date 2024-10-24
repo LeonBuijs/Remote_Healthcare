@@ -1,37 +1,69 @@
-namespace Client;
+namespace Client.Handlers;
 
 /**
- * Dummy klasse waarmee berichten naar de VR-Server gestuurd kunnen worden
+ * Klasse waarmee berichten naar de VR-omgeving gestuurd kunnen worden
  */
 public class VRHandler
 {
     private bool inSession;
+    private Connection connection;
 
-    public void SendSpeedToVr(int speed)
+    public VRHandler(Connection connection)
     {
-        //todo
+        this.connection = connection;
     }
 
+    /**
+     * Methode om chats van de arts naar de VR-omgeving te sturen
+     */
     public void SendChatToVr(string chat)
     {
-        //todo
+        connection.SendMessage($"0 {chat}");
     }
 
+    /**
+     * Methode om data vanuit de fiets naar de VR-omgeving te sturen
+     */
+    public void SendBikeDataToVr(BikeData bikeData)
+    {
+        if (!inSession)// todo
+        {
+            connection.SendMessage($"1 {bikeData}");
+        }
+    }
+
+    /**
+     * Methode om een startcommando naar de VR-omgeving te sturen
+     */
     public void StartSession()
     {
-        //todo
+        connection.SendMessage("2");
         inSession = true;
     }
 
+    /**
+     * Methode om een stopcommando naar de VR-omgeving te sturen
+     */
     public void StopSession()
     {
-        //todo
+        connection.SendMessage("3");
         inSession = false;
     }
 
+    /**
+     * Methode om een noodstopcommando naar de VR-omgeving te sturen
+     */
     public void EmergencyStop()
     {
-        //todo
+        connection.SendMessage("4");
         inSession = false;
+    }
+
+    /**
+     * Methode om de client naam naar de VR-omgeving te sturen
+     */
+    public void SendNameToVr(string firstName, string lastName)
+    {
+        connection.SendMessage($"5 {firstName} {lastName}");
     }
 }
