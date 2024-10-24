@@ -42,10 +42,10 @@ public class BLEHandler(MessageHandler messageHandler)
             Task.Run(async () =>
             {
                 await StartBLE(bikeNumber);
-                return true;
             });
+            return true;
         }
-
+        
         return false;
     }
 
@@ -76,6 +76,8 @@ public class BLEHandler(MessageHandler messageHandler)
         // Subscribe
         bleBike.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
         ErrorCodeBike = await bleBike.SubscribeToCharacteristic(BikeCharacteristic);
+
+        Console.WriteLine($"Error code bike: {ErrorCodeBike}");
     }
 
     /**
@@ -96,6 +98,8 @@ public class BLEHandler(MessageHandler messageHandler)
         // Subscribe
         bleHeart.SubscriptionValueChanged += BleBike_SubscriptionValueChanged;
         ErrorCodeHeart = await bleHeart.SubscribeToCharacteristic("HeartRateMeasurement");
+
+        Console.WriteLine($"Error code heart: {ErrorCodeHeart}");
     }
 
     /**
