@@ -44,7 +44,7 @@ public class Panel : VREngine
         {
             for (int i = chats.Count; i > 0; i--)
             {
-                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (chats.Count - i) * 20 + 30 }, 20);
+                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (chats.Count - i) * 20 + 60 }, 20);
             }
         }
     }

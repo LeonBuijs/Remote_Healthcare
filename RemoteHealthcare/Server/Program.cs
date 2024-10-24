@@ -340,7 +340,11 @@ public class Server : IDoctorCallback, IClientCallback
                        $"{messageParts[5]} {messageParts[6]}";
 
         // Live data opslaan in object van client
-        clientConnection.Item1.LiveData = bikeData;
+        
+        lock (clientConnection) 
+        {
+            clientConnection.Item1.LiveData = bikeData;
+        }
 
         // Huidige meting van bikeData opslaan in file
         if (clientConnection.Item1.InSession)

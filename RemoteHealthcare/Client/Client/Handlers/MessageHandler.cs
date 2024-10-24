@@ -28,15 +28,14 @@ public class MessageHandler : IBLECallback
         }
 
         var identifier = message[0];
-        var content = message.Substring(2);
 
         switch (identifier)
         {
             case '0':
-                HandleChatMessage(content);
+                HandleChatMessage(message.Substring(2));
                 break;
             case '1':
-                HandleBikeResistanceSettings(content);
+                HandleBikeResistanceSettings(message.Substring(2));
                 break;
             case '2':
                 HandleStartCommand();
@@ -48,7 +47,7 @@ public class MessageHandler : IBLECallback
                 HandleEmergencyStopCommand();
                 break;
             case '5':
-                HandleLoginConfirmation(content);
+                HandleLoginConfirmation(message.Substring(2));
                 break;
         }
     }
@@ -81,7 +80,7 @@ public class MessageHandler : IBLECallback
      */
     private void HandleStartCommand()
     {
-        // VrHandler.StartSession(); todo
+        VrHandler.StartSession(); 
     }
 
     /**

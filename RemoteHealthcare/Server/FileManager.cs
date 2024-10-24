@@ -184,6 +184,8 @@ public class FileManager
     /**
      * Async methode om gewenste waardes van een sessie te berekenen
      * Na het berekenen van de gewenste waarden worden alle andere waarden vervangen in het bestand door de gewenste waarden
+     *
+     * voorbeeld: 2024-24-10 13-49-31 0:10:21 7 70 92 153
      */
     public async Task CalculateDataFromSession(ClientConnection connection, string clientName, string sessionTime)
     {
@@ -227,10 +229,10 @@ public class FileManager
                 allHeartRates.Add(int.Parse(split[5]));
             }
 
-            var averageSpeed = allSpeeds.Average();
+            var averageSpeed = (int) allSpeeds.Average();
             var maxSpeed = allSpeeds.Max();
 
-            var averageHeartRate = allHeartRates.Average();
+            var averageHeartRate = (int) allHeartRates.Average();
             var maxHeartRate = allHeartRates.Max();
 
             var calculatedData = $"{date} {duration} {averageSpeed} {maxSpeed} {averageHeartRate} {maxHeartRate}";
