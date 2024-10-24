@@ -45,7 +45,7 @@ public class Server : IDoctorCallback, IClientCallback
             return;
         }
 
-        switch ((DoctorDataIndex)int.Parse(messageParts[0]))
+        switch ((DoctorDataIndex)int.Parse(messageParts[0].Trim()))
         {
             case DoctorDataIndex.Login:
                 DoctorLogin(connection, messageParts);
@@ -99,7 +99,9 @@ public class Server : IDoctorCallback, IClientCallback
             return;
         }
 
-        switch ((ClientDataIndex)int.Parse(messageParts[0]))
+        Console.WriteLine("messageparts: " + messageParts[0]);
+        
+        switch ((ClientDataIndex) int.Parse(messageParts[0]))
         {
             case ClientDataIndex.Login:
                 ClientLogin(connection, messageParts);
@@ -108,7 +110,7 @@ public class Server : IDoctorCallback, IClientCallback
                 ReceiveBikeData(connection, messageParts);
                 break;
             case ClientDataIndex.Disconnected:
-                DisconnectClient(connection);
+                // DisconnectClient(connection);
                 break;
         }
     }
@@ -262,13 +264,18 @@ public class Server : IDoctorCallback, IClientCallback
     {
         var clientIndex = GetIndexClient(messageParts);
 
+        Console.WriteLine($"live data from {clientIndex}!");
+
         // Check om te controleren of de client bestaat/verbonden is
         if (!clients.ContainsKey(clientIndex))
         {
+            Console.WriteLine($"client doesn't exist {clientIndex}");
             return;
         }
 
-        connection.Send($"1 {clients[clientIndex].LiveData}");
+        Console.WriteLine($"sent live data {clientIndex} {clients[clientIndex].LiveData}");//todo
+        
+        connection.Send($"1 {clientIndex} {clients[clientIndex].LiveData}");
     }
 
 
