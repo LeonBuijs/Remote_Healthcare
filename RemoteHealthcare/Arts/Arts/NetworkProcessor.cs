@@ -100,7 +100,7 @@ public class NetworkProcessor
                 dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
                 break;
             case 2:
-                string newClientId = packetData[1].Replace(";", " ");
+                string newClientId = $"{packetData[1]} {packetData[2]} {packetData[3]}";
                 Console.WriteLine($"Kreeg clientId {newClientId}");
                 ListWindowCallback.AddNewClient(newClientId);
                 break;
