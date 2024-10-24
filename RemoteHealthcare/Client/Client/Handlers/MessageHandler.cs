@@ -126,8 +126,6 @@ public class MessageHandler : IBLECallback
 
     public void OnReceivedBikeData(BikeData bikeData)
     {
-        // Sleep om te voorkomen dat er teveel data gestuurd wordt en door TCP samengevoegd wordt
-        Thread.Sleep(100);
         VrHandler.SendBikeDataToVr(bikeData);
         
         Console.WriteLine(bikeData);

@@ -33,16 +33,13 @@ public partial class DeviceConnection : Form
             CreateWarningPopup("Selected Bike Not Available", "Make sure you are connected with the bike");
             return;
         }
-
+        
         // Check voor sim mode, wanneer sim mode aan is, verbind deel overslaan
         if (messageHandler.BleHandler.ErrorCodeBike == 0 && messageHandler.BleHandler.ErrorCodeHeart == 0)
         {
             StartServerLogin();
             return;
         }
-
-        BikeConnectedStatusLabel.Text = "Connecting";
-        HeartRateConnectedStatusLabel.Text = "Connecting";
         
         // Timeout om de bleHandler tijd te geven om te verbinden
         Thread.Sleep(5000);

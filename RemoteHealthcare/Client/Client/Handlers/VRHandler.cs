@@ -18,7 +18,7 @@ public class VRHandler
      */
     public void SendChatToVr(string chat)
     {
-        connection.SendMessage($"0 {chat}");
+        connection.SendMessage($"0 {chat}\n");
     }
 
     /**
@@ -28,7 +28,7 @@ public class VRHandler
     {
         if (inSession)
         {
-            connection.SendMessage($"1 {bikeData}");
+            connection.SendMessage($"1 {bikeData}\n");
         }
     }
 
@@ -37,7 +37,7 @@ public class VRHandler
      */
     public void StartSession()
     {
-        connection.SendMessage("2");
+        connection.SendMessage("2\n");
         inSession = true;
     }
 
@@ -46,7 +46,7 @@ public class VRHandler
      */
     public void StopSession()
     {
-        connection.SendMessage("3");
+        connection.SendMessage("3\n");
         inSession = false;
     }
 
@@ -55,7 +55,7 @@ public class VRHandler
      */
     public void EmergencyStop()
     {
-        connection.SendMessage("4");
+        connection.SendMessage("4\n");
         inSession = false;
     }
 
@@ -64,6 +64,6 @@ public class VRHandler
      */
     public void SendNameToVr(string firstName, string lastName)
     {
-        connection.SendMessage($"5 {firstName} {lastName}");
+        connection.SendMessage($"5 {firstName} {lastName}\n");
     }
 }

@@ -179,7 +179,6 @@ public class FileManager
         return ["File does not exist"];
     }
 
-    // TODO: verder berekenen van data uit bestand, max en gemiddelde etc.
     // TODO: mogelijk versimpelen van vergelijken van tijden
     /**
      * Async methode om gewenste waardes van een sessie te berekenen
