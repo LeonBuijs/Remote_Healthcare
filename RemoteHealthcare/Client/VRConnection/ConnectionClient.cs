@@ -34,48 +34,17 @@ public class ConnectionClient
 
             Console.WriteLine($"----------\nReceived: {received}\n----------");
             
-            var identifier = received[0];
-
-            switch (identifier)
+            var commands = received.Split('\n');
+            foreach (var command in commands)
             {
-                case '0':
-                    // Message dokter
-                    HandleDokterMessage(received);
-                    break;
-                case '1':
-                    // Data
-                    string[] data = received.Substring(2).Split(' ');
-                    if (Convert.ToInt32(data[0]) != previousSpeed)
-                    {
-                        Route.ChangeFollowRouteSpeed(VREngine.uuidBike, Convert.ToInt32(data[0])/3.6);
-                        previousSpeed = Convert.ToInt32(data[0]);
-                    }
-                    
-                    Panel.ClearPanel(VREngine.uuidPanelData);
-                    Panel.ChangeDataPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]), 
-                        Convert.ToInt32(data[5]), data[3], Convert.ToInt32(data[1]));
-                    Panel.SwapPanel(VREngine.uuidPanelData);
-                    break;
-                case '2':
-                    // Start command
-                    break;
-                case '3':
-                    // Stop command
-                    break;
-                case '4':
-                    // Emergency stop command
-                    break;
-                case '5':
-                    // Naam
-                    name = received.Substring(2);
-                    Panel.ClearPanel(VREngine.uuidPanelChats);
-                    Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
-                    Panel.SwapPanel(VREngine.uuidPanelChats);
-                    break;
+                if (!(command.Length <= 1))
+                {
+                    HandleCommand(command.Trim());
+                }
             }
         }
     }
-    
+
     private static void HandleDokterMessage(string received)
     {
         dokterMessages.Add(received);
@@ -83,5 +52,48 @@ public class ConnectionClient
         Panel.ChangeChatsPanel(VREngine.uuidPanelChats, dokterMessages);
         Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
         Panel.SwapPanel(VREngine.uuidPanelChats);
+    }
+
+    private static void HandleCommand(string received)
+    {
+        var identifier = received[0];
+
+        switch (identifier)
+        {
+            case '0':
+                // Message dokter
+                HandleDokterMessage(received);
+                break;
+            case '1':
+                // Data
+                string[] data = received.Substring(2).Split(' ');
+                if (Convert.ToInt32(data[0]) != previousSpeed)
+                {
+                    Route.ChangeFollowRouteSpeed(VREngine.uuidBike, Convert.ToInt32(data[0])/3.6);
+                    previousSpeed = Convert.ToInt32(data[0]);
+                }
+                    
+                Panel.ClearPanel(VREngine.uuidPanelData);
+                Panel.ChangeDataPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]), 
+                    Convert.ToInt32(data[5]), data[3], Convert.ToInt32(data[1]));
+                Panel.SwapPanel(VREngine.uuidPanelData);
+                break;
+            case '2':
+                // Start command
+                break;
+            case '3':
+                // Stop command
+                break;
+            case '4':
+                // Emergency stop command
+                break;
+            case '5':
+                // Naam
+                name = received.Substring(2);
+                Panel.ClearPanel(VREngine.uuidPanelChats);
+                Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
+                Panel.SwapPanel(VREngine.uuidPanelChats);
+                break;
+        }
     }
 }

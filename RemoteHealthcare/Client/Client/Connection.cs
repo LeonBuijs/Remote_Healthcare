@@ -41,6 +41,7 @@ public class Connection
                 try
                 {
                     var received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+                    received = received.Trim('\n');
                     messageHandler.ProcessMessage(received);
                 }
                 catch (Exception e)
