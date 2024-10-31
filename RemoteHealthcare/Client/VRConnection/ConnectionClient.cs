@@ -30,8 +30,22 @@ public class ConnectionClient
         while (true)
         {
             var buffer = new byte[512];
-            var bytesRead = networkStream.Read(buffer, 0, buffer.Length);
-            var received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+            string received;
+            
+            try
+            {
+                var bytesRead = networkStream.Read(buffer, 0, buffer.Length);
+                received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
+            }
+            catch (Exception)
+            {
+                HandleMessage("  --- CLIENT DISCONNECTED ---");
+                client = listener.AcceptTcpClient();
+                networkStream = client.GetStream();
+                dokterMessages.Clear(); 
+                continue;
+            }
+            
 
             Console.WriteLine($"----------\nReceived: {received}\n----------");
             
@@ -88,13 +102,28 @@ public class ConnectionClient
         }
     }
 
-    private static void HandleDokterMessage(string received)
+    private static void HandleMessage(string received)
     {
-        dokterMessages.Add(received);
+        dokterMessages.Add(received.Substring(2));
         Panel.ClearPanel(VREngine.uuidPanelChats);
         Panel.ChangeChatsPanel(VREngine.uuidPanelChats, dokterMessages);
         Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
         Panel.SwapPanel(VREngine.uuidPanelChats);
+    }
+    private static void HandleStartStop(string received)
+    {
+        switch (received)
+        {
+            case "2":
+                HandleMessage("  --- START SESSION ---");
+                break;
+            case "3":
+                HandleMessage("  --- STOP SESSION ---");
+                break;
+            case "4":
+                HandleMessage("  --- EMERGENCY STOP! ---");
+                break;
+        }
     }
 
     private static void HandleCommand(string received)
@@ -106,7 +135,7 @@ public class ConnectionClient
         {
             case '0':
                 // Message dokter
-                HandleDokterMessage(received);
+                HandleMessage(received);
                 break;
             case '1':
                 // Data
@@ -124,12 +153,17 @@ public class ConnectionClient
                 break;
             case '2':
                 // Start command
+                HandleStartStop(received);
                 break;
             case '3':
                 // Stop command
+                HandleStartStop(received);  
+                Route.ChangeFollowRouteSpeed(VREngine.uuidBike, 0);
                 break;
             case '4':
                 // Emergency stop command
+                HandleStartStop(received);
+                Route.ChangeFollowRouteSpeed(VREngine.uuidBike, 0);
                 break;
             case '5':
                 // Naam

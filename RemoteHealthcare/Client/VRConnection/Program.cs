@@ -39,7 +39,7 @@ public class VREngine
             uuidRoute = Route.CreateRoute();
             Route.CreateRoad(uuidRoute);
             Route.FollowRoute(uuidRoute, uuidBike);
-            Route.ChangeFollowRouteSpeed(uuidBike, 10.0);
+            Route.ChangeFollowRouteSpeed(uuidBike, 0);
 
             AttachCameraToBike(uuidBike);
 
@@ -52,7 +52,7 @@ public class VREngine
 
             Panel.ClearPanel(uuidPanelData);
 
-            Panel.ChangeDataPanel(uuidPanelData, 15, 190, "00:00", 20000);
+            Panel.ChangeDataPanel(uuidPanelData, 0, 0, "00:00:00", 0);
             Panel.SwapPanel(uuidPanelData);
             Panel.AttachPanelToBike(uuidPanelData, uuidBike, new[] { -2, 2.2, -2.1 });
 
