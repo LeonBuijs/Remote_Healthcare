@@ -60,7 +60,8 @@ public class Server : IDoctorCallback, IClientCallback
                 await EmergencyStop(messageParts);
                 break;
             case DoctorDataIndex.MessageToSession:
-                SendCommandToClient(messageParts, $"0 {messageParts[4]}");
+                // SendCommandToClient(messageParts, $"0 {messageParts[4]}");
+                SendChatMessageToClient(messageParts);
                 break;
             case DoctorDataIndex.MessageToAllSessions:
                 MessageToAllSessions(messageParts);
@@ -111,7 +112,7 @@ public class Server : IDoctorCallback, IClientCallback
                 ReceiveBikeData(connection, messageParts);
                 break;
             case ClientDataIndex.Disconnected:
-                // DisconnectClient(connection);
+                DisconnectClient(connection);
                 break;
         }
     }
@@ -212,6 +213,20 @@ public class Server : IDoctorCallback, IClientCallback
 
         // Asynchroon berekenen van alle fietsdata
         await fileManager.CalculateDataFromSession(client, clientIndex, client.SessionTime);
+    }
+
+    /**
+     * Helper methode om een bericht naar een specifieke client te sturen
+     */
+    private void SendChatMessageToClient(string[] messageParts)
+    {
+        var message = "";
+        for (int i = 4; i < messageParts.Length; i++)
+        {
+            message += messageParts[i] + " ";
+        }
+        
+        SendCommandToClient(messageParts, $"0 {message}");
     }
 
     /**

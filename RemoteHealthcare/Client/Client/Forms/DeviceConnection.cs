@@ -30,7 +30,7 @@ public partial class DeviceConnection : Form
 
         if (!messageHandler.BleHandler.ConnectDevices(bikeNumber))
         {
-            CreateWarningPopup("Selected Bike Not Available", "Make sure you are connected with the bike");
+            CreateWarningPopup("Selected Bike Not Available", "Make sure you are connected with the bike and that the bike is turned on");
             return;
         }
         

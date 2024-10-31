@@ -98,12 +98,12 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
                 var received = connection.Receive();
                 received = received.Trim();
 
-                // if (received.Length > 0)
-                // {
+                if (received.Length > 0)
+                {
                     clientCallback.OnReceivedMessage(received, connection);
 
                     Console.WriteLine("Client sent: " + received);
-                // }
+                }
             }
             catch (Exception e)
             {

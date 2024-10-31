@@ -277,8 +277,8 @@ public class VREngine
         Array.Copy(prefix, 0, combinedArray, 0, prefix.Length);
         Array.Copy(array, 0, combinedArray, prefix.Length, array.Length);
         stream.Write(combinedArray, 0, combinedArray.Length);
-        Console.WriteLine(Encoding.ASCII.GetString(combinedArray, 0, combinedArray.Length));
-        Console.WriteLine("Bericht verstuurd\n");
+        // Console.WriteLine(Encoding.ASCII.GetString(combinedArray, 0, combinedArray.Length));
+        // Console.WriteLine("Bericht verstuurd\n");
     }
 
     /**
@@ -292,7 +292,7 @@ public class VREngine
         int bytesToRead = stream.Read(lengthBuffer, 0, lengthBuffer.Length);
 
         int packetLength = BitConverter.ToInt32(lengthBuffer, 0);
-        Console.WriteLine(packetLength);
+        // Console.WriteLine(packetLength);
 
         int totalBytesRead = 0;
         var buffer = new byte[packetLength];
@@ -304,7 +304,7 @@ public class VREngine
             totalBytesRead += bytesRead;
         }
 
-        Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, totalBytesRead));
+        // Console.WriteLine(Encoding.ASCII.GetString(buffer, 0, totalBytesRead));
         return Encoding.ASCII.GetString(buffer, 0, totalBytesRead);
     }
 }

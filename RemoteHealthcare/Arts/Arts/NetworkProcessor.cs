@@ -72,8 +72,13 @@ public class NetworkProcessor
         string[] multipleDataReivedSplit = receivedText.Split('\n');
         foreach (var argument in multipleDataReivedSplit)
         {
+            Console.WriteLine($"argument: {argument}");
             string[] argumentSplit = argument.Split(" ");
-            HandleData(argumentSplit);
+
+            if (argumentSplit.Length > 1)
+            {
+                HandleData(argumentSplit);   
+            }
         }
 
         artsStream.BeginRead(artsBuffer, 0, artsBuffer.Length, new AsyncCallback(OnRead), null);

@@ -13,6 +13,7 @@ public class ConnectionClient
     private static string name;
     private static double previousSpeed = 0;
 
+    private static Queue<string> CommandQueue = new();
     public static void StartServer()
     {
         listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9999);
@@ -28,19 +29,61 @@ public class ConnectionClient
     {
         while (true)
         {
-            var buffer = new byte[1024];
+            var buffer = new byte[512];
             var bytesRead = networkStream.Read(buffer, 0, buffer.Length);
             var received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
 
             Console.WriteLine($"----------\nReceived: {received}\n----------");
             
             var commands = received.Split('\n');
-            foreach (var command in commands)
+
+            // variabele om te controleren of de buffer een bericht van de doctor bevat,
+            // zo ja op true zetten en de index meegeven
+            var containsDoctorCommand = false;
+            for (int i = 0; i < commands.Length; i++)
             {
-                if (!(command.Length <= 1))
+                // if (!(command.Length <= 1))
+                // {
+                //     HandleCommand(command.Trim());
+                // }
+
+                var command = commands[i];
+                
+                if (!command.StartsWith("1") && command != "")
                 {
-                    HandleCommand(command.Trim());
+                    Console.WriteLine($"True Command: {command}");
+                    CommandQueue.Enqueue(command);
+                    containsDoctorCommand = true;
                 }
+            }
+
+            Console.WriteLine($"Doctor Command: {containsDoctorCommand}");
+            
+            if (!containsDoctorCommand)
+            {
+                var commandPosition = commands.Length - 2;
+
+                if (commandPosition < 0)
+                {
+                    commandPosition = 0;
+                }
+
+                if (commands.Length > commandPosition && CommandQueue.Count <= 1)
+                {
+                    CommandQueue.Enqueue(commands[commandPosition]);
+                }
+            }
+
+            var toHandle = "";
+
+            if (CommandQueue.Count > 0)
+            {
+                toHandle = CommandQueue.Dequeue();
+            }
+
+            if (toHandle != "")
+            {
+                HandleCommand(toHandle);
             }
         }
     }
@@ -56,6 +99,7 @@ public class ConnectionClient
 
     private static void HandleCommand(string received)
     {
+        Console.WriteLine($"identifier: {received}");
         var identifier = received[0];
 
         switch (identifier)
