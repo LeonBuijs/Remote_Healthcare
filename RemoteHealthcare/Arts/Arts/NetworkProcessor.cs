@@ -69,9 +69,12 @@ public class NetworkProcessor
         string receivedText = Encoding.ASCII.GetString(artsBuffer, 0, receivedBytes);
         totalBuffer += receivedText;
         
-        string[] packetSplit = receivedText.Split(" ");
-        HandleData(packetSplit);
-
+        string[] multipleDataReivedSplit = receivedText.Split('\n');
+        foreach (var argument in multipleDataReivedSplit)
+        {
+            string[] argumentSplit = argument.Split(" ");
+            HandleData(argumentSplit);
+        }
         artsStream.BeginRead(artsBuffer, 0, artsBuffer.Length, new AsyncCallback(OnRead), null);
     }
 
@@ -82,25 +85,25 @@ public class NetworkProcessor
      * 2: lijst met actieve sessies tonen
      * 3: lijst met opgeslagen data per sessie
      */
-    private void HandleData(string[] packetData)
+    private void HandleData(string[] argumentData)
     {
-        int packetPage = int.Parse(packetData[0]);
+        int packetPage = int.Parse(argumentData[0]);
         switch (packetPage)
         {
             case 0:
-                string argument = packetData[1];
+                string argument = argumentData[1];
                 Console.WriteLine($"Got login answer with argument {argument}");
                 LoginWindowCallback.OnLogin(argument);
                 break;
             case 1:
-                string clientId = $"{packetData[1]} {packetData[2]} {packetData[3]}";
-                string data = $"{packetData[4]} {packetData[5]} {packetData[6]} {packetData[7]} {packetData[8]} {packetData[9]}";
+                string clientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
+                string data = $"{argumentData[4]} {argumentData[5]} {argumentData[6]} {argumentData[7]} {argumentData[8]} {argumentData[9]}";
                 Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");   
                 
                 dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
                 break;
             case 2:
-                string newClientId = $"{packetData[1]} {packetData[2]} {packetData[3]}";
+                string newClientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
                 Console.WriteLine($"Kreeg clientId {newClientId}");
                 ListWindowCallback.AddNewClient(newClientId);
                 break;

@@ -13,7 +13,7 @@ public class Connection(TcpClient client)
 
     public void Send(string msg)
     {
-        var array = Encoding.ASCII.GetBytes(msg);
+        var array = Encoding.ASCII.GetBytes(msg + "\n");
         Stream.Write(array, 0, array.Length);
     }
 
