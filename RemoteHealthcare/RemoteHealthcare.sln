@@ -22,6 +22,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ServerSimulatie", "ServerSi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerSimulation", "ServerSimulation\ServerSimulation.csproj", "{317CC236-C035-4A39-9AA1-BEE6E8C90611}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SecurityManager", "SecurityManager\SecurityManager.csproj", "{E3A2EB85-A383-4C61-8D49-8891B3E5BEDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +54,10 @@ Global
 		{317CC236-C035-4A39-9AA1-BEE6E8C90611}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{317CC236-C035-4A39-9AA1-BEE6E8C90611}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{317CC236-C035-4A39-9AA1-BEE6E8C90611}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3A2EB85-A383-4C61-8D49-8891B3E5BEDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3A2EB85-A383-4C61-8D49-8891B3E5BEDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3A2EB85-A383-4C61-8D49-8891B3E5BEDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3A2EB85-A383-4C61-8D49-8891B3E5BEDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{CA3F0B46-30A0-4369-950C-3A9D9638D3E3} = {ED93D3D3-3031-4181-BA9C-6E5EDB6C4210}
