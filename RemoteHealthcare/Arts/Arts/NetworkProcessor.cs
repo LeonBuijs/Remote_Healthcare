@@ -183,9 +183,9 @@ public class NetworkProcessor
 
     public void AddActiveClient(string clientId)
     {
-        lock (clientsWhoRecieveData)
+        lock (clientsWhoReceiveData)
         {
-            if (!clientsWhoRecieveData.Contains(clientId))
+            if (!clientsWhoReceiveData.Contains(clientId))
             {
                 clientsWhoReceiveData.Add(clientId);
             }
