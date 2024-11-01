@@ -1,5 +1,6 @@
 using System.IO;
 using System.Text;
+using SecurityManager;
 
 namespace Arts;
 
@@ -9,16 +10,24 @@ namespace Arts;
 public class DataSender
 {
     private Stream stream;
+    public string publicServerKey { set; get; }
     public DataSender(Stream stream)
     {  
         this.stream = stream;
     }
 
-    private void Write(string finalString)
+    private void Write(string finalString, bool encryption = true)
     {
+        Console.WriteLine($"Dokter sending: {finalString}");
         try
         {
-            stream.Write(Encoding.ASCII.GetBytes(finalString));
+            byte[] bytesToSend = Encoding.ASCII.GetBytes(finalString);
+
+            if (encryption)
+            {
+                bytesToSend = Encryption.EncryptData(bytesToSend, publicServerKey);
+            }
+            stream.Write(bytesToSend);
             stream.Flush();
         }
         catch (Exception exception)
@@ -26,6 +35,11 @@ public class DataSender
             Console.WriteLine($"Couldn't write to server with exception: {exception}");
         }
         
+    }
+
+    public void SendPublicKey(string publicKey)
+    {
+        Write(publicKey, false);
     }
 
     public void SendLogin(string username, string password)

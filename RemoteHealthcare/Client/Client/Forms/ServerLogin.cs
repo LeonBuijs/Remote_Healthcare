@@ -39,6 +39,7 @@ public partial class ServerLogin : Form
 
         try
         {
+            
             var connected = ConnectToServer(serverIp);
 
             if (!connected)
@@ -67,7 +68,9 @@ public partial class ServerLogin : Form
     private bool ConnectToServer(string ip)
     {
         connection = new Connection(ip, 6666, messageHandler);
-
+        
+        Thread.Sleep(1000);
+        
         var loginMessage = $"0 {firstName} {lastName} {birthDate}";
         connection.SendMessage(loginMessage);
         messageHandler.BleHandler.serverConnection = connection;

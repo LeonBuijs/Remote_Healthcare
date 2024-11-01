@@ -1,8 +1,8 @@
-﻿using System.Security.Cryptography;
+using System;
+using System.Security.Cryptography;
 using System.Text;
 
-namespace SecurityManager;
-
+namespace Client;
 /**
  * <summary>
  * Klasse die alle encryptie en decryptie afhandelt van data

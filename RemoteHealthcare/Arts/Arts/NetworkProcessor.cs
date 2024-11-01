@@ -1,5 +1,6 @@
 using System.Net.Sockets;
 using System.Text;
+using SecurityManager;
 
 
 namespace Arts;
@@ -9,8 +10,10 @@ public class NetworkProcessor
     private TcpClient artsClient;
     private NetworkStream artsStream;
     private DataSender artsSender;
-    private byte[] artsBuffer = new byte[128];
-    private string totalBuffer;
+
+    private string privateKeyDoctor;
+    private string publicKeyDoctor;
+    public string? publicKeyServer { set; get; }
 
     private string ipAdress;
 
@@ -26,7 +29,18 @@ public class NetworkProcessor
         artsClient = new TcpClient();
         ipAdress = ipAddress;
         LoginWindowCallback = loginWindowWindowCallback;
+        SetRSAKeys();
         ConnectToServer();
+    }
+
+    /**
+     * Genereert en set RSA-sleutels voor de dokter
+     */
+    private void SetRSAKeys()
+    {
+        var (publicKey, privateKey) = Encryption.GenerateRsaKeyPair();
+        publicKeyDoctor = publicKey;
+        privateKeyDoctor = privateKey;
     }
 
     public void ConnectToServer()
@@ -34,9 +48,22 @@ public class NetworkProcessor
         try
         {
             artsClient.Connect(ipAdress, 7777);
+            
             //won't come here until it has connection.
-            new Thread(OnConnect).Start();
-            artsSender = new DataSender(artsClient.GetStream());
+            Console.WriteLine("Verbonden!");
+            artsStream = artsClient.GetStream();
+            artsSender = new DataSender(artsStream);
+
+            //Send the publicKey immediately to the server
+            artsSender.SendPublicKey(publicKeyDoctor);
+        
+            //Handle EncryptionKey which is always received as first immediate send.
+            byte[] serverSleutel = new byte[1024];
+            int bytesRead = artsStream.Read(serverSleutel, 0, serverSleutel.Length);
+            publicKeyServer = Encoding.ASCII.GetString(serverSleutel, 0, bytesRead);
+            artsSender.publicServerKey = publicKeyServer;
+            
+            new Thread(ReadSocket).Start();
         }
         catch (SocketException exception)
         {
@@ -50,40 +77,45 @@ public class NetworkProcessor
      * Methode om het zoeken naar verbinding te stoppen
      * Gebeurt bij gevonden verbinding en start een listener methode
      */
-    private void OnConnect()
+    private void ReadSocket()
     {
-        Console.WriteLine("Verbonden!");
-        artsStream = artsClient.GetStream();
-        artsStream.BeginRead(artsBuffer, 0, artsBuffer.Length, new AsyncCallback(OnRead), null);
-
-        artsSender = new DataSender(artsStream);
-        // artsSender.SendLogin(username, password);
-    }
-
-    /**
-     * Het uitlezen van data die het vervolgens naar een methode stuurt om te verwerken
-     */
-    private void OnRead(IAsyncResult ar)
-    {
-        int receivedBytes = artsStream.EndRead(ar);
-        string receivedText = Encoding.ASCII.GetString(artsBuffer, 0, receivedBytes);
-        totalBuffer += receivedText;
-
-        string[] multipleDataReivedSplit = receivedText.Split('\n');
-        foreach (var argument in multipleDataReivedSplit)
+        while (true)
         {
-            Console.WriteLine($"argument: {argument}");
-            string[] argumentSplit = argument.Split(" ");
-
-            if (argumentSplit.Length > 1)
+            try
             {
-                HandleData(argumentSplit);   
+                var buffer = new byte[1024];
+                int bytesRead = artsStream.Read(buffer, 0, buffer.Length);
+                var result = new byte[bytesRead];
+                Array.Copy(buffer, result, bytesRead);
+                
+                Console.WriteLine($"Doctor received raw message: \n{Convert.ToBase64String(result)}");
+                string receivedText = Encryption.DecryptData(result, privateKeyDoctor);
+                Console.WriteLine($"Doctor received decrypted message: \n{receivedText}");
+            
+                string[] multipleDataReivedSplit = receivedText.Split('\n');
+                foreach (var argument in multipleDataReivedSplit)
+                {
+                    if (string.IsNullOrEmpty(argument))
+                    {
+                        break;
+                    }
+                    Console.WriteLine($"argument: {argument}");
+                    string[] argumentSplit = argument.Split(" ");
+
+                    if (argumentSplit.Length > 1)
+                    {
+                        HandleData(argumentSplit);   
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Connection crashed\n{e}");
+                break;
             }
         }
-
-        artsStream.BeginRead(artsBuffer, 0, artsBuffer.Length, new AsyncCallback(OnRead), null);
     }
-
+    
     /**
      * Methode die gebruik maakt van ons protocol om de inkomende data af te handelen
      * 0: inloggegevens bevestigen, gebeurd verder in de inlog window.
@@ -129,10 +161,8 @@ public class NetworkProcessor
 
     public void AddActiveClient(string clientId)
     {
-        Console.WriteLine($"adding {clientId} to active clients");
         lock (clientsWhoRecieveData)
         {
-            Console.WriteLine($"{clientId} added to clients list!");
             if (!clientsWhoRecieveData.Contains(clientId))
             {
                 clientsWhoRecieveData.Add(clientId);
@@ -202,7 +232,6 @@ public class NetworkProcessor
 
     public void StartClientSession(string clientInfo)
     {
-        Console.WriteLine($"telling server {clientInfo} started");
         artsSender.StartSession(clientInfo);
     }
 

@@ -15,15 +15,38 @@ public class Connection
     private NetworkStream stream;
     private MessageHandler messageHandler;
 
+    private bool isEncrypted = false;
+    //encryption keys
+    private string privateKey;
+    public string publicKey { get; set; }
+    public string PublicKeyServer { get; set; }
+
     public Connection(string ipAddress, int port, MessageHandler messageHandler)
     {
+        if (port == 6666)
+        {
+            Console.WriteLine($"Encrypted activated on port: {port}");
+            isEncrypted = true;
+        }
         // Verbind met server
         client = new TcpClient(ipAddress, port);
         stream = client.GetStream();
-
+        
+        if (isEncrypted)
+        {
+            SetRSAKeys();
+            SendMessage(publicKey);
+        }
+        
         this.messageHandler = messageHandler;
-
         StartThreadReceive();
+    }
+    
+    private void SetRSAKeys()
+    {
+        var (generatedPublicKey, generatedPrivateKey) = Encryption.GenerateRsaKeyPair();
+        publicKey = generatedPublicKey;
+        privateKey = generatedPrivateKey;
     }
 
     /**
@@ -35,13 +58,32 @@ public class Connection
         {
             while (true)
             {
-                var buffer = new byte[1024];
-                var bytesRead = stream.Read(buffer, 0, buffer.Length);
-
                 try
                 {
-                    var received = Encoding.ASCII.GetString(buffer, 0, bytesRead);
-                    received = received.Trim('\n');
+                    var buffer = new byte[1024];
+                    int bytesRead = stream.Read(buffer, 0, buffer.Length);
+                    var result = new byte[bytesRead];
+                    Array.Copy(buffer, result, bytesRead);
+                    
+                    if (PublicKeyServer == null && isEncrypted)
+                    {
+                        PublicKeyServer = Encoding.ASCII.GetString(result);
+                        continue;
+                    }
+
+                    string received;
+                    
+                    if (isEncrypted)
+                    {
+                        received = Encryption.DecryptData(result, privateKey);
+                        Console.WriteLine($"Server received decrypted message:\n{received}");
+                    }
+                    else
+                    {
+                        
+                        received = Encoding.ASCII.GetString(result);
+                    }
+                    
                     messageHandler.ProcessMessage(received);
                 }
                 catch (Exception e)
@@ -71,6 +113,10 @@ public class Connection
     {
         Console.WriteLine($"Sending message: {message}");
         var data = Encoding.ASCII.GetBytes(message);
+        if (isEncrypted && PublicKeyServer != null)
+        {
+            data = Encryption.EncryptData(data, PublicKeyServer);
+        }
         stream.Write(data, 0, data.Length);
     }
 

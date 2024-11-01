@@ -85,6 +85,9 @@ public class Server : IDoctorCallback, IClientCallback
                 // Mogelijkheid om hier iets te implementeren
                 SendClientDisconnected(connection);
                 break;
+            default:
+                Console.WriteLine($"Unknown Doctor Data index: {messageParts[0]}");
+                break;
         }
     }
 
