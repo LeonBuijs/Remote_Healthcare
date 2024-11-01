@@ -3,11 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:local="clr-namespace:Arts"
-        xmlns:wpf="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
         xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"        
         mc:Ignorable="d"
-        Title="ClientWindow" Height="450" Width="800">
+        Title="ClientWindow" Height="450" Width="800" >
     <Grid>
         <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
             <!-- Tabblad voor bestanden downloaden -->
@@ -136,7 +134,7 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- Chart 1 -->
-                    <lvc:CartesianChart Series="{Binding SeriesCollections[0]}" Grid.Row="0" Grid.Column="0">
+                    <lvc:CartesianChart Name="Chart1" Series="{Binding SeriesCollections[0]}" Grid.Row="0" Grid.Column="0">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[0]}" />
                         </lvc:CartesianChart.AxisX>
@@ -146,7 +144,7 @@
                     </lvc:CartesianChart>
 
                     <!-- Chart 2 -->
-                    <lvc:CartesianChart Series="{Binding SeriesCollections[1]}" Grid.Row="0" Grid.Column="1">
+                    <lvc:CartesianChart Name="Chart2" Series="{Binding SeriesCollections[1]}" Grid.Row="0" Grid.Column="1">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[1]}" />
                         </lvc:CartesianChart.AxisX>
@@ -156,7 +154,7 @@
                     </lvc:CartesianChart>
 
                     <!-- Chart 3 -->
-                    <lvc:CartesianChart Series="{Binding SeriesCollections[2]}" Grid.Row="1" Grid.Column="0">
+                    <lvc:CartesianChart Name="Chart3" Series="{Binding SeriesCollections[2]}" Grid.Row="1" Grid.Column="0">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[2]}" />
                         </lvc:CartesianChart.AxisX>
@@ -166,7 +164,7 @@
                     </lvc:CartesianChart>
 
                     <!-- Chart 4 -->
-                    <lvc:CartesianChart Series="{Binding SeriesCollections[3]}" Grid.Row="1" Grid.Column="1">
+                    <lvc:CartesianChart Name="Chart4" Series="{Binding SeriesCollections[3]}" Grid.Row="1" Grid.Column="1">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[3]}" />
                         </lvc:CartesianChart.AxisX>

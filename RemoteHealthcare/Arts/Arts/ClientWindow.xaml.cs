@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using System.Windows.Data;
 using LiveCharts;
 using LiveCharts.Wpf;
 
@@ -21,11 +22,12 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
     public ClientWindow(string clientId, NetworkProcessor networkProcessor)
     {
         InitializeComponent();
+        DataContext = this;
         this.networkProcessor = networkProcessor;
         this.networkProcessor.AddCallbackMember(this);
         this.clientId = clientId;
         TitleBlock.Text = clientId;
-
+        
         InitializeGraphs();
     }
 
@@ -46,10 +48,11 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
      */
     private void InitializeGraphs()
     {
+        var charts = new []{Chart1, Chart2, Chart3, Chart4};
         // Initialiseer vier SeriesCollections en Labels
         SeriesCollections = new SeriesCollection[amoutOffGraphs];
         LabelsCollections = new ObservableCollection<string>[amoutOffGraphs];
-
+        
         for (int i = 0; i < amoutOffGraphs; i++)
         {
             SeriesCollections[i] = new SeriesCollection
@@ -57,24 +60,23 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
                 new LineSeries
                 {
                     Title = $"Data Serie {i+1}",
-                    Values = new ChartValues<double>([1,2,3,4,5])
+                    Values = new ChartValues<double>{1,2,3,4,5}
                 }
             };
             if (i<2)
             {
-                SeriesCollections[i] = new SeriesCollection
+                SeriesCollections[i].Add(new LineSeries
                 {
-                    new LineSeries
-                    {
-                        Title = $"Data Serie {i+1} lijn 2",
-                        Values = new ChartValues<double>()
-                    }
-                };
+                    Title = $"Data Serie {i+1} lijn 2",
+                    Values = new ChartValues<double>()
+                });
             }
-            LabelsCollections[i] = new ObservableCollection<string>(["jan", "feb", "maart", "april", "mei"]);
+            LabelsCollections[i] = new ObservableCollection<string>{ "jan", "feb", "maart", "april", "mei" };
+            charts[i].Series = SeriesCollections[i];
         }
 
         Formatter = value => value.ToString("N");
+        
     }
 
     /**
@@ -129,11 +131,13 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
         LabelsCollections[chartIndex].Add(label);
 
         // eventueel om oudere lijnen te verwijderen als er teveel in de grafiek komen
-        // if (((LineSeries)SeriesCollections[chartIndex][lineIndex]).Values.Count > 20)
-        // {
-        //     ((LineSeries)SeriesCollections[chartIndex][lineIndex]).Values.RemoveAt(0);
-        //     LabelsCollections[chartIndex].RemoveAt(0);
-        // }
+        if (((LineSeries)SeriesCollections[chartIndex][lineIndex]).Values.Count > 20)
+        {
+            ((LineSeries)SeriesCollections[chartIndex][lineIndex]).Values.RemoveAt(0);
+            LabelsCollections[chartIndex].RemoveAt(0);
+        }
+
+        Console.WriteLine($"Added {newValue} to chart {chartIndex} at line {lineIndex} with label {label}");
 
         OnPropertyChanged(nameof(SeriesCollections));
         OnPropertyChanged(nameof(LabelsCollections));
@@ -162,6 +166,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
      */
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
+        Console.WriteLine(propertyName + " changed");
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
