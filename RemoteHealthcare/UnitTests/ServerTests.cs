@@ -18,6 +18,7 @@ public class ServerTests
     {
         server = new Server.Server();
         server.SetCallbacks();
+        
 
         artsClient = new TcpClient("127.0.0.1", 7777);
         artsStream = artsClient.GetStream();
@@ -72,7 +73,7 @@ public class ServerTests
     
     private string ReadResponseFromStream(Stream stream)
     {
-        var buffer = new byte[10];
+        var buffer = new byte[1024];
         var bytesRead = stream.Read(buffer, 0, buffer.Length);
         return Encoding.ASCII.GetString(buffer, 0, bytesRead);
     }
