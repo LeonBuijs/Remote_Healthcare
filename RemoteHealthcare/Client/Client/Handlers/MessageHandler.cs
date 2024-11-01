@@ -6,7 +6,7 @@ public class MessageHandler : IBLECallback
 {
     public BLEHandler BleHandler;
     public VRHandler VrHandler { get; set; }
-    public bool LoggedIn;
+    public bool LoggedIn { get; private set; }
 
     public MessageHandler()
     {
@@ -24,7 +24,7 @@ public class MessageHandler : IBLECallback
         {
             return;
         }
-
+        message = message.Trim('\n');
         var identifier = message[0];
 
         switch (identifier)
@@ -69,7 +69,6 @@ public class MessageHandler : IBLECallback
         var resistance = int.Parse(settings);
         resistance *= 2;
         
-        // TODO: kijken of dit echt werkt
         BleHandler.SetResistance(resistance);
     }
 

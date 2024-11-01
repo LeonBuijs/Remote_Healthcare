@@ -51,6 +51,7 @@
   <ItemGroup>
     <Compile Include="BikeData.cs" />
     <Compile Include="Connection.cs" />
+    <Compile Include="Encryption.cs" />
     <Compile Include="Forms\DeviceConnection.cs">
       <SubType>Form</SubType>
     </Compile>

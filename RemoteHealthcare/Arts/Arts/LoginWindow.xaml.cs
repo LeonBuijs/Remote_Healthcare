@@ -40,19 +40,14 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
                 
         if (networkProcessor == null || !networkProcessor.IsConnected())
         {
-            Console.WriteLine("\nOnLoginClick making network connection");
             networkProcessor = new NetworkProcessor(ipAddress, this);
         }
-
-        Console.WriteLine("\nOnLoginClick making login try");
+        
         string username = UsernameBox.Text;
         string password = PasswordBox.Password;
-        Console.WriteLine($"Username: {username}\nPassword: {password}");
         
-      
         //Stuur aanzoek voor inloggen
         networkProcessor.TryLogin(username, password);
-        Console.WriteLine("OnLoginClick finished\n");
     }
 
     
@@ -67,13 +62,11 @@ public partial class LoginWindowWindow : Window, ILoginWindowCallback
      */
     public void OnLogin(string response)
     {
-        Console.WriteLine($"OnLogin called with {response}");
         if (response == "0")
         {
             string title = "Login unsuccessfull";
             string content = "Your username and/or password is incorrect, please try again. psst (password is incorrect)";
             MessageBox.Show(content, title);                 
-            Console.WriteLine("Unknown user or password!");
         }
         else if (response == "1")
         {
