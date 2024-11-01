@@ -98,14 +98,8 @@ public class NetworkProcessor
             return;
         }
 
-        string receivedText = "";
-
-        foreach (var VARIABLE in argumentData)
-        {
-            receivedText += VARIABLE;
-        }
-        
         var packetPage = int.Parse(argumentData[0]);
+        
         switch (packetPage)
         {
             case 0:
@@ -127,7 +121,23 @@ public class NetworkProcessor
                 ListWindowCallback.AddNewClient(newClientId);
                 break;
             case 3:
-                
+                string historyclientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
+
+                foreach (var clientWindow in dataUpdateCallbacks)
+                {
+                    if (clientWindow.GetClientinfo().Equals(historyclientId))
+                    {
+                        string date = argumentData[4];
+                        // {date} {duration}(0) {averageSpeed}(1) {maxSpeed}(1) {averageHeartRate}(2) {maxHeartRate}(2) {distance}(3)
+                        clientWindow.UpdateHistory(0,Int32.Parse(argumentData[5]), date);
+                        clientWindow.UpdateHistory(1,Int32.Parse(argumentData[6]), date);
+                        clientWindow.UpdateHistory(1,Int32.Parse(argumentData[7]), date, 1);
+                        clientWindow.UpdateHistory(2,Int32.Parse(argumentData[8]), date);
+                        clientWindow.UpdateHistory(2,Int32.Parse(argumentData[9]), date, 1);
+                        clientWindow.UpdateHistory(3,Int32.Parse(argumentData[10]), date);
+                        Console.WriteLine("1 line of hsitory added");
+                    }
+                }
                 break;
             case 4:
                 ListWindowCallback.RemoveClient(GetClientIndex(argumentData));

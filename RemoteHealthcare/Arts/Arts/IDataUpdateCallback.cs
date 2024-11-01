@@ -8,4 +8,6 @@ namespace Arts;
 public interface IDataUpdateCallback
 {
     void UpdateData(string clientId, string data);
+    void UpdateHistory(int chartIndex, double newValue, string label, int lineIndex = 0);
+    string GetClientinfo();
 }
