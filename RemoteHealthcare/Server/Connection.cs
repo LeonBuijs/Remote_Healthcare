@@ -1,26 +1,83 @@
 using System.Net.Sockets;
 using System.Text;
+using SecurityManager;
 
 namespace Server;
 
 /**
  * Klasse die de TCP-verbinding regelt voor de artsen en clients
  */
-public class Connection(TcpClient client)
+public class Connection
 {
-    public readonly NetworkStream Stream = client.GetStream();
-    public bool Access { get; set; }
+    public readonly NetworkStream Stream;
+    public bool Access { set; get; }
+    public string PublicKeyServerClient { set; get; }
+    private string privateKeyServer;
+    private string? publicKeyConnection;
 
-    public void Send(string msg)
+    public Connection(TcpClient tcpClient)
+    {
+        Stream = tcpClient.GetStream();
+        SetRSAKeys();
+    }
+
+    /**
+     * <summary>
+     * Benaderd Encryptie klasse van de library
+     * Vervolgens wordt er een tuple terug geleverd met public- en privateKey
+     * </summary>
+     */
+    private void SetRSAKeys()
+    {
+        var (publicKey, privateKey) = Encryption.GenerateRsaKeyPair();
+        PublicKeyServerClient = publicKey;
+        privateKeyServer = privateKey;
+    }
+
+    /**
+     * <summary>
+     * Methode die een bericht over de socket stuurt
+     * Encrypt altijd tenzij er false meegegeven wordt
+     * </summary>
+     * <param name="msg">Het bericht wat overgestuurd wordt</param>
+     * <param name="encryption">Staat default true, wanneer false geen encryptie</param>
+     */
+    public void Send(string msg, bool encryption = true)
     {
         var array = Encoding.ASCII.GetBytes(msg + "\n");
+        Console.WriteLine($"Sending message: {msg}");
+        if (encryption)
+        {
+            array = Encryption.EncryptData(array, publicKeyConnection);
+        }
+        
         Stream.Write(array, 0, array.Length);
     }
 
+    /**
+     * <summary>
+     * Methode die het data ontvangt
+     * Het eerste bericht zal ALTIJD de key zijn
+     * Daarom als de key false is, wordt ontvangen data als key neergezet
+     * </summary>
+     * <returns>String - Gedecodeerde ontvangen data</returns>
+     */
     public string Receive()
     {
         var buffer = new byte[1024];
-        var bytesRead = Stream.Read(buffer, 0, buffer.Length);
-        return Encoding.ASCII.GetString(buffer, 0, bytesRead);
+        int bytesRead = Stream.Read(buffer, 0, buffer.Length);
+        var result = new byte[bytesRead];
+        Array.Copy(buffer, result, bytesRead);
+        
+        if (publicKeyConnection == null)
+        {
+            publicKeyConnection = Encoding.ASCII.GetString(result);
+            return "69420";
+        }
+        
+        var received = Encryption.DecryptData(result, privateKeyServer);
+        Console.WriteLine($"Server received decrypted message:\n{received}");
+
+        return received;
     }
 }

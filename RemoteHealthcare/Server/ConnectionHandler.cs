@@ -23,6 +23,7 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
     /**
      * Methode voor het verbinden van doctoren, er wordt gewacht voor een verbinding en bij een nieuwe verbinding
      * wordt er een nieuwe thread aangemaakt voor die verbinding en start het proces opnieuw
+     * Bij connectie wordt er direct de public key van de connectieClient doorgestuurd
      */
     private void OpenConnectionDoctor()
     {
@@ -32,6 +33,8 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
         while (true)
         {
             var connectionClient = new Connection(listener.AcceptTcpClient());
+            //send public key without encryption
+            connectionClient.Send(connectionClient.PublicKeyServerClient, false);
             doctors.Add(connectionClient);
             var threadConnection = new Thread(() => HandleConnectionDoctor(connectionClient));
             threadConnection.Start();
@@ -41,6 +44,7 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
     /**
      * Methode voor het verbinden van clients, er wordt gewacht voor een verbinding en bij een nieuwe verbinding
      * wordt er een nieuwe thread aangemaakt voor die verbinding en start het proces opnieuw
+     * Bij connectie wordt er direct de public key van de connectieClient doorgestuurd
      */
     private void OpenConnectionClient()
     {
@@ -50,6 +54,8 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
         while (true)
         {
             var connectionClient = new Connection(listener.AcceptTcpClient());
+            //send public key without encryption
+            connectionClient.Send(connectionClient.PublicKeyServerClient, false);
             clients.Add(connectionClient);
             var threadConnection = new Thread(() => HandleConnectionClient(connectionClient));
             threadConnection.Start();
@@ -67,13 +73,8 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
             {
                 var received = connection.Receive();
                 received = received.Trim();
-
-                // if (received.Length > 0)
-                // {
-                    doctorCallback.OnReceivedMessage(received, connection);
-
-                    Console.WriteLine("Doctor sent: " + received);
-                // }
+                
+                doctorCallback.OnReceivedMessage(received, connection);
             }
             catch (Exception e)
             {
