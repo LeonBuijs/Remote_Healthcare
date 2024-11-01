@@ -2,7 +2,6 @@ namespace Server;
 
 public interface IServer
 {
-    Dictionary<string, ClientConnection> Clients { get; }
     void DoctorLogin(IConnection connection, string[] messageParts);
     void StartSession(string[] messageParts);
     Task StopSession(string[] messageParts);
