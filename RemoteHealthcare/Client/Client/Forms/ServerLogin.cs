@@ -75,7 +75,7 @@ public partial class ServerLogin : Form
         
         Thread.Sleep(1000);
         connection.SendMessage(loginMessage);
-        messageHandler.serverConnection = connection;
+        messageHandler.BleHandler.serverConnection = connection;
         
         Thread.Sleep(1000);
         
