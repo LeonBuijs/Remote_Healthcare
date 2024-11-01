@@ -133,16 +133,16 @@ public class TestClient()
     {
         speed++; hardrate++; rpm++; distance++; power++;
         history += 0.5;
-        return speed + ";" + hardrate + ";" + rpm + ";" + distance + ";" + power;
+        return speed + " " + hardrate + " " + rpm + " " + distance + " " + power;
     }
 
     public string GetHistory()
     {
-        return speed/history + ";" + hardrate/history + ";" + rpm/history + ";" + distance/history + ";" + power/history;
+        return speed/history + " " + hardrate/history + " " + rpm/history + " " + distance/history + " " + power/history;
     }
 
     public string GetClientInfo()
     {
-        return voornaam + ";" + achternaam + ";" + geboortedatum;
+        return voornaam + " " + achternaam + " " + geboortedatum;
     }
 }

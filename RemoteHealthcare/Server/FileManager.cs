@@ -230,11 +230,13 @@ public class FileManager
 
             var averageSpeed = (int) allSpeeds.Average();
             var maxSpeed = allSpeeds.Max();
+            
+            var distance = fileContents[fileContents.Length - 1].Split(" ")[1];
 
             var averageHeartRate = (int) allHeartRates.Average();
             var maxHeartRate = allHeartRates.Max();
 
-            var calculatedData = $"{date} {duration} {averageSpeed} {maxSpeed} {averageHeartRate} {maxHeartRate}";
+            var calculatedData = $"{date} {duration} {averageSpeed} {maxSpeed} {averageHeartRate} {maxHeartRate} {distance}";
 
             Console.WriteLine($"Calculated data: {calculatedData}");
 

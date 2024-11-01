@@ -1,12 +1,22 @@
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Globalization;
+using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Windows;
+using LiveCharts;
+using LiveCharts.Wpf;
 
 namespace Arts;
 
-public partial class ClientWindow : Window, IDataUpdateCallback
+public partial class ClientWindow : Window, IDataUpdateCallback, INotifyPropertyChanged
 {
     private string clientId;
+    private int amoutOffGraphs = 4;
     private NetworkProcessor networkProcessor;
+    private SeriesCollection[] SeriesCollections { get; set; }
+    private ObservableCollection<string>[] LabelsCollections { get; set; }
+    private Func<double, string> Formatter { get; set; }
 
     public ClientWindow(string clientId, NetworkProcessor networkProcessor)
     {
@@ -15,6 +25,56 @@ public partial class ClientWindow : Window, IDataUpdateCallback
         this.networkProcessor.AddCallbackMember(this);
         this.clientId = clientId;
         TitleBlock.Text = clientId;
+
+        InitializeGraphs();
+    }
+
+    /**
+     * <summary>
+     * In deze methode worden 4 verschillende grafieken aangemaakt,
+     * waar later de gegevens van de geschiedenis van de client in komen te staan
+     * </summary>
+     *
+     * <value> SeriesCollections is een lijst van 4 SeriesCollection 1 voor iedere grafiek. 
+     * 1 seriesCollection is een verzamenling van alle data die in een grafiek moet komen met het type grafiek </value>
+     * 
+     * <value> LabelsCollections is een lijst van 4 ObservableCollections 1 voor iedere grafiek.
+     * dit is een lijst die alle X_as waardes onthoud.</value>
+     * 
+     * <value> Formatter set de waardes voor de Y-as. Dit word generiek gedaan.
+     * De "N" staat voor Number wat inhoud dat de y as allemaal nummers zijn en in dit Format met 2 cijfers achter de comma</value>
+     */
+    private void InitializeGraphs()
+    {
+        // Initialiseer vier SeriesCollections en Labels
+        SeriesCollections = new SeriesCollection[amoutOffGraphs];
+        LabelsCollections = new ObservableCollection<string>[amoutOffGraphs];
+
+        for (int i = 0; i < amoutOffGraphs; i++)
+        {
+            SeriesCollections[i] = new SeriesCollection
+            {
+                new LineSeries
+                {
+                    Title = $"Data Serie {i+1}",
+                    Values = new ChartValues<double>()
+                }
+            };
+            if (i<2)
+            {
+                SeriesCollections[i] = new SeriesCollection
+                {
+                    new LineSeries
+                    {
+                        Title = $"Data Serie {i+1} lijn 2",
+                        Values = new ChartValues<double>()
+                    }
+                };
+            }
+            LabelsCollections[i] = new ObservableCollection<string>();
+        }
+
+        Formatter = value => value.ToString("N");
     }
 
     /**
@@ -50,6 +110,61 @@ public partial class ClientWindow : Window, IDataUpdateCallback
             });
         }
     }
+
+    /**
+     * <summary>
+     * Deze methode voegd nieuwe waardes toe aan de desbetreffende grafiek met de geschiedenis van data van de klant.
+     * </summary>
+     * <param name="chartIndex">Hiermee kies je in welke grafiek de data moet komen</param>
+     * <param name="newValue">Dit is de nieuwe waarde die toegevoegd gaat worden aan de grafiek</param>
+     * <param name="label">Dit is het bijpassende label wat op de X-as gezed gaat worden</param>
+     */
+    public void UpdateHistory(int chartIndex, double newValue, string label, int lineIndex = 0)
+    {
+        if (chartIndex < 0 || chartIndex >= SeriesCollections.Length) return;
+        
+        if (lineIndex < 0 || lineIndex >= SeriesCollections[chartIndex].Count) return;
+
+        ((LineSeries)SeriesCollections[chartIndex][lineIndex]).Values.Add(newValue);
+        LabelsCollections[chartIndex].Add(label);
+
+        // eventueel om oudere lijnen te verwijderen als er teveel in de grafiek komen
+        // if (((LineSeries)SeriesCollections[chartIndex][lineIndex]).Values.Count > 20)
+        // {
+        //     ((LineSeries)SeriesCollections[chartIndex][lineIndex]).Values.RemoveAt(0);
+        //     LabelsCollections[chartIndex].RemoveAt(0);
+        // }
+
+        OnPropertyChanged(nameof(SeriesCollections));
+        OnPropertyChanged(nameof(LabelsCollections));
+    }
+
+    public string GetClientinfo()
+    {
+        return clientId;
+    }
+
+    /**
+     * <summary>
+     * Dit event wordt getriggerrd als een iegenschap van van deze klasse verranderd.
+     * </summary>
+     */
+    public event PropertyChangedEventHandler? PropertyChanged;
+    
+    /**
+     * <summary>
+     * Deze methode roept het bovenstaande event aan. als dit event getriggerd is stuurdt hij een melding naar de GUI
+     * dat er in deze window iets verrandert is. hij geeft dan mee welke property verranderd zodat de GUI hem kan aanpassen
+     * </summary>
+     * <param name="propertyName">Dit is de property name die verranderd gaat worden. hij is standaard null,
+     * maar je initializeerd hem door  de methode aan te roepen met nameof(property) dan wordt de name van die property gebruikt</param>
+     * 
+     */
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
     private void StartClientSession(object sender, RoutedEventArgs e)
     {
         Console.WriteLine("Starting session!");
@@ -57,6 +172,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback
         networkProcessor.AddActiveClient(clientId);
 
     }
+
     private void StopClientSession(object sender, RoutedEventArgs e)
     {
         networkProcessor.StopClientSession(clientId);
@@ -70,10 +186,12 @@ public partial class ClientWindow : Window, IDataUpdateCallback
                 HeartRateValueTextBlock.Text = null;
             });
     }
+
     private void EmergencyStopClientSession(object sender, RoutedEventArgs e)
     {
         networkProcessor.EmergencyStopClientSession(clientId);
     }
+
     private void SendPressed(object sender, RoutedEventArgs e)
     {
         if (ChatInputTextBox.Text.Length > 0)
@@ -95,4 +213,12 @@ public partial class ClientWindow : Window, IDataUpdateCallback
     {
         
     }
+
+    // protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    // {
+    //     if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+    //     field = value;
+    //     OnPropertyChanged(propertyName);
+    //     return true;
+    // }
 }

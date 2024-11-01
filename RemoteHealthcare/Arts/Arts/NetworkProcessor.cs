@@ -120,6 +120,20 @@ public class NetworkProcessor
                 ListWindowCallback.AddNewClient(newClientId);
                 break;
             case 3:
+                foreach (var clientWindow in dataUpdateCallbacks)
+                {
+                    if (clientWindow.GetClientinfo().Equals(argumentData[1]))
+                    {
+                        string date = argumentData[2];
+                        // {date} {duration}(0) {averageSpeed}(1) {maxSpeed}(1) {averageHeartRate}(2) {maxHeartRate}(2) {distance}(3)
+                        clientWindow.UpdateHistory(0,Int32.Parse(argumentData[3]), date);
+                        clientWindow.UpdateHistory(1,Int32.Parse(argumentData[4]), date);
+                        clientWindow.UpdateHistory(1,Int32.Parse(argumentData[5]), date, 1);
+                        clientWindow.UpdateHistory(2,Int32.Parse(argumentData[6]), date);
+                        clientWindow.UpdateHistory(2,Int32.Parse(argumentData[7]), date, 1);
+                        clientWindow.UpdateHistory(3,Int32.Parse(argumentData[8]), date);
+                    }
+                }
                 break;
             default:
                 Console.WriteLine("Unknown Packet Page");
