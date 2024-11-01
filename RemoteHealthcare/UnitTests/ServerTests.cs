@@ -52,7 +52,7 @@ namespace UnitTests
         [TestCase(new[] { "3", "This", "is", "a", "test" }, "3 This is a test")]
         [TestCase(new[] { "4", "SingleMessage" }, "4 SingleMessage")]
         [TestCase(new[] { "5", "" }, "5 ")]
-        public void SendChatMessageToClient_ShouldFormatMessageCorrectly(string[] messageParts, string expectedMessage)
+        public void SendCommandToClient_ShouldFormatMessageAsExpected(string[] messageParts, string expectedMessage)
         {
             // Arrange
             var mockConnection = new Mock<IConnection>();
