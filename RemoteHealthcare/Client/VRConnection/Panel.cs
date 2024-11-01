@@ -5,18 +5,17 @@ namespace VRConnection;
 
 public class Panel : VREngine
 {
-    private static int[] black = [0, 0, 0, 1];
     /**
      * Methode om de naam aan te passen op het panel, je geeft de uuid van het panel mee en de naam.
      */
     public static void ChangeNamePanel(string uuidPanel, string name)
     {
-        DrawTextOnPanel(name, uuidPanel,new[] { 10, 30 }, 30, black);
+        DrawTextOnPanel(name, uuidPanel,new[] { 10, 30 }, 30);
     }
     
     public static void SetDataText(string uuidPanel)
     {
-        DrawTextOnPanel("Snelheid | Hartslag | Tijdsduur | Afstand", uuidPanel,new[] { 10, 20 }, 18, black);
+        DrawTextOnPanel("Snelheid | Hartslag | Tijdsduur | Afstand", uuidPanel,new[] { 10, 20 }, 18);
     }
 
     /**
@@ -26,26 +25,26 @@ public class Panel : VREngine
     {
         // TODO: Mooier uitlijnen voor elke waarde
         DrawTextOnPanel("" + speed + "           " + heartRate + "          " + time + "         " + distance, 
-            uuidPanel,new[] {25, 10 }, 18, black);
+            uuidPanel,new[] {25, 10 }, 18);
     }
     
     /**
      * Methode om de afstand aan te passen op het panel, je geeft de uuid van het panel mee en de afstand.
      */
-    public static void ChangeChatsPanel(string uuidPanel, List<string> chats, int[] color)
+    public static void ChangeChatsPanel(string uuidPanel, List<string> chats)
     {
         if (chats.Count >= 8)
         {
             for (int i = 5; i > 0; i--)
             {
-                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (8 - i) * 20 + 60 }, 20, color);
+                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (8 - i) * 20 + 60 }, 20);
             }
         }
         else
         {
             for (int i = chats.Count; i > 0; i--)
             {
-                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (chats.Count - i) * 20 + 60 }, 20, color);
+                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (chats.Count - i) * 20 + 60 }, 20);
             }
         }
     }
@@ -53,7 +52,7 @@ public class Panel : VREngine
     /**
      * Methode om meegegeven tekst weer te geven op het meegegeven panel.
      */
-    private static void DrawTextOnPanel(string text, string uuidPanel, int[] position, int size, int[] color)
+    private static void DrawTextOnPanel(string text, string uuidPanel, int[] position, int size)
     {
         SendThroughTunnel("scene/panel/drawtext", new
         {

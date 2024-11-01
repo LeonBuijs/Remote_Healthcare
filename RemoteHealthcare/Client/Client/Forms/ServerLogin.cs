@@ -69,6 +69,8 @@ public partial class ServerLogin : Form
         connection = new Connection(ip, 6666, messageHandler);
 
         var loginMessage = $"0 {firstName} {lastName} {birthDate}";
+        
+        Thread.Sleep(1000);
         connection.SendMessage(loginMessage);
         messageHandler.BleHandler.serverConnection = connection;
         

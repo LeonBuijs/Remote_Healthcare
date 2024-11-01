@@ -51,12 +51,12 @@ public class Connection
                     {
                         SendMessage("404");
                         messageHandler.Disconnect();
-                        Disconnect();
+                        // Disconnect();
                         return; 
                     }
 
                     messageHandler.Disconnect();
-                    Disconnect();
+                    // Disconnect();
                     return;
                 }
             }

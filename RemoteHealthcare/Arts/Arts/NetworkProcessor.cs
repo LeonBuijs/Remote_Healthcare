@@ -17,9 +17,9 @@ public class NetworkProcessor
     private readonly ILoginWindowCallback LoginWindowCallback;
     public IListWindowCallback ListWindowCallback { set; get; }
 
-    private List<IDataUpdateCallback> dataUpdateCallbacks = new List<IDataUpdateCallback>();
-    private List<string> clientsWhoRecieveData = new List<string>();
-    private bool isAskingData = false;
+    private List<IDataUpdateCallback> dataUpdateCallbacks = [];
+    private List<string> clientsWhoReceiveData = [];
+    private bool isAskingData;
 
     public NetworkProcessor(string ipAddress, ILoginWindowCallback loginWindowWindowCallback)
     {
@@ -77,7 +77,7 @@ public class NetworkProcessor
 
             if (argumentSplit.Length > 1)
             {
-                HandleData(argumentSplit);   
+                HandleData(argumentSplit);
             }
         }
 
@@ -98,6 +98,8 @@ public class NetworkProcessor
             return;
         }
 
+        Console.WriteLine($"argument: {argumentData[0]} {argumentData[1]} {argumentData[2]}");
+        
         var packetPage = int.Parse(argumentData[0]);
         switch (packetPage)
         {
@@ -107,7 +109,7 @@ public class NetworkProcessor
                 LoginWindowCallback.OnLogin(argument);
                 break;
             case 1:
-                string clientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
+                string clientId = GetClientIndex(argumentData);
                 string data =
                     $"{argumentData[4]} {argumentData[5]} {argumentData[6]} {argumentData[7]} {argumentData[8]} {argumentData[9]}";
                 Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");
@@ -115,11 +117,16 @@ public class NetworkProcessor
                 dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
                 break;
             case 2:
-                string newClientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
+                string newClientId = GetClientIndex(argumentData);
                 Console.WriteLine($"Kreeg clientId {newClientId}");
                 ListWindowCallback.AddNewClient(newClientId);
                 break;
             case 3:
+                
+                break;
+            case 4:
+                ListWindowCallback.RemoveClient(GetClientIndex(argumentData));
+                RemoveActiveClient(GetClientIndex(argumentData));
                 break;
             default:
                 Console.WriteLine("Unknown Packet Page");
@@ -130,12 +137,13 @@ public class NetworkProcessor
     public void AddActiveClient(string clientId)
     {
         Console.WriteLine($"adding {clientId} to active clients");
-        lock (clientsWhoRecieveData)
+        Console.WriteLine($"{clientId} added to clients list!");
+        
+        lock (clientsWhoReceiveData)
         {
-            Console.WriteLine($"{clientId} added to clients list!");
-            if (!clientsWhoRecieveData.Contains(clientId))
+            if (!clientsWhoReceiveData.Contains(clientId))
             {
-                clientsWhoRecieveData.Add(clientId);
+                clientsWhoReceiveData.Add(clientId);
             }
         }
 
@@ -152,10 +160,10 @@ public class NetworkProcessor
 
             while (count > 0)
             {
-                lock (clientsWhoRecieveData)
+                lock (clientsWhoReceiveData)
                 {
-                    clientsWhoRecieveData.ForEach(GetRealtimeData);
-                    count = clientsWhoRecieveData.Count;
+                    clientsWhoReceiveData.ForEach(GetRealtimeData);
+                    count = clientsWhoReceiveData.Count;
                 }
 
                 Thread.Sleep(500);
@@ -163,6 +171,14 @@ public class NetworkProcessor
 
             isAskingData = false;
         }).Start();
+    }
+
+    private void RemoveActiveClient(string clientId)
+    {
+        lock (clientsWhoReceiveData)
+        {
+            clientsWhoReceiveData.Remove(clientId);
+        }
     }
 
     public bool IsConnected()
@@ -208,9 +224,9 @@ public class NetworkProcessor
 
     public void StopClientSession(string clientInfo)
     {
-        lock (clientsWhoRecieveData)
+        lock (clientsWhoReceiveData)
         {
-            clientsWhoRecieveData.Remove(clientInfo);
+            clientsWhoReceiveData.Remove(clientInfo);
         }
 
         artsSender.StopSession(clientInfo);
@@ -239,5 +255,10 @@ public class NetworkProcessor
     public void GetDataHistory(string session)
     {
         artsSender.RetrievePreviousSessions(session);
+    }
+
+    private string GetClientIndex(string[] argumentData)
+    {
+        return $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
     }
 }

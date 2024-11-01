@@ -60,7 +60,6 @@ public class Server : IDoctorCallback, IClientCallback
                 await EmergencyStop(messageParts);
                 break;
             case DoctorDataIndex.MessageToSession:
-                // SendCommandToClient(messageParts, $"0 {messageParts[4]}");
                 SendChatMessageToClient(messageParts);
                 break;
             case DoctorDataIndex.MessageToAllSessions:
@@ -252,13 +251,13 @@ public class Server : IDoctorCallback, IClientCallback
         //geen sessie beschikbaar van client
         if (sessions == null)
         {
-            connection.Send("3 null");
+            connection.Send("3");
             return;
         }
 
         foreach (var session in sessions)
         {
-            connection.Send($"3 {session}");
+            connection.Send($"3 {clientIndex} {session}");
         }
     }
 

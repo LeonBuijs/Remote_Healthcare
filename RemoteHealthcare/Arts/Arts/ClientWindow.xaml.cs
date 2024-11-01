@@ -93,6 +93,6 @@ public partial class ClientWindow : Window, IDataUpdateCallback
 
     private void GetHistoryClicked(object sender, RoutedEventArgs e)
     {
-        
+        networkProcessor.GetDataHistory(clientId);
     }
 }

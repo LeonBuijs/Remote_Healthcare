@@ -110,6 +110,9 @@ public partial class ClientListWindow : Window, IListWindowCallback
         
             fileNames.Remove(clientId);
         });
+        
+        MessageBox.Show($"{clientId} Has Disconnected", "Client Disconnected",
+            MessageBoxButton.OK, MessageBoxImage.Warning);
     }
 
     private void ChatButtonPressed(object sender, RoutedEventArgs e)

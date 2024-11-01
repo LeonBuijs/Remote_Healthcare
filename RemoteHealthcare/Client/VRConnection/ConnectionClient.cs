@@ -30,7 +30,7 @@ public class ConnectionClient
     {
         while (true)
         {
-            var buffer = new byte[512];
+            var buffer = new byte[1024];
             string received;
 
             try
@@ -97,7 +97,7 @@ public class ConnectionClient
     {
         dokterMessages.Add(received.Substring(2));
         Panel.ClearPanel(VREngine.uuidPanelChats);
-        Panel.ChangeChatsPanel(VREngine.uuidPanelChats, dokterMessages, [0, 0, 0, 1]);
+        Panel.ChangeChatsPanel(VREngine.uuidPanelChats, dokterMessages);
         Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
         Panel.SwapPanel(VREngine.uuidPanelChats);
     }
@@ -162,12 +162,9 @@ public class ConnectionClient
                 HandleMessage("  --- STOP SESSION ---");
                 break;
             case "4":
-                // HandleMessage("  --- EMERGENCY STOP! ---");
-                dokterMessages.Add("  --- EMERGENCY STOP! ---");
-                Panel.ClearPanel(VREngine.uuidPanelChats);
-                Panel.ChangeChatsPanel(VREngine.uuidPanelChats, dokterMessages, [255, 0, 0, 1]);
-                Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
-                Panel.SwapPanel(VREngine.uuidPanelChats);
+                HandleMessage("  --- EMERGENCY STOP! ---");
+                HandleMessage("  --- HELP IS ON THE WAY ---");
+                HandleMessage("  --- EMERGENCY STOP! ---");
                 break;
         }
     }

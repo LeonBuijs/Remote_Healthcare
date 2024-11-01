@@ -1,8 +1,11 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Timers;
 using Avans.TI.BLE;
+using Timer = System.Threading.Timer;
 
 namespace Client.Handlers;
 
@@ -14,6 +17,8 @@ public class BLEHandler(MessageHandler messageHandler)
     public BikeData BikeData { get; set; } = new();
     private MessageHandler messageHandler = messageHandler;
     public Connection? serverConnection;
+    private System.Timers.Timer timer;
+    private bool isTimerOver;
 
     private static BLE bleBike = new();
     private static BLE bleHeart = new();
@@ -39,10 +44,13 @@ public class BLEHandler(MessageHandler messageHandler)
 
         if (DeviceAvailable(bikeNumber))
         {
-            Task.Run(async () => { await StartBLE(bikeNumber); });
+            Task.Run(async () =>
+            {
+                await StartBLE(bikeNumber);
+            });
             return true;
         }
-
+        
         return false;
     }
 
@@ -53,6 +61,18 @@ public class BLEHandler(MessageHandler messageHandler)
     {
         await ConnectBike(bikeNumber);
         await ConnectHeart();
+        timer = new System.Timers.Timer(40);
+        timer.Elapsed += OnTimedEvent;
+        timer.AutoReset = true;
+        timer.Enabled = true;
+    }
+    
+    /**
+     * Methode eventhandler om de timer event af te handelen.
+     */
+    private void OnTimedEvent(Object source, ElapsedEventArgs e)
+    {
+        isTimerOver = true;
     }
 
     /**
@@ -127,10 +147,14 @@ public class BLEHandler(MessageHandler messageHandler)
     * Print waarde ontvangen uit fiets naar console
     */
     private void BleBike_SubscriptionValueChanged(object Sender, BLESubscriptionValueChangedEventArgs e)
-    { 
-        BikeData.UpdateData(BitConverter.ToString(e.Data).Replace("-", " "));
-        messageHandler.OnReceivedBikeData(BikeData);
-        serverConnection.SendMessage($"1 {BikeData}");
+    {
+        if (serverConnection != null && isTimerOver)
+        {
+            BikeData.UpdateData(BitConverter.ToString(e.Data).Replace("-", " "));
+            messageHandler.OnReceivedBikeData(BikeData);
+            serverConnection.SendMessage($"1 {BikeData}");
+            isTimerOver = false;
+        }
     }
 
     /**
@@ -212,7 +236,7 @@ public class BLEHandler(MessageHandler messageHandler)
 
                 BikeData.UpdateData(BitConverter.ToString(buffer, 0, bytesRead).Replace("-", " "));
                 messageHandler.OnReceivedBikeData(BikeData);
-
+                
                 if (serverConnection != null)
                 {
                     serverConnection.SendMessage($"1 {BikeData}");

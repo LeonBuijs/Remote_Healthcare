@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using Client.Handlers;
@@ -8,6 +9,7 @@ namespace Client.Forms;
 public partial class DeviceConnection : Form
 {
     private MessageHandler messageHandler;
+
     // private BLEHandler bleHandler;
     public DeviceConnection()
     {
@@ -22,7 +24,7 @@ public partial class DeviceConnection : Form
     {
         var bikeNumber = CheckBikeNumberBox();
 
-        if (bikeNumber == "")
+        if (bikeNumber == "" || !bikeNumber.All(char.IsDigit))
         {
             CreateWarningPopup("Invalid Bike Number", "Please enter a valid bike number.");
             return;
@@ -30,17 +32,18 @@ public partial class DeviceConnection : Form
 
         if (!messageHandler.BleHandler.ConnectDevices(bikeNumber))
         {
-            CreateWarningPopup("Selected Bike Not Available", "Make sure you are connected with the bike and that the bike is turned on");
+            CreateWarningPopup("Selected Bike Not Available",
+                "Make sure that the bike is turned on and that the bike number is correct.");
             return;
         }
-        
+
         // Check voor sim mode, wanneer sim mode aan is, verbind deel overslaan
         if (messageHandler.BleHandler.ErrorCodeBike == 0 && messageHandler.BleHandler.ErrorCodeHeart == 0)
         {
             StartServerLogin();
             return;
         }
-        
+
         // Timeout om de bleHandler tijd te geven om te verbinden
         Thread.Sleep(5000);
 
@@ -52,10 +55,8 @@ public partial class DeviceConnection : Form
             StartServerLogin();
             return;
         }
-        
+
         UpdateConnectionStatus();
-        
-        CreateWarningPopup("Connecting Failed", "Please try connecting again");
     }
 
     /**
@@ -64,10 +65,10 @@ public partial class DeviceConnection : Form
     private void StartServerLogin()
     {
         Console.WriteLine("ServerLogin Started!");
-        
+
         Hide();
         var serverLogin = new ServerLogin(messageHandler);
-        serverLogin.Closed += (s, args) => Close(); 
+        serverLogin.Closed += (s, args) => Close();
         serverLogin.Show();
     }
 
@@ -76,7 +77,9 @@ public partial class DeviceConnection : Form
      */
     private void UpdateConnectionStatus()
     {
-        if (messageHandler.BleHandler.ErrorCodeBike == 0)
+        var errorcodeBike = messageHandler.BleHandler.ErrorCodeBike;
+        var errorcodeHeart = messageHandler.BleHandler.ErrorCodeHeart;
+        if (errorcodeBike == 0)
         {
             BikeConnectedStatusLabel.Text = "Connected!";
         }
@@ -85,13 +88,26 @@ public partial class DeviceConnection : Form
             BikeConnectedStatusLabel.Text = "NOT CONNECTED";
         }
 
-        if (messageHandler.BleHandler.ErrorCodeHeart == 0)
+        if (errorcodeHeart == 0)
         {
             HeartRateConnectedStatusLabel.Text = "Connected!";
         }
         else
         {
             HeartRateConnectedStatusLabel.Text = "NOT CONNECTED";
+        }
+
+        if (errorcodeBike > 0 && errorcodeHeart > 0)
+        {
+            CreateWarningPopup("Connecting Failed", "Please try connecting again");
+        }
+        else if (errorcodeBike > 0 && errorcodeHeart == 0)
+        {
+            CreateWarningPopup("Connecting With Bike Failed", "Please try connecting again");
+        }
+        else if (errorcodeBike == 0 && errorcodeHeart > 0)
+        {
+            CreateWarningPopup("Connecting With Heart Rate Monitor Failed", "Please try connecting again");
         }
     }
 
@@ -102,7 +118,7 @@ public partial class DeviceConnection : Form
     {
         MessageBox.Show($"{title}\n{message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
     }
-    
+
     /**
      * Methode voor het controleren van een geldige input van de gebruiker
      */
@@ -110,7 +126,7 @@ public partial class DeviceConnection : Form
     {
         var bikeNumber = bikeNumberTextBox.Text;
         var correctLength = bikeNumber.Length == 5;
-        
+
         if (string.IsNullOrWhiteSpace(bikeNumber) || !correctLength)
         {
             return "";
