@@ -46,8 +46,16 @@ public class Connection
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Error: \n{e}");
-                    // messageHandler.Disconnect();
+                    Console.WriteLine(e);
+                    if (e.Equals(new InvalidOperationException()))
+                    {
+                        SendMessage("404");
+                        messageHandler.Disconnect();
+                        Disconnect();
+                        return; 
+                    }
+
+                    messageHandler.Disconnect();
                     Disconnect();
                     return;
                 }

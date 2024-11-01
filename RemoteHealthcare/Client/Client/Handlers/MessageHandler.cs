@@ -87,6 +87,7 @@ public class MessageHandler : IBLECallback
     private void HandleStopCommand()
     {
         VrHandler.StopSession();
+        BleHandler.BikeData = new BikeData();
     }
 
     /**
@@ -95,6 +96,9 @@ public class MessageHandler : IBLECallback
     private void HandleEmergencyStopCommand()
     {
         VrHandler.EmergencyStop();
+        BleHandler.BikeData = new BikeData();
+        // Exception throwen om verbinding te sluiten
+        throw new InvalidOperationException();
     }
 
     /**

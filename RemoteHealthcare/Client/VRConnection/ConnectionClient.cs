@@ -14,6 +14,7 @@ public class ConnectionClient
     private static double previousSpeed = 0;
 
     private static Queue<string> CommandQueue = new();
+
     public static void StartServer()
     {
         listener = new TcpListener(IPAddress.Parse("127.0.0.1"), 9999);
@@ -31,7 +32,7 @@ public class ConnectionClient
         {
             var buffer = new byte[512];
             string received;
-            
+
             try
             {
                 var bytesRead = networkStream.Read(buffer, 0, buffer.Length);
@@ -42,13 +43,13 @@ public class ConnectionClient
                 HandleMessage("  --- CLIENT DISCONNECTED ---");
                 client = listener.AcceptTcpClient();
                 networkStream = client.GetStream();
-                dokterMessages.Clear(); 
+                dokterMessages.Clear();
                 continue;
             }
-            
+
 
             Console.WriteLine($"----------\nReceived: {received}\n----------");
-            
+
             var commands = received.Split('\n');
 
             // variabele om te controleren of de buffer een bericht van de doctor bevat,
@@ -56,13 +57,8 @@ public class ConnectionClient
             var containsDoctorCommand = false;
             for (int i = 0; i < commands.Length; i++)
             {
-                // if (!(command.Length <= 1))
-                // {
-                //     HandleCommand(command.Trim());
-                // }
-
                 var command = commands[i];
-                
+
                 if (!command.StartsWith("1") && command != "")
                 {
                     Console.WriteLine($"True Command: {command}");
@@ -72,7 +68,7 @@ public class ConnectionClient
             }
 
             Console.WriteLine($"Doctor Command: {containsDoctorCommand}");
-            
+
             if (!containsDoctorCommand)
             {
                 var commandPosition = commands.Length - 2;
@@ -88,12 +84,7 @@ public class ConnectionClient
                 }
             }
 
-            var toHandle = "";
-
-            if (CommandQueue.Count > 0)
-            {
-                toHandle = CommandQueue.Dequeue();
-            }
+            var toHandle = CommandQueue.Dequeue();
 
             if (toHandle != "")
             {
@@ -106,24 +97,9 @@ public class ConnectionClient
     {
         dokterMessages.Add(received.Substring(2));
         Panel.ClearPanel(VREngine.uuidPanelChats);
-        Panel.ChangeChatsPanel(VREngine.uuidPanelChats, dokterMessages);
+        Panel.ChangeChatsPanel(VREngine.uuidPanelChats, dokterMessages, [0, 0, 0, 1]);
         Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
         Panel.SwapPanel(VREngine.uuidPanelChats);
-    }
-    private static void HandleStartStop(string received)
-    {
-        switch (received)
-        {
-            case "2":
-                HandleMessage("  --- START SESSION ---");
-                break;
-            case "3":
-                HandleMessage("  --- STOP SESSION ---");
-                break;
-            case "4":
-                HandleMessage("  --- EMERGENCY STOP! ---");
-                break;
-        }
     }
 
     private static void HandleCommand(string received)
@@ -142,12 +118,12 @@ public class ConnectionClient
                 string[] data = received.Substring(2).Split(' ');
                 if (Convert.ToInt32(data[0]) != previousSpeed)
                 {
-                    Route.ChangeFollowRouteSpeed(VREngine.uuidBike, Convert.ToInt32(data[0])/3.6);
+                    Route.ChangeFollowRouteSpeed(VREngine.uuidBike, Convert.ToInt32(data[0]) / 3.6);
                     previousSpeed = Convert.ToInt32(data[0]);
                 }
-                    
+
                 Panel.ClearPanel(VREngine.uuidPanelData);
-                Panel.ChangeDataPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]), 
+                Panel.ChangeDataPanel(VREngine.uuidPanelData, Convert.ToInt32(data[0]),
                     Convert.ToInt32(data[5]), data[3], Convert.ToInt32(data[1]));
                 Panel.SwapPanel(VREngine.uuidPanelData);
                 break;
@@ -157,7 +133,7 @@ public class ConnectionClient
                 break;
             case '3':
                 // Stop command
-                HandleStartStop(received);  
+                HandleStartStop(received);
                 Route.ChangeFollowRouteSpeed(VREngine.uuidBike, 0);
                 break;
             case '4':
@@ -169,6 +145,27 @@ public class ConnectionClient
                 // Naam
                 name = received.Substring(2);
                 Panel.ClearPanel(VREngine.uuidPanelChats);
+                Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
+                Panel.SwapPanel(VREngine.uuidPanelChats);
+                break;
+        }
+    }
+
+    private static void HandleStartStop(string received)
+    {
+        switch (received)
+        {
+            case "2":
+                HandleMessage("  --- START SESSION ---");
+                break;
+            case "3":
+                HandleMessage("  --- STOP SESSION ---");
+                break;
+            case "4":
+                // HandleMessage("  --- EMERGENCY STOP! ---");
+                dokterMessages.Add("  --- EMERGENCY STOP! ---");
+                Panel.ClearPanel(VREngine.uuidPanelChats);
+                Panel.ChangeChatsPanel(VREngine.uuidPanelChats, dokterMessages, [255, 0, 0, 1]);
                 Panel.ChangeNamePanel(VREngine.uuidPanelChats, name);
                 Panel.SwapPanel(VREngine.uuidPanelChats);
                 break;

@@ -82,9 +82,9 @@ public partial class ServerLogin : Form
      */
     private void ConnectToVr()
     {
-        var connected = false;
+        var connected = true;
 
-        while (!connected)
+        while (connected)
         {
             try
             {
@@ -99,7 +99,7 @@ public partial class ServerLogin : Form
                 continue;
             }
             
-            connected = true;
+            connected = false;
         }
     }
 
