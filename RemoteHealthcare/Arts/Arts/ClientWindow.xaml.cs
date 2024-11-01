@@ -57,7 +57,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
                 new LineSeries
                 {
                     Title = $"Data Serie {i+1}",
-                    Values = new ChartValues<double>()
+                    Values = new ChartValues<double>([1,2,3,4,5])
                 }
             };
             if (i<2)
@@ -71,7 +71,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
                     }
                 };
             }
-            LabelsCollections[i] = new ObservableCollection<string>();
+            LabelsCollections[i] = new ObservableCollection<string>(["jan", "feb", "maart", "april", "mei"]);
         }
 
         Formatter = value => value.ToString("N");
@@ -211,7 +211,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
 
     private void GetHistoryClicked(object sender, RoutedEventArgs e)
     {
-        
+        networkProcessor.GetDataHistory(clientId);
     }
 
     // protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)

@@ -74,9 +74,9 @@ public class NetworkProcessor
         {
             Console.WriteLine($"argument: {argument}");
             string[] argumentSplit = argument.Split(" ");
-
             if (argumentSplit.Length > 1)
             {
+                Console.WriteLine("faka");
                 HandleData(argumentSplit);   
             }
         }
@@ -99,7 +99,7 @@ public class NetworkProcessor
         }
 
         var packetPage = int.Parse(argumentData[0]);
-        string clientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
+        
         switch (packetPage)
         {
             case 0:
@@ -108,6 +108,8 @@ public class NetworkProcessor
                 LoginWindowCallback.OnLogin(argument);
                 break;
             case 1:
+                string clientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
+
                 string data =
                     $"{argumentData[4]} {argumentData[5]} {argumentData[6]} {argumentData[7]} {argumentData[8]} {argumentData[9]}";
                 Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");
@@ -115,13 +117,17 @@ public class NetworkProcessor
                 dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
                 break;
             case 2:
-                Console.WriteLine($"Kreeg clientId {clientId}");
-                ListWindowCallback.AddNewClient(clientId);
+                string newclientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
+
+                Console.WriteLine($"Kreeg clientId {newclientId}");
+                ListWindowCallback.AddNewClient(newclientId);
                 break;
             case 3:
+                string historyclientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
+
                 foreach (var clientWindow in dataUpdateCallbacks)
                 {
-                    if (clientWindow.GetClientinfo().Equals(clientId))
+                    if (clientWindow.GetClientinfo().Equals(historyclientId))
                     {
                         string date = argumentData[4];
                         // {date} {duration}(0) {averageSpeed}(1) {maxSpeed}(1) {averageHeartRate}(2) {maxHeartRate}(2) {distance}(3)
@@ -131,6 +137,7 @@ public class NetworkProcessor
                         clientWindow.UpdateHistory(2,Int32.Parse(argumentData[8]), date);
                         clientWindow.UpdateHistory(2,Int32.Parse(argumentData[9]), date, 1);
                         clientWindow.UpdateHistory(3,Int32.Parse(argumentData[10]), date);
+                        Console.WriteLine("1 line of hsitory added");
                     }
                 }
                 break;

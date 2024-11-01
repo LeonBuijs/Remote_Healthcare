@@ -1,4 +1,5 @@
-﻿using Server;
+﻿using System.Collections;
+using Server;
  
 public class ServerSimulation():IDoctorCallback, IClientCallback
 {
@@ -76,7 +77,12 @@ public class ServerSimulation():IDoctorCallback, IClientCallback
                 {
                     if (client.voornaam == messageParts[1] && client.achternaam == messageParts[2] && client.geboortedatum == messageParts[3])
                     {
-                        connection.Send($"3 {client.GetHistory()}");
+                        ArrayList temp = client.GetHistory();
+                        foreach (var data in temp)
+                        {
+                            connection.Send($"3 {client.GetClientInfo()} {data}");
+                            Thread.Sleep(200);
+                        }
                     }
                 }
                 break;
@@ -121,24 +127,34 @@ public class TestClient()
     private int rpm = 0;
     private int distance = 0;
     private int power = 0;
-    private double history = 0;
+    private int tijd = 0;
+    private int extra = 0;
+    private ArrayList history = new ArrayList();
+    private int count = 0;
     public TestClient(string voornaam, string achternaam, string geboortedatum) : this()
     {
         this.voornaam = voornaam;
         this.achternaam = achternaam;
         this.geboortedatum = geboortedatum;
+        
     }
 
     public string GetData()
     {
-        speed++; hardrate++; rpm++; distance++; power++;
-        history += 0.5;
-        return speed + " " + hardrate + " " + rpm + " " + distance + " " + power;
+        if (count == 5)
+        {
+            tijd++;
+            history.Add(tijd + " " + speed + " " + hardrate + " " + rpm + " " + distance + " " + power + " " + extra);
+            count = 0;
+        }
+        speed++; hardrate += 2; rpm+= 3; distance+= 4; power += 5; extra += 6; 
+        count++;
+        return speed + " " + hardrate + " " + rpm + " " + distance + " " + power + " " + extra;
     }
 
-    public string GetHistory()
+    public ArrayList GetHistory()
     {
-        return speed/history + " " + hardrate/history + " " + rpm/history + " " + distance/history + " " + power/history;
+        return history;
     }
 
     public string GetClientInfo()
