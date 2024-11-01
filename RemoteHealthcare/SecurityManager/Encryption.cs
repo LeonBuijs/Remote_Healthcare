@@ -50,7 +50,7 @@ public class Encryption
 	 * </summary>
 	 * <param name="dataToEncrypt">De data die encrypt moet worden</param>
 	 * <param name="publicKeyReceiver">De public key van de ontvanger</param>
-	 * <returns>byte[] van de encrypted data</returns>
+	 * <returns>byte[] - van de encrypted data</returns>
 	 */
 	public static byte[] EncryptData(byte[] dataToEncrypt, string publicKeyReceiver)
 	{
@@ -65,7 +65,7 @@ public class Encryption
 	* </summary>
 	* <param name="dataToDecrypt">De data die decrypt moet worden</param>
 	* <param name="privateKeyReceiver">De private key van de ontvanger</param>
-	* <returns>byte[] van de decrypted data</returns>
+	* <returns>byte[] - van de decrypted data</returns>
 	*/
 	public static string DecryptData(byte[] dataToDecrypt, string privateKeyReceiver)
 	{

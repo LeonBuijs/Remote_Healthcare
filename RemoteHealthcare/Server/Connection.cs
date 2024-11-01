@@ -21,6 +21,12 @@ public class Connection
         SetRSAKeys();
     }
 
+    /**
+     * <summary>
+     * Benaderd Encryptie klasse van de library
+     * Vervolgens wordt er een tuple terug geleverd met public- en privateKey
+     * </summary>
+     */
     private void SetRSAKeys()
     {
         var (publicKey, privateKey) = Encryption.GenerateRsaKeyPair();
@@ -28,6 +34,14 @@ public class Connection
         privateKeyServer = privateKey;
     }
 
+    /**
+     * <summary>
+     * Methode die een bericht over de socket stuurt
+     * Encrypt altijd tenzij er false meegegeven wordt
+     * </summary>
+     * <param name="msg">Het bericht wat overgestuurd wordt</param>
+     * <param name="encryption">Staat default true, wanneer false geen encryptie</param>
+     */
     public void Send(string msg, bool encryption = true)
     {
         var array = Encoding.ASCII.GetBytes(msg + "\n");
@@ -40,6 +54,14 @@ public class Connection
         Stream.Write(array, 0, array.Length);
     }
 
+    /**
+     * <summary>
+     * Methode die het data ontvangt
+     * Het eerste bericht zal ALTIJD de key zijn
+     * Daarom als de key false is, wordt ontvangen data als key neergezet
+     * </summary>
+     * <returns>String - Gedecodeerde ontvangen data</returns>
+     */
     public string Receive()
     {
         var buffer = new byte[1024];
