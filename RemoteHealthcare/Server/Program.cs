@@ -1,9 +1,9 @@
 namespace Server;
 
-public class Server : IServer, IDoctorCallback, IClientCallback
+public class Server : IDoctorCallback, IClientCallback
 {
     private readonly FileManager fileManager = new();
-    public readonly Dictionary<string, ClientConnection> clients = new();
+    public Dictionary<string, ClientConnection> clients = new();
     private ConnectionHandler connectionHandler;
 
     public static void Main(string[] args)
@@ -13,7 +13,7 @@ public class Server : IServer, IDoctorCallback, IClientCallback
         server.SetCallbacks();
     }
 
-    private void SetCallbacks()
+    public void SetCallbacks()
     {
         connectionHandler = new ConnectionHandler(this, this);
         connectionHandler.Start();
@@ -120,7 +120,7 @@ public class Server : IServer, IDoctorCallback, IClientCallback
     /**
      * Helper methode om de login van de Doctor af te handelen
      */
-    public void DoctorLogin(IConnection connection, string[] messageParts)
+    public void DoctorLogin(Connection connection, string[] messageParts)
     {
         if (fileManager.CheckDoctorLogin(messageParts[1], messageParts[2]))
         {
@@ -265,7 +265,7 @@ public class Server : IServer, IDoctorCallback, IClientCallback
     /**
      * Helper methode om alle verbonden clients op te halen en te versturen
      */
-    public void SendAllClients(IConnection connection)
+    public void SendAllClients(Connection connection)
     {
         foreach (var client in clients)
         {

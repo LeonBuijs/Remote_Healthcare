@@ -1,109 +1,79 @@
-using Moq;
+using System.Net.Sockets;
+using System.Text;
 using Server;
 
-namespace UnitTests
+namespace UnitTests;
+
+public class ServerTests
 {
-    public class ServerTests
+    private Server.Server server;
+    private TcpClient artsClient;
+    private NetworkStream artsStream;
+
+    private TcpClient clientClient;
+    private NetworkStream clientStream;
+
+    [SetUp]
+    public void Setup()
     {
-        /**
-        * Test controleert of de toegang van de dokter correct wordt ingesteld
-        * op basis van de opgegeven inloggegevens.
-        */
-        [Test]
-        [TestCase("test", "test", true)]
-        [TestCase("testFout", "test", false)]
-        [TestCase("test", "testFout", false)]
-        [TestCase("testFout", "testFout", false)]
-        public void DoctorLogin_ShouldSetAccessCorrectly(string username, string password, bool expectedAccess)
-        {
-            // Arrange
-            var mockConnection = new Mock<IConnection>();
-            mockConnection.SetupProperty(c => c.Access, false);
+        server = new Server.Server();
+        server.SetCallbacks();
 
-            var mockServer = new Mock<IServer>();
-            mockServer.Setup(s => s.DoctorLogin(It.IsAny<IConnection>(), It.IsAny<string[]>()))
-                .Callback<IConnection, string[]>((conn, credentials) =>
-                {
-                    if (credentials[0] == "test" && credentials[1] == "test")
-                    {
-                        conn.Access = true;
-                    }
-                    else
-                    {
-                        conn.Access = false;
-                    }
-                });
-
-            // Act
-            mockServer.Object.DoctorLogin(mockConnection.Object, new string[] { username, password });
-
-            // Assert
-            Assert.AreEqual(expectedAccess, mockConnection.Object.Access);
-        }
-
-        /**
-        * Test controleert of het verzenden van een chatbericht aan de client
-        * correct wordt geformatteerd op basis van de opgegeven berichtenonderdelen.
-        */
-        [Test]
-        [TestCase(new[] { "0", "Hello", "world", "!" }, "0 Hello world !")]
-        [TestCase(new[] { "1", "Goodbye", "world", "!" }, "1 Goodbye world !")]
-        [TestCase(new[] { "2", "Testing", "123" }, "2 Testing 123")]
-        [TestCase(new[] { "3", "This", "is", "a", "test" }, "3 This is a test")]
-        [TestCase(new[] { "4", "SingleMessage" }, "4 SingleMessage")]
-        [TestCase(new[] { "5", "" }, "5 ")]
-        public void SendCommandToClient_ShouldFormatMessageAsExpected(string[] messageParts, string expectedMessage)
-        {
-            // Arrange
-            var mockConnection = new Mock<IConnection>();
-            var mockServer = new Mock<IServer>();
-    
-            mockServer.Setup(s => s.SendCommandToClient(It.IsAny<string[]>(), It.IsAny<string>()))
-                .Callback<string[], string>((parts, msg) =>
-                {
-                    Assert.AreEqual(expectedMessage, msg);
-                });
-
-            // Act
-            mockServer.Object.SendCommandToClient(messageParts, $"{messageParts[0]} {string.Join(" ", messageParts.Skip(1))}");
-
-            // Assert
-            mockServer.Verify(s => s.SendCommandToClient(It.IsAny<string[]>(), expectedMessage), Times.Once);
-        }
+        artsClient = new TcpClient("127.0.0.1", 7777);
+        artsStream = artsClient.GetStream();
         
-        /**
-        * Test de SendChatMessageToClient-methode van de server.
-        * Controleert of de berichten correct worden opgemaakt en verzonden naar de client.
-        */
-        [Test]
-        [TestCase(new[] { "Hello", "world", "!" }, "0 Hello world !")]
-        [TestCase(new[] { "Goodbye", "world", "!" }, "0 Goodbye world !")]
-        [TestCase(new[] { "Testing", "123" }, "0 Testing 123")]
-        [TestCase(new[] { "This", "is", "a", "test" }, "0 This is a test")]
-        [TestCase(new[] { "SingleMessage" }, "0 SingleMessage")]
-        [TestCase(new[] { "" }, "0 ")]
-        public void SendChatMessageToClient_ShouldFormatMessageAsExpected(string[] messageParts, string expectedMessage)
-        {
-            // Arrange
-            var mockConnection = new Mock<IConnection>();
-            var mockServer = new Mock<IServer>();
+        clientClient = new TcpClient("127.0.0.1", 6666);
+        clientStream = clientClient.GetStream();
+    }
 
-            
-            mockServer.Setup(s => s.SendChatMessageToClient(It.IsAny<string[]>()))
-                .Callback<string[]>(parts =>
-                {
-                    string formattedMessage = "0 " + string.Join(" ", parts);
-                    mockConnection.Object.Send(formattedMessage);
-                    Assert.AreEqual(expectedMessage, formattedMessage);
-                });
+    [TearDown]
+    public void TearDown()
+    {
+        // Sluit de stream en de client correct af
+        artsStream.Close();
+        artsClient.Close();
+        clientStream.Close();
+        clientClient.Close();
+    }
 
-            // Act
-            mockServer.Object.SendChatMessageToClient(messageParts);
+    [Test]
+    [TestCase("0 test test", "0 1")]
+    [TestCase("0 testFout testFout", "0 0")]
+    [TestCase("0 TeSt TesT", "0 0")]
+    public void ShouldRespondCorrectly_WhenDoctorAttemptsLogin(string input, string expectedResponse)
+    {
+        // Arrange
+        var data = Encoding.ASCII.GetBytes(input);
+        artsStream.Write(data, 0, data.Length);
 
-            // Assert
-            mockConnection.Verify(conn => conn.Send(expectedMessage), Times.Once);
-        }
+        // Act
+        var response = ReadResponseFromStream(artsStream).TrimEnd('\n');
 
+        // Assert
+        Assert.AreEqual(expectedResponse, response); // Controleer het verwachte antwoord
+    }
+    
+    [Test]
+    [TestCase("0 a a 1", "5 1")]
+    [TestCase("0 testFout testFout 11223333", "5 0")]
+    [TestCase("0 TeSt TesT 01012000", "5 0")]
+    public void ShouldRespondCorrectly_WhenClientAttemptsLogin(string input, string expectedResponse)
+    {
+        // Arrange
+        var data = Encoding.ASCII.GetBytes(input);
+        clientStream.Write(data, 0, data.Length);
 
+        // Act
+        var response = ReadResponseFromStream(clientStream).TrimEnd('\n');
+
+        // Assert
+        Assert.AreEqual(expectedResponse, response); // Controleer het verwachte antwoord
+    }
+    
+    private string ReadResponseFromStream(Stream stream)
+    {
+        var buffer = new byte[10];
+        var bytesRead = stream.Read(buffer, 0, buffer.Length);
+        return Encoding.ASCII.GetString(buffer, 0, bytesRead);
     }
 }
