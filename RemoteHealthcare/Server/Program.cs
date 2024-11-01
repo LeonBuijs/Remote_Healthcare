@@ -3,7 +3,7 @@ namespace Server;
 public class Server : IServer, IDoctorCallback, IClientCallback
 {
     private readonly FileManager fileManager = new();
-    private readonly Dictionary<string, ClientConnection> clients = new();
+    public readonly Dictionary<string, ClientConnection> clients = new();
     private ConnectionHandler connectionHandler;
 
     public static void Main(string[] args)
