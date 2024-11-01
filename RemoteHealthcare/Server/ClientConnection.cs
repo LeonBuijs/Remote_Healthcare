@@ -5,7 +5,7 @@ namespace Server;
  */
 public class ClientConnection(string name, Connection connection)
 {
-    public Connection Connection { get; set; }
+    public Connection Connection { get; set; } = connection;
     public string Name { get; } = name;
     public bool InSession { get; set; }
     public string SessionTime { get; set; } = "";

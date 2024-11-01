@@ -326,7 +326,7 @@ public class Server : IDoctorCallback, IClientCallback
         // Controleert of client bestaat in het clientsbestand, zo ja toevoegen aan lijst met live clients
         if (fileManager.CheckClientLogin(clientIndex) && !clients.ContainsKey(clientIndex))
         {
-            clients.Add(GetIndexClient(messageParts), new ClientConnection($"{clientIndex}", connection));
+            clients.Add(clientIndex, new ClientConnection(clientIndex, connection));
             connection.Access = true;
             connection.Send("5 1");
         }
