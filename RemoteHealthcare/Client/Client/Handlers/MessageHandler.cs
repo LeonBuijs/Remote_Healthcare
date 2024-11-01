@@ -7,6 +7,8 @@ public class MessageHandler : IBLECallback
     public BLEHandler BleHandler;
     public VRHandler VrHandler { get; set; }
     public bool LoggedIn { get; private set; }
+    public Connection serverConnection { get; set; }
+    private bool sessionStarted = false;
 
     public MessageHandler()
     {
@@ -78,6 +80,7 @@ public class MessageHandler : IBLECallback
     private void HandleStartCommand()
     {
         VrHandler.StartSession(); 
+        sessionStarted = true;
     }
 
     /**
@@ -87,6 +90,7 @@ public class MessageHandler : IBLECallback
     {
         VrHandler.StopSession();
         BleHandler.BikeData = new BikeData();
+        sessionStarted = false;
     }
 
     /**
@@ -96,6 +100,7 @@ public class MessageHandler : IBLECallback
     {
         VrHandler.EmergencyStop();
         BleHandler.BikeData = new BikeData();
+        sessionStarted = false;
         // Exception throwen om verbinding te sluiten
         throw new InvalidOperationException();
     }
@@ -128,6 +133,11 @@ public class MessageHandler : IBLECallback
     public void OnReceivedBikeData(BikeData bikeData)
     {
         VrHandler.SendBikeDataToVr(bikeData);
+
+        if (sessionStarted)
+        {
+            serverConnection.SendMessage($"1 {bikeData}");  
+        }
         
         Console.WriteLine(bikeData);
     }

@@ -11,6 +11,7 @@ public class Server : IDoctorCallback, IClientCallback
         Console.WriteLine("Starting server...");
         var server = new Server();
         server.SetCallbacks();
+        Console.WriteLine();
     }
 
     public void SetCallbacks()

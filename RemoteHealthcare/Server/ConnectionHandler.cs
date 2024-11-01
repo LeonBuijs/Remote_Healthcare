@@ -27,7 +27,7 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
      */
     private void OpenConnectionDoctor()
     {
-        var listener = new TcpListener(IPAddress.Loopback, 7777);
+        var listener = new TcpListener(IPAddress.Any, 7777);
         listener.Start();
 
         while (true)
@@ -48,7 +48,7 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
      */
     private void OpenConnectionClient()
     {
-        var listener = new TcpListener(IPAddress.Loopback, 6666);
+        var listener = new TcpListener(IPAddress.Any, 6666);
         listener.Start();
 
         while (true)
