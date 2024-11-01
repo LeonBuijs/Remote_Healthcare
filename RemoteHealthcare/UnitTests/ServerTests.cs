@@ -41,6 +41,10 @@ namespace UnitTests
             Assert.AreEqual(expectedAccess, mockConnection.Object.Access);
         }
 
+        /**
+        * Test controleert of het verzenden van een chatbericht aan de client
+        * correct wordt geformatteerd op basis van de opgegeven berichtenonderdelen.
+        */
         [Test]
         [TestCase(new[] { "0", "Hello", "world", "!" }, "0 Hello world !")]
         [TestCase(new[] { "1", "Goodbye", "world", "!" }, "1 Goodbye world !")]
@@ -54,11 +58,9 @@ namespace UnitTests
             var mockConnection = new Mock<IConnection>();
             var mockServer = new Mock<IServer>();
     
-            // Stel in dat de mock een aanroep naar SendCommandToClient verwacht met de juiste argumenten
             mockServer.Setup(s => s.SendCommandToClient(It.IsAny<string[]>(), It.IsAny<string>()))
                 .Callback<string[], string>((parts, msg) =>
                 {
-                    // Controleer of het bericht goed is geformatteerd
                     Assert.AreEqual(expectedMessage, msg);
                 });
 
