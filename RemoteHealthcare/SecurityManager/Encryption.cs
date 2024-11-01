@@ -54,7 +54,7 @@ public class Encryption
 	{
 		using RSA rsa = RSA.Create();
 		rsa.FromXmlString(publicKeyReceiver);
-		byte[] dataToEncryptBytes = Encoding.UTF8.GetBytes(dataToEncrypt);
+		byte[] dataToEncryptBytes = Encoding.ASCII.GetBytes(dataToEncrypt);
 		return rsa.Encrypt(dataToEncryptBytes, RSAEncryptionPadding.OaepSHA256);
 	}
 
@@ -70,7 +70,7 @@ public class Encryption
 	{
 		using RSA rsa = RSA.Create();
 		rsa.FromXmlString(privateKeyReceiver);
-		return Encoding.UTF8.GetString((rsa.Decrypt(dataToDecrypt, RSAEncryptionPadding.OaepSHA256)));
+		return Encoding.ASCII.GetString((rsa.Decrypt(dataToDecrypt, RSAEncryptionPadding.OaepSHA256)));
 	}
 
 	public static byte[] HashData(string dataToHash)
