@@ -6,7 +6,7 @@ namespace Server;
 /**
  * Klasse die de TCP-verbinding regelt voor de artsen en clients
  */
-public class Connection(TcpClient client)
+public class Connection(TcpClient client) : IConnection
 {
     public readonly NetworkStream Stream = client.GetStream();
     public bool Access { get; set; }

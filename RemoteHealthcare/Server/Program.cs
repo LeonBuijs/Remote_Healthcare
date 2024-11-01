@@ -1,6 +1,6 @@
 namespace Server;
 
-public class Server : IDoctorCallback, IClientCallback
+public class Server : IServer, IDoctorCallback, IClientCallback
 {
     private readonly FileManager fileManager = new();
     private readonly Dictionary<string, ClientConnection> clients = new();
@@ -120,7 +120,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om de login van de Doctor af te handelen
      */
-    private void DoctorLogin(Connection connection, string[] messageParts)
+    public void DoctorLogin(IConnection connection, string[] messageParts)
     {
         if (fileManager.CheckDoctorLogin(messageParts[1], messageParts[2]))
         {
@@ -139,7 +139,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om een sessie bij een client te starten
      */
-    private void StartSession(string[] messageParts)
+    public void StartSession(string[] messageParts)
     {
         var clientIndex = GetIndexClient(messageParts);
 
@@ -164,7 +164,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
     * Helper methode om een sessie van een client stop te zetten
     */
-    private async Task StopSession(string[] messageParts)
+    public async Task StopSession(string[] messageParts)
     {
         var clientIndex = GetIndexClient(messageParts);
 
@@ -191,7 +191,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om een noodstop te maken bij een sessie
      */
-    private async Task EmergencyStop(string[] messageParts)
+    public async Task EmergencyStop(string[] messageParts)
     {
         var clientIndex = GetIndexClient(messageParts);
 
@@ -218,7 +218,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om een bericht naar een specifieke client te sturen
      */
-    private void SendChatMessageToClient(string[] messageParts)
+    public void SendChatMessageToClient(string[] messageParts)
     {
         var message = "";
         for (int i = 4; i < messageParts.Length; i++)
@@ -232,7 +232,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om een bericht naar alle sessies te sturen
      */
-    private void MessageToAllSessions(string[] messageParts)
+    public void MessageToAllSessions(string[] messageParts)
     {
         foreach (var client in clients)
         {
@@ -243,7 +243,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om data van een bepaalde sessie op te halen
      */
-    private void GetSessionData(Connection connection, string[] messageParts)
+    public void GetSessionData(Connection connection, string[] messageParts)
     {
         var clientIndex = GetIndexClient(messageParts);
 
@@ -265,7 +265,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om alle verbonden clients op te halen en te versturen
      */
-    private void SendAllClients(Connection connection)
+    public void SendAllClients(IConnection connection)
     {
         foreach (var client in clients)
         {
@@ -276,7 +276,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om live data van een bepaalde client naar de doctor te sturen
      */
-    private void SendLiveData(Connection connection, string[] messageParts)
+    public void SendLiveData(Connection connection, string[] messageParts)
     {
         var clientIndex = GetIndexClient(messageParts);
 
@@ -298,7 +298,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om het verbreken van een verbinding van een client door te geven
      */
-    private void SendClientDisconnected(Connection connection)
+    public void SendClientDisconnected(Connection connection)
     {
         foreach (var doctor in connectionHandler.doctors)
         {
@@ -315,7 +315,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om de login van een client af te handelen
      */
-    private void ClientLogin(Connection connection, string[] messageParts)
+    public void ClientLogin(Connection connection, string[] messageParts)
     {
         var clientIndex = GetIndexClient(messageParts);
 
@@ -335,9 +335,9 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om ontvangen BikeData te verwerken van een client
      */
-    private void ReceiveBikeData(Connection connection, string[] messageParts)
+    public void ReceiveBikeData(Connection connection, string[] messageParts)
     {
-        var clientConnection = getClientConnection(connection);
+        var clientConnection = GetClientConnection(connection);
 
         // Mocht er een fout optreden, returnen
         if (clientConnection == null)
@@ -373,9 +373,9 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om een client te disconnecten van de server
      */
-    private void DisconnectClient(Connection connection)
+    public void DisconnectClient(Connection connection)
     {
-        var client = getClientConnection(connection);
+        var client = GetClientConnection(connection);
 
         //Asynchroon berekenen van alle fietsdata
         Task.Run(async () =>
@@ -396,7 +396,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Methode om de index (voornaam achternaam geboortedatum) van een client te verkrijgen
      */
-    private static string GetIndexClient(string[] messageParts)
+    public string GetIndexClient(string[] messageParts)
     {
         if (messageParts.Length < 4)
         {
@@ -409,7 +409,7 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Methode om commando naar client te sturen
      */
-    private void SendCommandToClient(string[] messageParts, string command)
+    public void SendCommandToClient(string[] messageParts, string command)
     {
         var requestedClientId = GetIndexClient(messageParts);
         foreach (var client in clients)
@@ -421,7 +421,7 @@ public class Server : IDoctorCallback, IClientCallback
         }
     }
 
-    private Tuple<ClientConnection, string> getClientConnection(Connection connection)
+    public Tuple<ClientConnection, string> GetClientConnection(Connection connection)
     {
         // Door middel van connection kijken welke client het in de lijst is
         foreach (var client in clients)
