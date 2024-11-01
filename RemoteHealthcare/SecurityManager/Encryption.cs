@@ -13,19 +13,35 @@ public class Encryption
 {
 	/**
 	 * <summary>
+	 * Totdat we unit tests hebben zal dit de test methode zijn van Encryption
+	 * </summary>
+	 */
+	public static void TestPrintEncryption()
+	{
+		var (publicKey, privateKey) = GenerateRsaKeyPair();
+		Console.WriteLine($"Public Key: \n{publicKey}\n\nPrivate Key: \n{privateKey}");
+		
+		byte[] encryptedTextInBytes = EncryptData("Hello i am under die water",publicKey);
+		Console.WriteLine($"Encrypted Text: \n{Convert.ToBase64String(encryptedTextInBytes)}");
+		string decryptedText = DecryptData(encryptedTextInBytes, privateKey);
+		Console.WriteLine($"Decrypted Text: \n{decryptedText}");
+	}
+	
+	/**
+	 * <summary>
 	 * Genereert een publicKey en privateKey
 	 * Vervolgens zet hij die in out parameters in de vorm van een string
 	 * </summary>
-	 * <param name="publicKey">De out string value van de public key</param>
-	 * <param name="privateKey">De out string value van de private key</param>
+	 * <returns>(string, string) - De publicKey en privateKey</returns>
 	 */
-	public static void GenerateRsaKeyPair(out string publicKey, out string privateKey)
+	public static (string, string) GenerateRsaKeyPair()
 	{
-		using RSA rsa = RSA.Create(1024);
-		publicKey = rsa.ExportRSAPublicKeyPem();
-		privateKey = rsa.ExportRSAPrivateKeyPem();
-	}	
-
+		using RSA rsa = RSA.Create();
+		string publicKey = rsa.ToXmlString(false);
+		string privateKey = rsa.ToXmlString(true);
+		return (publicKey, privateKey);
+	}
+	
 	/**
 	 * <summary>
 	 * Encrypt de data met RSA en een padding van SHA256
@@ -36,9 +52,9 @@ public class Encryption
 	 */
 	public static byte[] EncryptData(string dataToEncrypt, string publicKeyReceiver)
 	{
-		byte[] dataToEncryptBytes = Encoding.ASCII.GetBytes(dataToEncrypt);
 		using RSA rsa = RSA.Create();
-		rsa.ImportFromPem(publicKeyReceiver);
+		rsa.FromXmlString(publicKeyReceiver);
+		byte[] dataToEncryptBytes = Encoding.UTF8.GetBytes(dataToEncrypt);
 		return rsa.Encrypt(dataToEncryptBytes, RSAEncryptionPadding.OaepSHA256);
 	}
 
@@ -50,12 +66,11 @@ public class Encryption
 	* <param name="privateKeyReceiver">De private key van de ontvanger</param>
 	* <returns>byte[] van de decrypted data</returns>
 	*/
-	public static byte[] DecryptData(string dataToDecrypt, string privateKeyReceiver)
+	public static string DecryptData(byte[] dataToDecrypt, string privateKeyReceiver)
 	{
-		byte[] dataToDecryptBytes = Convert.FromBase64String(dataToDecrypt);
 		using RSA rsa = RSA.Create();
-		rsa.ImportFromPem(privateKeyReceiver);
-		return rsa.Decrypt(dataToDecryptBytes, RSAEncryptionPadding.OaepSHA256);
+		rsa.FromXmlString(privateKeyReceiver);
+		return Encoding.UTF8.GetString((rsa.Decrypt(dataToDecrypt, RSAEncryptionPadding.OaepSHA256)));
 	}
 
 	public static byte[] HashData(string dataToHash)
