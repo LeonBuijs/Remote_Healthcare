@@ -116,7 +116,7 @@ public class Server : IServer, IDoctorCallback, IClientCallback
                 break;
         }
     }
-
+    
     /**
      * Helper methode om de login van de Doctor af te handelen
      */
@@ -144,13 +144,13 @@ public class Server : IServer, IDoctorCallback, IClientCallback
         var clientIndex = GetIndexClient(messageParts);
 
         // Check om te controleren of de client bestaat/verbonden is
-        if (!clients.ContainsKey(clientIndex))
+        if (!Clients.ContainsKey(clientIndex))
         {
             return;
         }
 
         SendCommandToClient(messageParts, "2");
-        var clientConnection = clients[clientIndex];
+        var clientConnection = Clients[clientIndex];
 
         //client in lijst in sessie zetten
         clientConnection.InSession = true;
@@ -169,12 +169,12 @@ public class Server : IServer, IDoctorCallback, IClientCallback
         var clientIndex = GetIndexClient(messageParts);
 
         // Check om te controleren of de client bestaat/verbonden is
-        if (!clients.ContainsKey(clientIndex))
+        if (!Clients.ContainsKey(clientIndex))
         {
             return;
         }
 
-        var client = clients[clientIndex];
+        var client = Clients[clientIndex];
 
         if (!client.InSession)
         {
@@ -196,12 +196,12 @@ public class Server : IServer, IDoctorCallback, IClientCallback
         var clientIndex = GetIndexClient(messageParts);
 
         // Check om te controleren of de client bestaat/verbonden is
-        if (!clients.ContainsKey(clientIndex))
+        if (!Clients.ContainsKey(clientIndex))
         {
             return;
         }
 
-        var client = clients[clientIndex];
+        var client = Clients[clientIndex];
 
         if (!client.InSession)
         {
@@ -234,7 +234,7 @@ public class Server : IServer, IDoctorCallback, IClientCallback
      */
     public void MessageToAllSessions(string[] messageParts)
     {
-        foreach (var client in clients)
+        foreach (var client in Clients)
         {
             client.Value.Connection.Send($"0 {messageParts[1]}");
         }
@@ -267,7 +267,7 @@ public class Server : IServer, IDoctorCallback, IClientCallback
      */
     public void SendAllClients(IConnection connection)
     {
-        foreach (var client in clients)
+        foreach (var client in Clients)
         {
             connection.Send($"2 {client.Key}");
         }
@@ -283,15 +283,15 @@ public class Server : IServer, IDoctorCallback, IClientCallback
         Console.WriteLine($"live data from {clientIndex}!");
 
         // Check om te controleren of de client bestaat/verbonden is
-        if (!clients.ContainsKey(clientIndex))
+        if (!Clients.ContainsKey(clientIndex))
         {
             Console.WriteLine($"client doesn't exist {clientIndex}");
             return;
         }
 
-        Console.WriteLine($"sent live data {clientIndex} {clients[clientIndex].LiveData}");//todo
+        Console.WriteLine($"sent live data {clientIndex} {Clients[clientIndex].LiveData}");//todo
         
-        connection.Send($"1 {clientIndex} {clients[clientIndex].LiveData}");
+        connection.Send($"1 {clientIndex} {Clients[clientIndex].LiveData}");
     }
 
 
@@ -302,7 +302,7 @@ public class Server : IServer, IDoctorCallback, IClientCallback
     {
         foreach (var doctor in connectionHandler.doctors)
         {
-            foreach (var client in clients)
+            foreach (var client in Clients)
             {
                 if (connection.Equals(client.Value.Connection))
                 {
@@ -320,9 +320,9 @@ public class Server : IServer, IDoctorCallback, IClientCallback
         var clientIndex = GetIndexClient(messageParts);
 
         // Controleert of client bestaat in het clientsbestand, zo ja toevoegen aan lijst met live clients
-        if (fileManager.CheckClientLogin(clientIndex) && !clients.ContainsKey(clientIndex))
+        if (fileManager.CheckClientLogin(clientIndex) && !Clients.ContainsKey(clientIndex))
         {
-            clients.Add(GetIndexClient(messageParts), new ClientConnection($"{clientIndex}", connection));
+            Clients.Add(GetIndexClient(messageParts), new ClientConnection($"{clientIndex}", connection));
             connection.Access = true;
             connection.Send("5 1");
         }
@@ -384,11 +384,11 @@ public class Server : IServer, IDoctorCallback, IClientCallback
         });
         
         
-        foreach (var clientName in clients.Keys)
+        foreach (var clientName in Clients.Keys)
         {
-            if (connection.Equals(clients[clientName].Connection))
+            if (connection.Equals(Clients[clientName].Connection))
             {
-                clients.Remove(clientName);
+                Clients.Remove(clientName);
             }
         }
     }
@@ -412,7 +412,7 @@ public class Server : IServer, IDoctorCallback, IClientCallback
     public void SendCommandToClient(string[] messageParts, string command)
     {
         var requestedClientId = GetIndexClient(messageParts);
-        foreach (var client in clients)
+        foreach (var client in Clients)
         {
             if (requestedClientId.Equals(client.Value.Name))
             {
@@ -424,7 +424,7 @@ public class Server : IServer, IDoctorCallback, IClientCallback
     public Tuple<ClientConnection, string> GetClientConnection(Connection connection)
     {
         // Door middel van connection kijken welke client het in de lijst is
-        foreach (var client in clients)
+        foreach (var client in Clients)
         {
             if (client.Value.Connection == connection)
             {
