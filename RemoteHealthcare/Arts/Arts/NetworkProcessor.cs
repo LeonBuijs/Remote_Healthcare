@@ -98,7 +98,12 @@ public class NetworkProcessor
             return;
         }
 
-        Console.WriteLine($"argument: {argumentData[0]} {argumentData[1]} {argumentData[2]}");
+        string receivedText = "";
+
+        foreach (var VARIABLE in argumentData)
+        {
+            receivedText += VARIABLE;
+        }
         
         var packetPage = int.Parse(argumentData[0]);
         switch (packetPage)

@@ -106,11 +106,11 @@ public class FileManager
      */
     private static string GetDataFromSession(string session)
     {
-        var fileContents = File.ReadAllLines(session);
+        var fileContents = File.ReadAllText(session);
 
         if (fileContents.Length > 1)
         {
-            return fileContents[0];
+            return fileContents;
         }
 
         return "";

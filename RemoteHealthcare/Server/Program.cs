@@ -257,6 +257,7 @@ public class Server : IDoctorCallback, IClientCallback
 
         foreach (var session in sessions)
         {
+            Console.WriteLine($"Session: {session}");
             connection.Send($"3 {clientIndex} {session}");
         }
     }
