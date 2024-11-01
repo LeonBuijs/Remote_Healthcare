@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\SecurityManager\SecurityManager.csproj" />
       <ProjectReference Include="..\..\Simulation\Simulation.csproj" />
     </ItemGroup>
 
