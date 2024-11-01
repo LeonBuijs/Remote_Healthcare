@@ -6,7 +6,10 @@ namespace Client;
 /**
  * <summary>
  * Klasse die alle encryptie en decryptie afhandelt van data
- * Kan ook een keypair genereren
+ * Kan ook een een public- en private key genereren
+ * LET OP! DEZE KLAS IS COMPLEET GECOPY-PASTE
+ * DIT KOMT DOORDAT DIT EEN OUDERE .NET TARGET FRAMEWORK IS
+ * WAARDOOR WIJ ONZE LIBRARY NIET ALS REFERENCE KUNNEN TOEVOEGEN
  * </summary>
  */
 public class Encryption
@@ -65,7 +68,7 @@ public class Encryption
 	* </summary>
 	* <param name="dataToDecrypt">De data die decrypt moet worden</param>
 	* <param name="privateKeyReceiver">De private key van de ontvanger</param>
-	* <returns>byte[] van de decrypted data</returns>
+	* <returns>String met de gedecodeerde data</returns>
 	*/
 	public static string DecryptData(byte[] dataToDecrypt, string privateKeyReceiver)
 	{

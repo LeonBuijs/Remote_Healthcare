@@ -49,15 +49,15 @@ public class NetworkProcessor
         {
             artsClient.Connect(ipAdress, 7777);
             
-            //won't come here until it has connection.
+            //Komt hier niet totdat er een connectie is gemaakt
             Console.WriteLine("Verbonden!");
             artsStream = artsClient.GetStream();
             artsSender = new DataSender(artsStream);
 
-            //Send the publicKey immediately to the server
+            //Stuurt de public key direct door
             artsSender.SendPublicKey(publicKeyDoctor);
         
-            //Handle EncryptionKey which is always received as first immediate send.
+            //Verwerk de EncryptionKey die ALTIJD als eerste wordt ontvangen
             byte[] serverSleutel = new byte[1024];
             int bytesRead = artsStream.Read(serverSleutel, 0, serverSleutel.Length);
             publicKeyServer = Encoding.ASCII.GetString(serverSleutel, 0, bytesRead);
@@ -76,6 +76,7 @@ public class NetworkProcessor
     /**
      * Methode om het zoeken naar verbinding te stoppen
      * Gebeurt bij gevonden verbinding en start een listener methode
+     * Ontvangen data zal gedecodeerd worden.
      */
     private void ReadSocket()
     {
@@ -88,7 +89,6 @@ public class NetworkProcessor
                 var result = new byte[bytesRead];
                 Array.Copy(buffer, result, bytesRead);
                 
-                Console.WriteLine($"Doctor received raw message: \n{Convert.ToBase64String(result)}");
                 string receivedText = Encryption.DecryptData(result, privateKeyDoctor);
                 Console.WriteLine($"Doctor received decrypted message: \n{receivedText}");
             

@@ -23,6 +23,7 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
     /**
      * Methode voor het verbinden van doctoren, er wordt gewacht voor een verbinding en bij een nieuwe verbinding
      * wordt er een nieuwe thread aangemaakt voor die verbinding en start het proces opnieuw
+     * Bij connectie wordt er direct de public key van de connectieClient doorgestuurd
      */
     private void OpenConnectionDoctor()
     {
@@ -43,6 +44,7 @@ public class ConnectionHandler(IClientCallback clientCallback, IDoctorCallback d
     /**
      * Methode voor het verbinden van clients, er wordt gewacht voor een verbinding en bij een nieuwe verbinding
      * wordt er een nieuwe thread aangemaakt voor die verbinding en start het proces opnieuw
+     * Bij connectie wordt er direct de public key van de connectieClient doorgestuurd
      */
     private void OpenConnectionClient()
     {
