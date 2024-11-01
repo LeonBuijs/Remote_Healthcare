@@ -70,6 +70,40 @@ namespace UnitTests
             // Assert
             mockServer.Verify(s => s.SendCommandToClient(It.IsAny<string[]>(), expectedMessage), Times.Once);
         }
+        
+        /**
+        * Test de SendChatMessageToClient-methode van de server.
+        * Controleert of de berichten correct worden opgemaakt en verzonden naar de client.
+        */
+        [Test]
+        [TestCase(new[] { "Hello", "world", "!" }, "0 Hello world !")]
+        [TestCase(new[] { "Goodbye", "world", "!" }, "0 Goodbye world !")]
+        [TestCase(new[] { "Testing", "123" }, "0 Testing 123")]
+        [TestCase(new[] { "This", "is", "a", "test" }, "0 This is a test")]
+        [TestCase(new[] { "SingleMessage" }, "0 SingleMessage")]
+        [TestCase(new[] { "" }, "0 ")]
+        public void SendChatMessageToClient_ShouldFormatMessageAsExpected(string[] messageParts, string expectedMessage)
+        {
+            // Arrange
+            var mockConnection = new Mock<IConnection>();
+            var mockServer = new Mock<IServer>();
+
+            
+            mockServer.Setup(s => s.SendChatMessageToClient(It.IsAny<string[]>()))
+                .Callback<string[]>(parts =>
+                {
+                    string formattedMessage = "0 " + string.Join(" ", parts);
+                    mockConnection.Object.Send(formattedMessage);
+                    Assert.AreEqual(expectedMessage, formattedMessage);
+                });
+
+            // Act
+            mockServer.Object.SendChatMessageToClient(messageParts);
+
+            // Assert
+            mockConnection.Verify(conn => conn.Send(expectedMessage), Times.Once);
+        }
+
 
     }
 }
