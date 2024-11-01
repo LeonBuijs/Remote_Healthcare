@@ -152,7 +152,7 @@ public class BLEHandler(MessageHandler messageHandler)
         {
             BikeData.UpdateData(BitConverter.ToString(e.Data).Replace("-", " "));
             messageHandler.OnReceivedBikeData(BikeData);
-            
+            serverConnection.SendMessage($"1 {BikeData}");
             isTimerOver = false;
         }
     }
