@@ -99,6 +99,7 @@ public class NetworkProcessor
         }
 
         var packetPage = int.Parse(argumentData[0]);
+        string clientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
         switch (packetPage)
         {
             case 0:
@@ -107,7 +108,6 @@ public class NetworkProcessor
                 LoginWindowCallback.OnLogin(argument);
                 break;
             case 1:
-                string clientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
                 string data =
                     $"{argumentData[4]} {argumentData[5]} {argumentData[6]} {argumentData[7]} {argumentData[8]} {argumentData[9]}";
                 Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");
@@ -115,23 +115,22 @@ public class NetworkProcessor
                 dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
                 break;
             case 2:
-                string newClientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
-                Console.WriteLine($"Kreeg clientId {newClientId}");
-                ListWindowCallback.AddNewClient(newClientId);
+                Console.WriteLine($"Kreeg clientId {clientId}");
+                ListWindowCallback.AddNewClient(clientId);
                 break;
             case 3:
                 foreach (var clientWindow in dataUpdateCallbacks)
                 {
-                    if (clientWindow.GetClientinfo().Equals(argumentData[1]))
+                    if (clientWindow.GetClientinfo().Equals(clientId))
                     {
-                        string date = argumentData[2];
+                        string date = argumentData[4];
                         // {date} {duration}(0) {averageSpeed}(1) {maxSpeed}(1) {averageHeartRate}(2) {maxHeartRate}(2) {distance}(3)
-                        clientWindow.UpdateHistory(0,Int32.Parse(argumentData[3]), date);
-                        clientWindow.UpdateHistory(1,Int32.Parse(argumentData[4]), date);
-                        clientWindow.UpdateHistory(1,Int32.Parse(argumentData[5]), date, 1);
-                        clientWindow.UpdateHistory(2,Int32.Parse(argumentData[6]), date);
-                        clientWindow.UpdateHistory(2,Int32.Parse(argumentData[7]), date, 1);
-                        clientWindow.UpdateHistory(3,Int32.Parse(argumentData[8]), date);
+                        clientWindow.UpdateHistory(0,Int32.Parse(argumentData[5]), date);
+                        clientWindow.UpdateHistory(1,Int32.Parse(argumentData[6]), date);
+                        clientWindow.UpdateHistory(1,Int32.Parse(argumentData[7]), date, 1);
+                        clientWindow.UpdateHistory(2,Int32.Parse(argumentData[8]), date);
+                        clientWindow.UpdateHistory(2,Int32.Parse(argumentData[9]), date, 1);
+                        clientWindow.UpdateHistory(3,Int32.Parse(argumentData[10]), date);
                     }
                 }
                 break;
