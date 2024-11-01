@@ -33,11 +33,11 @@ public class Panel : VREngine
      */
     public static void ChangeChatsPanel(string uuidPanel, List<string> chats)
     {
-        if (chats.Count >= 5)
+        if (chats.Count >= 8)
         {
             for (int i = 5; i > 0; i--)
             {
-                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (5 - i) * 20 + 60 }, 20);
+                DrawTextOnPanel(chats[chats.Count - i], uuidPanel, new[] { 10, (8 - i) * 20 + 60 }, 20);
             }
         }
         else

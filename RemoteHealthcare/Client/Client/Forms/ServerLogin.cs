@@ -82,28 +82,6 @@ public partial class ServerLogin : Form
      */
     private void ConnectToVr()
     {
-        // TEST CODE
-        
-        // var simProcess = new Process();
-        // simProcess.StartInfo.FileName =
-        //     @"C:\Users\jaspe\RiderProjects\Remote_Healthcare\RemoteHealthcare\Client\VRConnection\bin\Debug\net8.0\NetworkEngine.24.9.26\NetworkEngine\sim.bat";
-        // simProcess.Start();
-        
-        // var processStartInfo = new ProcessStartInfo("cmd.exe", "/c " + @"C:\Users\jaspe\RiderProjects\Remote_Healthcare\RemoteHealthcare\Client\VRConnection\bin\Debug\net8.0\NetworkEngine.24.9.26\NetworkEngine\sim.bat");
-        // simProcess = Process.Start(processStartInfo);
-        //
-        // Thread.Sleep(5000);
-        
-        // Process firstProc = new Process();
-        // firstProc.StartInfo.FileName = "C:\\Users\\jaspe\\RiderProjects\\Remote_Healthcare\\RemoteHealthcare\\Client\\VRConnection\\bin\\Debug\\net8.0\\VRConnection.exe";
-        // firstProc.ConnectDevices();
-        
-        // var vrProcess = new Process();
-        // vrProcess.StartInfo.FileName = @"C:\Users\jaspe\RiderProjects\Remote_Healthcare\RemoteHealthcare\Client\VRConnection\bin\Debug\net8.0\VRConnection.exe";
-        // vrProcess.Start();
-        
-        // TEST CODE
-
         var connected = false;
 
         while (!connected)

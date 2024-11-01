@@ -16,7 +16,7 @@ public class NetworkProcessor
 
     private readonly ILoginWindowCallback LoginWindowCallback;
     public IListWindowCallback ListWindowCallback { set; get; }
-    
+
     private List<IDataUpdateCallback> dataUpdateCallbacks = new List<IDataUpdateCallback>();
     private List<string> clientsWhoRecieveData = new List<string>();
     private bool isAskingData = false;
@@ -28,14 +28,14 @@ public class NetworkProcessor
         LoginWindowCallback = loginWindowWindowCallback;
         ConnectToServer();
     }
-    
+
     public void ConnectToServer()
     {
         try
         {
             artsClient.Connect(ipAdress, 7777);
             //won't come here until it has connection.
-            new Thread(OnConnect).Start(); 
+            new Thread(OnConnect).Start();
             artsSender = new DataSender(artsClient.GetStream());
         }
         catch (SocketException exception)
@@ -45,7 +45,7 @@ public class NetworkProcessor
             LoginWindowCallback.ConnectionFailed();
         }
     }
-    
+
     /**
      * Methode om het zoeken naar verbinding te stoppen
      * Gebeurt bij gevonden verbinding en start een listener methode
@@ -68,13 +68,19 @@ public class NetworkProcessor
         int receivedBytes = artsStream.EndRead(ar);
         string receivedText = Encoding.ASCII.GetString(artsBuffer, 0, receivedBytes);
         totalBuffer += receivedText;
-        
+
         string[] multipleDataReivedSplit = receivedText.Split('\n');
         foreach (var argument in multipleDataReivedSplit)
         {
+            Console.WriteLine($"argument: {argument}");
             string[] argumentSplit = argument.Split(" ");
-            HandleData(argumentSplit);
+
+            if (argumentSplit.Length > 1)
+            {
+                HandleData(argumentSplit);   
+            }
         }
+
         artsStream.BeginRead(artsBuffer, 0, artsBuffer.Length, new AsyncCallback(OnRead), null);
     }
 
@@ -87,7 +93,12 @@ public class NetworkProcessor
      */
     private void HandleData(string[] argumentData)
     {
-        int packetPage = int.Parse(argumentData[0]);
+        if (argumentData.Length == 0)
+        {
+            return;
+        }
+
+        var packetPage = int.Parse(argumentData[0]);
         switch (packetPage)
         {
             case 0:
@@ -97,9 +108,10 @@ public class NetworkProcessor
                 break;
             case 1:
                 string clientId = $"{argumentData[1]} {argumentData[2]} {argumentData[3]}";
-                string data = $"{argumentData[4]} {argumentData[5]} {argumentData[6]} {argumentData[7]} {argumentData[8]} {argumentData[9]}";
-                Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");   
-                
+                string data =
+                    $"{argumentData[4]} {argumentData[5]} {argumentData[6]} {argumentData[7]} {argumentData[8]} {argumentData[9]}";
+                Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");
+
                 dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
                 break;
             case 2:
@@ -124,20 +136,20 @@ public class NetworkProcessor
             if (!clientsWhoRecieveData.Contains(clientId))
             {
                 clientsWhoRecieveData.Add(clientId);
-            }    
+            }
         }
-        
+
         if (isAskingData)
         {
             return;
         }
-        
+
         isAskingData = true;
         new Thread(() =>
         {
             //Bij het starten zal er altijd 1 waarde zijn in de lijst.
             int count = 1;
-            
+
             while (count > 0)
             {
                 lock (clientsWhoRecieveData)
@@ -145,27 +157,29 @@ public class NetworkProcessor
                     clientsWhoRecieveData.ForEach(GetRealtimeData);
                     count = clientsWhoRecieveData.Count;
                 }
+
                 Thread.Sleep(500);
             }
+
             isAskingData = false;
         }).Start();
-
     }
 
     public bool IsConnected()
     {
         return artsClient.Connected;
     }
-    
-    public void TryLogin(string username, string password){
+
+    public void TryLogin(string username, string password)
+    {
         if (!IsConnected())
         {
             return;
         }
-        
+
         artsSender.SendLogin(username, password);
     }
-    
+
     public void AddCallbackMember(IDataUpdateCallback callbackMember)
     {
         dataUpdateCallbacks.Add(callbackMember);
@@ -198,6 +212,7 @@ public class NetworkProcessor
         {
             clientsWhoRecieveData.Remove(clientInfo);
         }
+
         artsSender.StopSession(clientInfo);
     }
 
@@ -210,7 +225,7 @@ public class NetworkProcessor
     {
         artsSender.SendBikeConfigs(session, resistance);
     }
-    
+
     public void SendMessage(string clientInfo, string messege)
     {
         artsSender.SendMessageToSession(clientInfo, messege);

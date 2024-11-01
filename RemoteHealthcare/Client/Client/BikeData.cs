@@ -1,3 +1,5 @@
+using System;
+
 namespace Client;
 
 public class BikeData
@@ -120,6 +122,18 @@ public class BikeData
 
     public override string ToString()
     {
-        return $"{Speed} {Distance} {Watt} {Time} {Rpm} {HeartRate} ";
+        return $"{Speed} {Distance} {Watt} {FormatTime()} {Rpm} {HeartRate} ";
+    }
+
+    /**
+     * Methode om de tijd een mooi format te geven
+     */
+    private string FormatTime()
+    {
+        var hoursInt = (int)(Time / 3600);
+        var minutesInt = (int)(Time / 60) % 60;
+        var secondsInt = (int)(Time % 60);
+
+        return $"{hoursInt:D2}:{minutesInt:D2}:{secondsInt:D2}";
     }
 }
