@@ -12,7 +12,9 @@ public class Connection
     public readonly NetworkStream Stream;
     public bool Access { set; get; }
     public string PublicKeyServerClient { set; get; }
+
     private string privateKeyServer;
+
     private string? publicKeyConnection;
 
     public Connection(TcpClient tcpClient)
@@ -21,17 +23,29 @@ public class Connection
         SetRSAKeys();
     }
 
+    private int setRSAKeyTries = 0;
     /**
      * <summary>
      * Benaderd Encryptie klasse van de library
      * Vervolgens wordt er een tuple terug geleverd met public- en privateKey
+     * Als er keys null zijn, zal hij recursief nieuwe keys proberen te maken.
+     * Na 5 pogingen zal hij een exception throwen
      * </summary>
      */
     private void SetRSAKeys()
     {
+        if (setRSAKeyTries >= 5)
+        {
+            throw new Exception("Failed to set RSA key in 5 tries.");
+        }
         var (publicKey, privateKey) = Encryption.GenerateRsaKeyPair();
         PublicKeyServerClient = publicKey;
         privateKeyServer = privateKey;
+        if (string.IsNullOrEmpty(PublicKeyServerClient) || string.IsNullOrEmpty(privateKeyServer))
+        {
+            setRSAKeyTries++;
+            SetRSAKeys();
+        }
     }
 
     /**
@@ -49,6 +63,12 @@ public class Connection
         if (encryption)
         {
             array = Encryption.EncryptData(array, publicKeyConnection);
+            //Vang het mogelijke null resultaat af
+            if (array == null)
+            {
+                Console.WriteLine($"Encryption failed, incorrect data. Aborting send");
+                return;
+            }
         }
         
         Stream.Write(array, 0, array.Length);
@@ -76,6 +96,11 @@ public class Connection
         }
         
         var received = Encryption.DecryptData(result, privateKeyServer);
+        if (string.IsNullOrEmpty(received))
+        {
+            Console.WriteLine($"Decryption failed, incorrect data. Aborting receive");
+            return "69420";
+        }
         Console.WriteLine($"Server received decrypted message:\n{received}");
 
         return received;

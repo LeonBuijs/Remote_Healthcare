@@ -42,11 +42,22 @@ public class Connection
         StartThreadReceive();
     }
     
+    private int setRSAKeyTries = 0;
+    
     private void SetRSAKeys()
     {
+        if (setRSAKeyTries >= 5)
+        {
+            throw new Exception("Failed to set RSA key in 5 tries.");
+        }
         var (generatedPublicKey, generatedPrivateKey) = Encryption.GenerateRsaKeyPair();
         publicKey = generatedPublicKey;
         privateKey = generatedPrivateKey;
+        if (string.IsNullOrEmpty(publicKey) || string.IsNullOrEmpty(privateKey))
+        {
+            setRSAKeyTries++;
+            SetRSAKeys();
+        }
     }
 
     /**
@@ -76,6 +87,11 @@ public class Connection
                     if (isEncrypted)
                     {
                         received = Encryption.DecryptData(result, privateKey);
+                        if (string.IsNullOrEmpty(received))
+                        {
+                            Console.WriteLine($"Encryption failed, incorrect data. Aborting receive");
+                            continue;
+                        }
                         Console.WriteLine($"Server received decrypted message:\n{received}");
                     }
                     else
@@ -116,6 +132,11 @@ public class Connection
         if (isEncrypted && PublicKeyServer != null)
         {
             data = Encryption.EncryptData(data, PublicKeyServer);
+            if (data == null)
+            {
+                Console.WriteLine($"Encryption failed, incorrect data. Aborting send");
+                return;
+            }
         }
         stream.Write(data, 0, data.Length);
     }

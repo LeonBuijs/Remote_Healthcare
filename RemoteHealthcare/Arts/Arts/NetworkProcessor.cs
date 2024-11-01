@@ -33,14 +33,25 @@ public class NetworkProcessor
         ConnectToServer();
     }
 
+    private int setRSAKeyTries = 0;
     /**
      * Genereert en set RSA-sleutels voor de dokter
      */
     private void SetRSAKeys()
     {
+        if (setRSAKeyTries >= 5)
+        {
+            throw new Exception("Failed to set RSA Keys in 5 tries");
+        }
+        
         var (publicKey, privateKey) = Encryption.GenerateRsaKeyPair();
         publicKeyDoctor = publicKey;
         privateKeyDoctor = privateKey;
+        if (string.IsNullOrEmpty(privateKeyDoctor) || string.IsNullOrEmpty(privateKeyDoctor))
+        {
+            setRSAKeyTries++;
+            SetRSAKeys();
+        }
     }
 
     public void ConnectToServer()
@@ -90,6 +101,11 @@ public class NetworkProcessor
                 Array.Copy(buffer, result, bytesRead);
                 
                 string receivedText = Encryption.DecryptData(result, privateKeyDoctor);
+                if (string.IsNullOrEmpty(receivedText))
+                {
+                    Console.WriteLine("Decrypting failed. Aborting receive");
+                    continue;
+                }
                 Console.WriteLine($"Doctor received decrypted message: \n{receivedText}");
             
                 string[] multipleDataReivedSplit = receivedText.Split('\n');

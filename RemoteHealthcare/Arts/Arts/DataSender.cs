@@ -26,6 +26,12 @@ public class DataSender
             if (encryption)
             {
                 bytesToSend = Encryption.EncryptData(bytesToSend, publicServerKey);
+                //vang de mogelijke null return waarde af
+                if (bytesToSend == null)
+                {
+                    Console.WriteLine("Failed to encrypt data. Aborting send.");
+                    return;
+                }
             }
             stream.Write(bytesToSend);
             stream.Flush();

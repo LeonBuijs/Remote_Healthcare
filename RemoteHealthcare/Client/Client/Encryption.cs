@@ -3,18 +3,16 @@ using System.Security.Cryptography;
 using System.Text;
 
 namespace Client;
+
 /**
  * <summary>
  * Klasse die alle encryptie en decryptie afhandelt van data
- * Kan ook een een public- en private key genereren
- * LET OP! DEZE KLAS IS COMPLEET GECOPY-PASTE
- * DIT KOMT DOORDAT DIT EEN OUDERE .NET TARGET FRAMEWORK IS
- * WAARDOOR WIJ ONZE LIBRARY NIET ALS REFERENCE KUNNEN TOEVOEGEN
+ * Kan ook een keypair genereren
  * </summary>
  */
 public class Encryption
 {
-	private readonly static int KeySize = 2048;
+	private static readonly int KeySize = 2048;
 	/**
 	 * <summary>
 	 * Totdat we unit tests hebben zal dit de test methode zijn van Encryption
@@ -37,14 +35,22 @@ public class Encryption
 	 * Genereert een publicKey en privateKey
 	 * Vervolgens zet hij die in out parameters in de vorm van een string
 	 * </summary>
-	 * <returns>(string, string) - De publicKey en privateKey</returns>
+	 * <returns>(string, string) - De publicKey en privateKey. Bij exception null</returns>
 	 */
 	public static (string, string) GenerateRsaKeyPair()
 	{
-		using RSA rsa = RSA.Create(KeySize);
-		string publicKey = rsa.ToXmlString(false);
-		string privateKey = rsa.ToXmlString(true);
-		return (publicKey, privateKey);
+		try
+		{
+			using RSA rsa = RSA.Create(KeySize);
+			string publicKey = rsa.ToXmlString(false);
+			string privateKey = rsa.ToXmlString(true);
+			return (publicKey, privateKey);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Failed to generate RSA key: \n{ex}");
+			return (null, null);
+		}
 	}
 	
 	/**
@@ -53,13 +59,21 @@ public class Encryption
 	 * </summary>
 	 * <param name="dataToEncrypt">De data die encrypt moet worden</param>
 	 * <param name="publicKeyReceiver">De public key van de ontvanger</param>
-	 * <returns>byte[] van de encrypted data</returns>
+	 * <returns>byte[] - van de encrypted data. Bij exception </returns>
 	 */
 	public static byte[] EncryptData(byte[] dataToEncrypt, string publicKeyReceiver)
 	{
-		using RSA rsa = RSA.Create(KeySize);
-		rsa.FromXmlString(publicKeyReceiver);
-		return rsa.Encrypt(dataToEncrypt, RSAEncryptionPadding.OaepSHA256);
+		try
+		{
+			using RSA rsa = RSA.Create(KeySize);
+			rsa.FromXmlString(publicKeyReceiver);
+			return rsa.Encrypt(dataToEncrypt, RSAEncryptionPadding.OaepSHA256);
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Failed to encrypt data: \n{ex}");
+			return null;
+		}
 	}
 
 	/**
@@ -68,13 +82,22 @@ public class Encryption
 	* </summary>
 	* <param name="dataToDecrypt">De data die decrypt moet worden</param>
 	* <param name="privateKeyReceiver">De private key van de ontvanger</param>
-	* <returns>String met de gedecodeerde data</returns>
+	* <returns>byte[] - van de decrypted data. Bij exception null</returns>
 	*/
 	public static string DecryptData(byte[] dataToDecrypt, string privateKeyReceiver)
 	{
-		using RSA rsa = RSA.Create(KeySize);
-		rsa.FromXmlString(privateKeyReceiver);
-		return Encoding.UTF8.GetString((rsa.Decrypt(dataToDecrypt, RSAEncryptionPadding.OaepSHA256)));
+		try
+		{
+			using RSA rsa = RSA.Create(KeySize);
+			rsa.FromXmlString(privateKeyReceiver);
+			return Encoding.UTF8.GetString((rsa.Decrypt(dataToDecrypt, RSAEncryptionPadding.OaepSHA256)));
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine($"Failed to decrypt data: \n{ex}");
+			return null;
+		}
+
 	}
 
 	public static byte[] HashData(string dataToHash)
