@@ -250,18 +250,15 @@ public class FileManager
     private static string GetDuration(string date)
     {
         // Verschil in tijd berekenen met DateTime objecten
-        var start = date.Split(" ");
+        var dateSplit = date.Split("-");
 
-        var startDate = start[0].Split("-");
-        var startTime = start[1].Split("-");
+        var startYear = dateSplit[0];
+        var startDay = dateSplit[1];
+        var startMonth = dateSplit[2];
 
-        var startYear = startDate[0];
-        var startDay = startDate[1];
-        var startMonth = startDate[2];
-
-        var startHour = startTime[0];
-        var startMinute = startTime[1];
-        var startSecond = startTime[2];
+        var startHour = dateSplit[3];
+        var startMinute = dateSplit[4];
+        var startSecond = dateSplit[5];
 
         Console.WriteLine($"new date: {startYear} {startMonth} {startDay} {startHour} {startMinute} {startSecond}");
 

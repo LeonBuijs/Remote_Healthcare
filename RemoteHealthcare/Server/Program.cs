@@ -160,7 +160,7 @@ public class Server : IDoctorCallback, IClientCallback
 
         // Start van sessie opslaan, is ook naam van het bestand waar alle data van sessie in staat
         clientConnection.SessionTime =
-            $"{DateTime.Now.Year}-{DateTime.Now.Day}-{DateTime.Now.Month} " +
+            $"{DateTime.Now.Year}-{DateTime.Now.Day}-{DateTime.Now.Month}-" +
             $"{DateTime.Now.Hour}-{DateTime.Now.Minute}-{DateTime.Now.Second}";
     }
 
