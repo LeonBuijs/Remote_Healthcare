@@ -97,7 +97,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback
      */
     public void UpdateHistoryCharts(int chartIndex, double newValue, string label, int lineIndex = 0)
     {
-        chartViewModel.UpdateHistoryCharts(chartIndex, newValue, label);
+        chartViewModel.UpdateHistoryCharts(chartIndex, newValue, label, lineIndex);
     }
     
     public string GetClientinfo()
