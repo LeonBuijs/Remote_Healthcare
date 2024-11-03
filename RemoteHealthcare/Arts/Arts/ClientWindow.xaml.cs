@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Data;
 using LiveCharts;
 using LiveCharts.Wpf;
+using LiveCharts.Wpf.Charts.Base;
 
 namespace Arts;
 
@@ -14,10 +15,10 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
 {
     private string clientId;
     private int amoutOffGraphs = 4;
-    private NetworkProcessor networkProcessor;
-    private SeriesCollection[] SeriesCollections { get; set; }
-    private ObservableCollection<string>[] LabelsCollections { get; set; }
-    private Func<double, string> Formatter { get; set; }
+    private NetworkProcessor networkProcessor;    
+    public SeriesCollection[] SeriesCollections { get; set; }
+    public ObservableCollection<string>[] LabelsCollections { get; set; }
+    public Func<double, string> Formatter { get; set; }
 
     public ClientWindow(string clientId, NetworkProcessor networkProcessor)
     {
@@ -27,7 +28,8 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
         this.networkProcessor.AddCallbackMember(this);
         this.clientId = clientId;
         TitleBlock.Text = clientId;
-        
+        //uncomment for test showcase
+        //UpdateHistoryTextBlock("01-11-2024", "00:12:30", "3", "4", "5", "6", "7");
         InitializeGraphs();
     }
 
@@ -113,6 +115,20 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
         }
     }
 
+    public void UpdateHistoryTextBlock(string date, string duration, string averageSpeed, string maxSpeed,
+        string averageHeartRate, string maxHeartRate, string distance)
+    {
+        string toShow = $"{date}, {duration}\n" +
+                        $"{averageSpeed} km/h avg, {maxSpeed} km/h max\n" +
+                        $"{averageHeartRate} bpm avg, {maxHeartRate} bpm max\n" +
+                        $"Total distance: {distance} meter";
+        if (!string.IsNullOrEmpty(HistoryTextBlock.Text))
+        {
+            toShow = $"\n{toShow}";
+        }
+        HistoryTextBlock.Text += toShow;
+    }
+
     /**
      * <summary>
      * Deze methode voegd nieuwe waardes toe aan de desbetreffende grafiek met de geschiedenis van data van de klant.
@@ -121,7 +137,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
      * <param name="newValue">Dit is de nieuwe waarde die toegevoegd gaat worden aan de grafiek</param>
      * <param name="label">Dit is het bijpassende label wat op de X-as gezed gaat worden</param>
      */
-    public void UpdateHistory(int chartIndex, double newValue, string label, int lineIndex = 0)
+    public void UpdateHistoryCharts(int chartIndex, double newValue, string label, int lineIndex = 0)
     {
         if (chartIndex < 0 || chartIndex >= SeriesCollections.Length) return;
         
@@ -142,6 +158,8 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
         OnPropertyChanged(nameof(SeriesCollections));
         OnPropertyChanged(nameof(LabelsCollections));
     }
+
+    
 
     public string GetClientinfo()
     {
