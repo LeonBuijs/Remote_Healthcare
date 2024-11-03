@@ -12,6 +12,8 @@ public class ChartViewModel : INotifyPropertyChanged
     public ObservableCollection<string>[] LabelsCollections { get; set; }
     public Func<double, string> Formatter { get; set; }
     private int amoutOffGraphs = 4;
+    private string[] firstLineLabels = ["Duration", "Average speed", "Average heart rate", "Distance"];
+    private string[] secondLineLabels = ["FillerValue","Maximum speed", "Maximum heart rate"];
     
     public ChartViewModel()
     {
@@ -46,15 +48,16 @@ public class ChartViewModel : INotifyPropertyChanged
             {
                 new LineSeries
                 {
-                    Title = $"Data Serie {i+1}",
+                    Title = firstLineLabels[i],
                     Values = new ChartValues<double>{1,2,3,4,5}
                 }
             };
-            if (i<2)
+            if (i<3)
             {
-                SeriesCollections[i].Add(new LineSeries
+                SeriesCollections[i].Add(
+                    new LineSeries
                 {
-                    Title = $"Data Serie {i+1} lijn 2",
+                    Title = secondLineLabels[i],
                     Values = new ChartValues<double>()
                 });
             }
