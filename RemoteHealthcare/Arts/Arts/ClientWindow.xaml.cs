@@ -122,11 +122,17 @@ public partial class ClientWindow : Window, IDataUpdateCallback, INotifyProperty
                         $"{averageSpeed} km/h avg, {maxSpeed} km/h max\n" +
                         $"{averageHeartRate} bpm avg, {maxHeartRate} bpm max\n" +
                         $"Total distance: {distance} meter";
-        if (!string.IsNullOrEmpty(HistoryTextBlock.Text))
+        
+        //work on UI thread when using UI features
+        Dispatcher.Invoke(() =>
         {
-            toShow = $"\n{toShow}";
-        }
-        HistoryTextBlock.Text += toShow;
+            if (!string.IsNullOrEmpty(HistoryTextBlock.Text))
+            {
+                toShow = $"\n{toShow}";
+            }
+
+            HistoryTextBlock.Text += toShow;
+        });
     }
 
     /**
