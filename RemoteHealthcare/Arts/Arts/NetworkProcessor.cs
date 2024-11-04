@@ -165,11 +165,11 @@ public class NetworkProcessor
                 {
                     if (clientWindow.GetClientinfo().Equals(clientId))
                     {
-                        updateCharts(clientWindow,[4,5,6,7,8],[argumentData[4], argumentData[5],argumentData[7], argumentData[8], argumentData[9]], argumentData[6], [0,0,0,0,0]);
-                        for (int i = 4; i < 9; i++)
-                        {
-                            clientWindow.UpdateCharts(i,Int32.Parse(argumentData[i]), argumentData[9]);
-                        }
+                        updateCharts(clientWindow,[4,5,6,7,8],[argumentData[4], argumentData[5],argumentData[6], argumentData[8], argumentData[9]], argumentData[7], [0,0,0,0,0]);
+                        // for (int i = 4; i < 9; i++)
+                        // {
+                        //     clientWindow.UpdateCharts(i,Int32.Parse(argumentData[i]), argumentData[9]);
+                        // }
                     }
                 }
 
