@@ -9,6 +9,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\SecurityManager\SecurityManager.csproj" />
+      <ProjectReference Include="..\Server\Server.csproj" />
     </ItemGroup>
 
 </Project>

@@ -1,0 +1,34 @@
+<Window x:Class="Arts.ClientListWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:local="clr-namespace:Arts"
+        mc:Ignorable="d"
+        Title="MainPage" Height="450" Width="800">
+    <Grid>
+        
+        <StackPanel Margin="10">
+            <Label Content="Selecteer een item:" Margin="0,0,0,10"/>
+            <ListBox Name="ItemList" Margin="0,0,0,10" Height="150" SelectionChanged="ChosenClient">
+            </ListBox>
+            <Button Name="refreshButton" Content="Refresh" HorizontalAlignment="Left" Width="200" Click="RefreshClientsPressed"/>
+            
+            <StackPanel Orientation="Horizontal">
+                <TextBox Name="ChatTextBox" Width="200" Margin="0,10,5,0"></TextBox>
+                <Button Name="ChatButton" Content="Send to all" Width="200" Height="20" Margin="0,10,0,0" Click="ChatButtonPressed"></Button>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Client full Name" Margin="10,10,5,0"></Label>
+                <Label  Content="Client date of birth" Margin="100,10,0,0"></Label>
+                <Label Name="invalidDob" Content="(DD-MM-YYYY)" Foreground="Red" Margin="0,10,0,0" Visibility="Hidden"></Label>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,10,0">
+                    <TextBox Name="ClientName" Width="200" Margin="0,0,5,0"></TextBox>
+                    <TextBox Name="ClientdateOfBirth" Width="200" Margin="0,0,5,0" ></TextBox>
+                    <Button Name="MakeClientButton" Content="Create Client" Width="200" Margin="0,0,5,0" Click="MakeClientPressed"></Button>
+            </StackPanel>
+        </StackPanel>
+        
+    </Grid>
+</Window>

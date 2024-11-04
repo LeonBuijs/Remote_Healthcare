@@ -1,3 +1,14 @@
-﻿// See https://aka.ms/new-console-template for more information
+using System.Windows.Forms;
+using Client.Forms;
 
-Console.WriteLine("Hello, World!");
+namespace Client;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+        Application.Run(new DeviceConnection());
+    }
+}

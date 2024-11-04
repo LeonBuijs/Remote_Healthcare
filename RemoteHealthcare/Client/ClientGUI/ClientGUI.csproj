@@ -2,14 +2,16 @@
 
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
-        <TargetFramework>net8.0-windows</TargetFramework>
-        <Nullable>enable</Nullable>
+        <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
         <UseWindowsForms>true</UseWindowsForms>
         <ImplicitUsings>enable</ImplicitUsings>
+        <TargetFramework>net8.0-windows</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Server\Server.csproj" />
+      <Reference Include="BLELibrary">
+        <HintPath>..\Client\BLELibrary.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>

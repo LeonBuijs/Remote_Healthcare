@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net8.0-windows</TargetFramework>
+	<UseWPF>true</UseWPF>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Compile Update="Program.cs">
+        <DependentUpon>App.xaml</DependentUpon>
+      </Compile>
+      <Compile Update="LoginWindow.xaml.cs">
+        <DependentUpon>LoginWindowWindow.xaml</DependentUpon>
+      </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\SecurityManager\SecurityManager.csproj" />
+      <ProjectReference Include="..\..\Simulation\Simulation.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="LiveCharts.Wpf" Version="0.9.7" />
+    </ItemGroup>
+
+</Project>

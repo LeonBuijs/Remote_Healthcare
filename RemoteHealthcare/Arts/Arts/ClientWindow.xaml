@@ -1,0 +1,258 @@
+<Window x:Class="Arts.ClientWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:lvc="clr-namespace:LiveCharts.Wpf;assembly=LiveCharts.Wpf"
+        xmlns:arts="clr-namespace:Arts"
+        mc:Ignorable="d"
+        Title="ClientWindow" Height="450" Width="800" >
+    <Window.DataContext>
+        <arts:ChartViewModel/>
+    </Window.DataContext>
+    <Grid>
+        <TabControl HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <TabItem Header="Client info">  
+                <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Title row -->
+            <RowDefinition Height="*"/>    <!-- Data and chat row -->
+            <RowDefinition Height="0.5*"/> <!-- Settings row -->
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/> <!-- Realtime data column -->
+            <ColumnDefinition Width="2*"/> <!-- History data column -->
+            <ColumnDefinition Width="1.5*"/> <!-- Chat column -->
+        </Grid.ColumnDefinitions>
+
+        <!-- Title of the window: Client Name -->
+        <TextBlock Name="TitleBlock" Text="Client 'naam'" FontSize="16" FontWeight="Bold" 
+                   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                   HorizontalAlignment="Center" VerticalAlignment="Top" />
+
+        <!-- Data section -->
+        <GroupBox Header="Realtime data" Grid.Row="1" Grid.Column="0" Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+        
+                    <TextBlock Text="Speed:" Grid.Row="0" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
+                    <TextBlock Name="SpeedValueTextBlock" Grid.Row="0" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+
+                    <TextBlock Text="Distance:" Grid.Row="1" HorizontalAlignment="Left" FontWeight="Bold"/>
+                    <TextBlock Name="DistanceValueTextBlock" Grid.Row="1" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+                   
+                    <TextBlock Text="Time:" Grid.Row="2" HorizontalAlignment="Left" FontWeight="Bold"/>
+                    <TextBlock Name="TimeValueTextBlock" Grid.Row="2" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+
+                    <TextBlock Text="Power:" Grid.Row="3" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
+                    <TextBlock Name="PowerValueTextBlock" Grid.Row="3" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+                    
+                    <TextBlock Text="RPM:" Grid.Row="4" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
+                    <TextBlock Name="RpmValueTextBlock" Grid.Row="4" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+                    
+                    <TextBlock Text="HeartRate:" Grid.Row="5" HorizontalAlignment="Left" FontWeight="Bold" Margin="0,0,0,3"/>
+                    <TextBlock Name="HeartRateValueTextBlock" Grid.Row="5" HorizontalAlignment="Right" Margin="10,0,0,3"/>
+                </Grid>
+        </GroupBox>
+        
+        <Grid Grid.Row="1" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"></RowDefinition>
+                <RowDefinition Height="Auto"></RowDefinition>
+            </Grid.RowDefinitions>
+            <GroupBox Header="Data History" Grid.Row="0" Margin="5">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="5">
+                    <TextBlock Name="HistoryTextBlock" TextWrapping="Wrap"/>
+                </ScrollViewer>
+            </GroupBox>
+            <Button Grid.Row="1" Height="20" Margin="5,0,5,5" Content="Get history" 
+                    Click="GetHistoryClicked"></Button>
+        </Grid>
+
+
+        <!-- Chat section -->
+        <GroupBox Header="Chat" Grid.Row="1" Grid.Column="1" Margin="5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <!-- Text area for the chat history -->
+                <TextBox Grid.Row="0" Name="ChatHistoryBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto"/>
+                <Grid Grid.Row="1">
+                    
+                    <!-- Text input for chat sending -->
+                    <TextBox Name="ChatInputTextBox" HorizontalAlignment="Stretch" Margin="5,5,60,5" >
+                        
+                    </TextBox>
+                    <!-- Button to send message -->
+                    <Button Name="SendButton" Content="Send" Click="SendPressed" HorizontalAlignment="Right" Width="50" Margin="5" />
+                </Grid>
+            </Grid>
+        </GroupBox>
+
+        <!-- Settings section -->
+        <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Header="Settings" Margin="5">
+            
+            <!-- Add settings controls here -->
+            <StackPanel HorizontalAlignment="Left">
+                <TextBlock Text="{Binding ElementName=ResistanceSlider, Path=Value, Mode=TwoWay, StringFormat=Resistance: {0}}"
+                           Margin="0,5,0,0"/>
+                <Slider Name="ResistanceSlider" Minimum="0" Maximum="100" Value="0" 
+                        TickFrequency="2.5" IsSnapToTickEnabled="True" Width="200" 
+                        TickPlacement="BottomRight" Background="White" Foreground="Black"/>
+                <Button Name="ConfirmResistance" Content="Confirm" Click="ConfirmResistancePressed"
+                        Margin="0,5,0,0"/>
+            </StackPanel>
+        </GroupBox>
+        
+        <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal" Margin="5,15,5,5">
+
+            <Button Name="StartSessie" Content="Start Sessie" Width="100" Click="StartClientSession"/>
+            <StackPanel >
+                <Button Name="StopButton" Content="Stop Sessie" Height="61" Click="StopClientSession"/>
+                <Button Name ="EmergencyStop" Content="EmergencyStop Sessie" Height="62" Click="EmergencyStopClientSession"/>
+            </StackPanel>
+        </StackPanel>
+        
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="LiveData Charts">
+                <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                    
+                    <Label Grid.Row="0" Grid.Column="0" Content="Speed (Km/h)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="LiveChart1" Series="{Binding SeriesCollections[4]}" Grid.Row="1" Grid.Column="0">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[5]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                    
+                    <Label Grid.Row="0" Grid.Column="1" Content="Distance (Meters)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="LiveChart2" Series="{Binding SeriesCollections[5]}" Grid.Row="1" Grid.Column="1">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[5]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                    
+                    <Label Grid.Row="0" Grid.Column="2" Content="Power (Watt)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="LiveChart3" Series="{Binding SeriesCollections[6]}" Grid.Row="1" Grid.Column="2">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[6]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                    
+                    <Label Grid.Row="2" Grid.Column="0" Content="RPM" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="LiveChart4" Series="{Binding SeriesCollections[7]}" Grid.Row="3" Grid.Column="0">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[7]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                    
+                    <Label Grid.Row="2" Grid.Column="2" Content="HeartRate (BPM)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="LiveChart5" Series="{Binding SeriesCollections[8]}" Grid.Row="3" Grid.Column="2">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[8]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                    
+                </Grid>
+            </TabItem>
+            
+            <TabItem Header="History Charts">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- Chart 1 -->
+                    <Label Grid.Row="0" Grid.Column="0" Content="Duration (Seconds)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="Chart1" Series="{Binding SeriesCollections[0]}" Grid.Row="1" Grid.Column="0">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[0]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+
+                    <!-- Chart 2 -->
+                    <Label Grid.Row="0" Grid.Column="1" Content="Speed (Km/h)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="Chart2" Series="{Binding SeriesCollections[1]}" Grid.Row="1" Grid.Column="1">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[1]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+
+                    <!-- Chart 3 -->
+                    <Label Grid.Row="2" Grid.Column="0" Content="Heart rate (BPM)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="Chart3" Series="{Binding SeriesCollections[2]}" Grid.Row="3" Grid.Column="0">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[2]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+
+                    <!-- Chart 4 -->
+                    <Label Grid.Row="2" Grid.Column="1" Content="Distance (Meters)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="Chart4" Series="{Binding SeriesCollections[3]}" Grid.Row="3" Grid.Column="1">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[3]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                </Grid>
+                
+                
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>
