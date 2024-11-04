@@ -109,20 +109,12 @@ public class NetworkProcessor
                 Console.WriteLine($"Doctor received decrypted message: \n{receivedText}");
             
                 string[] multipleDataReivedSplit = receivedText.Split('\n');
-                foreach (var argument in multipleDataReivedSplit)
-                {
-                    if (string.IsNullOrEmpty(argument))
-                    {
-                        break;
-                    }
-                    Console.WriteLine($"argument: {argument}");
-                    string[] argumentSplit = argument.Split(" ");
-
-                    if (argumentSplit.Length > 1)
-                    {
-                        HandleData(argumentSplit);   
-                    }
-                }
+                //Pak eerste data regel, want die is altijd in orde.
+                var argument = multipleDataReivedSplit[0];
+                Console.WriteLine($"argument: {argument}");
+                string[] argumentSplit = argument.Split(" ");
+                    
+                HandleData(argumentSplit);   
             }
             catch (Exception e)
             {
@@ -194,10 +186,12 @@ public class NetworkProcessor
                         string averageHeartRate = argumentData[8];
                         string maxHeartRate = argumentData[9];
                         string distance = argumentData[10];
+                        
+                        string durationInSeconds = CalculateDurationInSeconds(duration);
                         clientWindow.UpdateHistoryTextBlock(date, duration, averageSpeed, maxSpeed, averageHeartRate, maxHeartRate, distance);
                         // {date} {duration}(0) {averageSpeed}(1) {maxSpeed}(1) {averageHeartRate}(2) {maxHeartRate}(2) {distance}(3)
                         updateCharts(clientWindow, [0,1,1,2,2,3], 
-                            [duration,averageSpeed,maxSpeed,averageHeartRate,maxHeartRate,distance], 
+                            [durationInSeconds,averageSpeed,maxSpeed,averageHeartRate,maxHeartRate,distance], 
                             date, [0,0,1,0,1,0]);
                         // clientWindow.UpdateCharts(0,Int32.Parse(duration), date);
                         // clientWindow.UpdateCharts(1,Int32.Parse(averageSpeed), date);
@@ -218,6 +212,15 @@ public class NetworkProcessor
                 Console.WriteLine("Unknown Packet Page");
                 break;
         }
+    }
+
+    private string CalculateDurationInSeconds(string duration)
+    {
+        var durationFormatSplit = duration.Split(":");
+        int durationInSeconds = (int.Parse(durationFormatSplit[0]) * 3600) + 
+            (int.Parse(durationFormatSplit[1]) * 60) + 
+            int.Parse(durationFormatSplit[2]);
+        return durationInSeconds.ToString();
     }
 
     public void updateCharts(IDataUpdateCallback clientWindow, int[] charts, string[] newValues, string label,

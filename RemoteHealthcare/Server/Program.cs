@@ -70,7 +70,7 @@ public class Server : IDoctorCallback, IClientCallback
                 SendCommandToClient(messageParts, $"1 {messageParts[4]}");
                 break;
             case DoctorDataIndex.RetrieveSessionData:
-                GetSessionData(connection, messageParts);
+                await GetSessionData(connection, messageParts);
                 break;
             case DoctorDataIndex.RetrieveAllClients:
                 SendAllClients(connection);
@@ -246,24 +246,28 @@ public class Server : IDoctorCallback, IClientCallback
     /**
      * Helper methode om data van een bepaalde sessie op te halen
      */
-    public void GetSessionData(Connection connection, string[] messageParts)
+    public async Task GetSessionData(Connection connection, string[] messageParts)
     {
-        var clientIndex = GetIndexClient(messageParts);
-
-        var sessions = fileManager.GetAllClientSessions(clientIndex);
-
-        //geen sessie beschikbaar van client
-        if (sessions == null)
+        await Task.Run(() =>
         {
-            connection.Send("3");
-            return;
-        }
+            var clientIndex = GetIndexClient(messageParts);
 
-        foreach (var session in sessions)
-        {
-            Console.WriteLine($"Session: {session}");
-            connection.Send($"3 {clientIndex} {session}");
-        }
+            var sessions = fileManager.GetAllClientSessions(clientIndex);
+
+            //geen sessie beschikbaar van client
+            if (sessions == null)
+            {
+                connection.Send("3");
+                return;
+            }
+
+            foreach (var session in sessions)
+            {
+                Console.WriteLine($"Session: {session}");
+                connection.Send($"3 {clientIndex} {session}");
+                Thread.Sleep(100);
+            }
+        });
     }
 
     /**

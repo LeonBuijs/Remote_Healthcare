@@ -98,7 +98,6 @@ public class VREngine
         DeleteNode(SearchNode("LeftHand"));
         DeleteNode(SearchNode("RightHand"));
         DeleteNode(SearchNode("Head"));
-        DeleteNode(SearchNode("face"));// todo
         DeleteNode(SearchNode("GroundPlane"));
     }
 
