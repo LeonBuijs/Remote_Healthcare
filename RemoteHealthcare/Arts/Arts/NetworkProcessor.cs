@@ -165,6 +165,7 @@ public class NetworkProcessor
                 {
                     if (clientWindow.GetClientinfo().Equals(clientId))
                     {
+                        updateCharts(clientWindow,[4,5,6,7,8],[argumentData[4], argumentData[5],argumentData[7], argumentData[8], argumentData[9]], argumentData[6], [0,0,0,0,0]);
                         for (int i = 4; i < 9; i++)
                         {
                             clientWindow.UpdateCharts(i,Int32.Parse(argumentData[i]), argumentData[9]);
@@ -195,12 +196,15 @@ public class NetworkProcessor
                         string distance = argumentData[10];
                         clientWindow.UpdateHistoryTextBlock(date, duration, averageSpeed, maxSpeed, averageHeartRate, maxHeartRate, distance);
                         // {date} {duration}(0) {averageSpeed}(1) {maxSpeed}(1) {averageHeartRate}(2) {maxHeartRate}(2) {distance}(3)
-                        clientWindow.UpdateCharts(0,Int32.Parse(duration), date);
-                        clientWindow.UpdateCharts(1,Int32.Parse(averageSpeed), date);
-                        clientWindow.UpdateCharts(1,Int32.Parse(maxSpeed), date, 1);
-                        clientWindow.UpdateCharts(2,Int32.Parse(averageHeartRate), date);
-                        clientWindow.UpdateCharts(2,Int32.Parse(maxHeartRate), date, 1);
-                        clientWindow.UpdateCharts(3,Int32.Parse(distance), date);
+                        updateCharts(clientWindow, [0,1,1,2,2,3], 
+                            [duration,averageSpeed,maxSpeed,averageHeartRate,maxHeartRate,distance], 
+                            date, [0,0,1,0,1,0]);
+                        // clientWindow.UpdateCharts(0,Int32.Parse(duration), date);
+                        // clientWindow.UpdateCharts(1,Int32.Parse(averageSpeed), date);
+                        // clientWindow.UpdateCharts(1,Int32.Parse(maxSpeed), date, 1);
+                        // clientWindow.UpdateCharts(2,Int32.Parse(averageHeartRate), date);
+                        // clientWindow.UpdateCharts(2,Int32.Parse(maxHeartRate), date, 1);
+                        // clientWindow.UpdateCharts(3,Int32.Parse(distance), date);
                         Console.WriteLine("1 line of hsitory added");
                         break;
                     }
@@ -213,6 +217,15 @@ public class NetworkProcessor
             default:
                 Console.WriteLine("Unknown Packet Page");
                 break;
+        }
+    }
+
+    public void updateCharts(IDataUpdateCallback clientWindow, int[] charts, string[] newValues, string label,
+        int[] lineIndex)
+    {
+        for (int i = 0; i < charts.Length; i++)
+        {
+            clientWindow.UpdateCharts(charts[i], Int32.Parse(newValues[i]), label, lineIndex[i]);
         }
     }
 
