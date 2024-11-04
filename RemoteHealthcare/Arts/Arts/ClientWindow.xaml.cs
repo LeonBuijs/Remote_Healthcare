@@ -73,7 +73,8 @@ public partial class ClientWindow : Window, IDataUpdateCallback
         string toShow = $"{date}, {duration}\n" +
                         $"{averageSpeed} km/h avg, {maxSpeed} km/h max\n" +
                         $"{averageHeartRate} bpm avg, {maxHeartRate} bpm max\n" +
-                        $"Total distance: {distance} meter";
+                        $"Total distance: {distance} meter" +
+                        $"\n------------------------";
         
         //work on UI thread when using UI features
         Dispatcher.Invoke(() =>
