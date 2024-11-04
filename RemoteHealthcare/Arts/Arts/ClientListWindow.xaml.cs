@@ -118,5 +118,6 @@ public partial class ClientListWindow : Window, IListWindowCallback
     private void ChatButtonPressed(object sender, RoutedEventArgs e)
     {
         networkProcessor.SendMessageToAll(ChatTextBox.Text);
+        ChatTextBox.Text = string.Empty;
     }
 }
