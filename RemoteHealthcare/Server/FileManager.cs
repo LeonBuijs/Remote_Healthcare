@@ -106,11 +106,12 @@ public class FileManager
      */
     private static string GetDataFromSession(string session)
     {
-        var fileContents = File.ReadAllText(session);
+        var fileContents = File.ReadAllLines(session);
 
-        if (fileContents.Length > 1)
+        //sla lege bestanden over en bestanden die geen valide data bevatten
+        if (fileContents.Length == 1)
         {
-            return fileContents;
+            return fileContents[0];
         }
 
         return "";

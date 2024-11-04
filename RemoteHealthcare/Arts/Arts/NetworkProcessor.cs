@@ -109,20 +109,12 @@ public class NetworkProcessor
                 Console.WriteLine($"Doctor received decrypted message: \n{receivedText}");
             
                 string[] multipleDataReivedSplit = receivedText.Split('\n');
-                foreach (var argument in multipleDataReivedSplit)
-                {
-                    if (string.IsNullOrEmpty(argument))
-                    {
-                        break;
-                    }
-                    Console.WriteLine($"argument: {argument}");
-                    string[] argumentSplit = argument.Split(" ");
-
-                    if (argumentSplit.Length > 1)
-                    {
-                        HandleData(argumentSplit);   
-                    }
-                }
+                //Pak eerste data regel, want die is altijd in orde.
+                var argument = multipleDataReivedSplit[0];
+                Console.WriteLine($"argument: {argument}");
+                string[] argumentSplit = argument.Split(" ");
+                    
+                HandleData(argumentSplit);   
             }
             catch (Exception e)
             {
@@ -161,6 +153,18 @@ public class NetworkProcessor
                     $"{argumentData[4]} {argumentData[5]} {argumentData[6]} {argumentData[7]} {argumentData[8]} {argumentData[9]}";
                 Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");
 
+                foreach (var clientWindow in dataUpdateCallbacks)
+                {
+                    if (clientWindow.GetClientinfo().Equals(clientId))
+                    {
+                        updateCharts(clientWindow,[4,5,6,7,8],[argumentData[4], argumentData[5],argumentData[6], argumentData[8], argumentData[9]], argumentData[7], [0,0,0,0,0]);
+                        // for (int i = 4; i < 9; i++)
+                        // {
+                        //     clientWindow.UpdateCharts(i,Int32.Parse(argumentData[i]), argumentData[9]);
+                        // }
+                    }
+                }
+
                 dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
                 break;
             case 2:
@@ -182,15 +186,16 @@ public class NetworkProcessor
                         string averageHeartRate = argumentData[8];
                         string maxHeartRate = argumentData[9];
                         string distance = argumentData[10];
+                        
+                        string durationInSeconds = CalculateDurationInSeconds(duration);
+                        //Voeg de history data toe
                         clientWindow.UpdateHistoryTextBlock(date, duration, averageSpeed, maxSpeed, averageHeartRate, maxHeartRate, distance);
                         // {date} {duration}(0) {averageSpeed}(1) {maxSpeed}(1) {averageHeartRate}(2) {maxHeartRate}(2) {distance}(3)
-                        clientWindow.UpdateHistoryCharts(0,Int32.Parse(duration), date);
-                        clientWindow.UpdateHistoryCharts(1,Int32.Parse(averageSpeed), date);
-                        clientWindow.UpdateHistoryCharts(1,Int32.Parse(maxSpeed), date, 1);
-                        clientWindow.UpdateHistoryCharts(2,Int32.Parse(averageHeartRate), date);
-                        clientWindow.UpdateHistoryCharts(2,Int32.Parse(maxHeartRate), date, 1);
-                        clientWindow.UpdateHistoryCharts(3,Int32.Parse(distance), date);
+                        updateCharts(clientWindow, [0,1,1,2,2,3], 
+                            [durationInSeconds,averageSpeed,maxSpeed,averageHeartRate,maxHeartRate,distance], 
+                            date, [0,0,1,0,1,0]);
                         Console.WriteLine("1 line of hsitory added");
+                        break;
                     }
                 }
                 break;
@@ -201,6 +206,24 @@ public class NetworkProcessor
             default:
                 Console.WriteLine("Unknown Packet Page");
                 break;
+        }
+    }
+
+    private string CalculateDurationInSeconds(string duration)
+    {
+        var durationFormatSplit = duration.Split(":");
+        int durationInSeconds = (int.Parse(durationFormatSplit[0]) * 3600) + 
+            (int.Parse(durationFormatSplit[1]) * 60) + 
+            int.Parse(durationFormatSplit[2]);
+        return durationInSeconds.ToString();
+    }
+
+    public void updateCharts(IDataUpdateCallback clientWindow, int[] charts, string[] newValues, string label,
+        int[] lineIndex)
+    {
+        for (int i = 0; i < charts.Length; i++)
+        {
+            clientWindow.UpdateCharts(charts[i], Int32.Parse(newValues[i]), label, lineIndex[i]);
         }
     }
 

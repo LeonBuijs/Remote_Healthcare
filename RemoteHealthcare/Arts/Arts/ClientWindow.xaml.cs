@@ -73,7 +73,8 @@ public partial class ClientWindow : Window, IDataUpdateCallback
         string toShow = $"{date}, {duration}\n" +
                         $"{averageSpeed} km/h avg, {maxSpeed} km/h max\n" +
                         $"{averageHeartRate} bpm avg, {maxHeartRate} bpm max\n" +
-                        $"Total distance: {distance} meter";
+                        $"Total distance: {distance} meter" +
+                        $"\n------------------------";
         
         //work on UI thread when using UI features
         Dispatcher.Invoke(() =>
@@ -95,9 +96,12 @@ public partial class ClientWindow : Window, IDataUpdateCallback
      * <param name="newValue">Dit is de nieuwe waarde die toegevoegd gaat worden aan de grafiek</param>
      * <param name="label">Dit is het bijpassende label wat op de X-as gezed gaat worden</param>
      */
-    public void UpdateHistoryCharts(int chartIndex, double newValue, string label, int lineIndex = 0)
+    public void UpdateCharts(int chartIndex, double newValue, string label, int lineIndex = 0)
     {
-        chartViewModel.UpdateHistoryCharts(chartIndex, newValue, label, lineIndex);
+        Dispatcher.Invoke(() =>
+        {
+            chartViewModel.UpdateCharts(chartIndex, newValue, label, lineIndex);
+        });
     }
     
     public string GetClientinfo()
@@ -138,6 +142,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback
         {
             networkProcessor.SendMessage(clientId, ChatInputTextBox.Text);
             ChatHistoryBox.Text += ChatInputTextBox.Text + "\n";
+            ChatInputTextBox.Clear();
         }
     }
 
@@ -151,6 +156,13 @@ public partial class ClientWindow : Window, IDataUpdateCallback
 
     private void GetHistoryClicked(object sender, RoutedEventArgs e)
     {
+        //Voordat je de geschiedenis toont. De oude geschiedenis verwijderen.
+        ResetHistoryData();
         networkProcessor.GetDataHistory(clientId);
+    }
+    public void ResetHistoryData()
+    {
+        HistoryTextBlock.Text = string.Empty;
+        chartViewModel.ResetCharts();
     }
 }

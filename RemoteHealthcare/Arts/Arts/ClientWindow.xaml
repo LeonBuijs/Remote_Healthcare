@@ -126,6 +126,73 @@
                 </Grid>
             </TabItem>
             
+            <TabItem Header="LiveData Charts">
+                <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*"></ColumnDefinition>
+                </Grid.ColumnDefinitions>
+                    
+                    <Label Grid.Row="0" Grid.Column="0" Content="Speed (Km/h)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="LiveChart1" Series="{Binding SeriesCollections[4]}" Grid.Row="1" Grid.Column="0">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[5]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                    
+                    <Label Grid.Row="0" Grid.Column="1" Content="Distance (Meters)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="LiveChart2" Series="{Binding SeriesCollections[5]}" Grid.Row="1" Grid.Column="1">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[5]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                    
+                    <Label Grid.Row="0" Grid.Column="2" Content="Power (Watt)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="LiveChart3" Series="{Binding SeriesCollections[6]}" Grid.Row="1" Grid.Column="2">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[6]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                    
+                    <Label Grid.Row="2" Grid.Column="0" Content="RPM" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="LiveChart4" Series="{Binding SeriesCollections[7]}" Grid.Row="3" Grid.Column="0">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[7]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                    
+                    <Label Grid.Row="2" Grid.Column="2" Content="HeartRate (BPM)" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <lvc:CartesianChart Name="LiveChart5" Series="{Binding SeriesCollections[8]}" Grid.Row="3" Grid.Column="2">
+                        <lvc:CartesianChart.AxisX>
+                            <lvc:Axis Labels="{Binding LabelsCollections[8]}" />
+                        </lvc:CartesianChart.AxisX>
+                        <lvc:CartesianChart.AxisY>
+                            <lvc:Axis LabelFormatter="{Binding Formatter}" />
+                        </lvc:CartesianChart.AxisY>
+                    </lvc:CartesianChart>
+                    
+                </Grid>
+            </TabItem>
+            
             <TabItem Header="History Charts">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -140,7 +207,7 @@
                     </Grid.ColumnDefinitions>
                     
                     <!-- Chart 1 -->
-                    <Label Grid.Row="0" Grid.Column="0" Content="Duration" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="0" Content="Duration (Seconds)" HorizontalAlignment="Center" FontWeight="Bold"/>
                     <lvc:CartesianChart Name="Chart1" Series="{Binding SeriesCollections[0]}" Grid.Row="1" Grid.Column="0">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[0]}" />
@@ -151,7 +218,7 @@
                     </lvc:CartesianChart>
 
                     <!-- Chart 2 -->
-                    <Label Grid.Row="0" Grid.Column="1" Content="Speed" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="1" Content="Speed (Km/h)" HorizontalAlignment="Center" FontWeight="Bold"/>
                     <lvc:CartesianChart Name="Chart2" Series="{Binding SeriesCollections[1]}" Grid.Row="1" Grid.Column="1">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[1]}" />
@@ -162,7 +229,7 @@
                     </lvc:CartesianChart>
 
                     <!-- Chart 3 -->
-                    <Label Grid.Row="2" Grid.Column="0" Content="Heart rate" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <Label Grid.Row="2" Grid.Column="0" Content="Heart rate (BPM)" HorizontalAlignment="Center" FontWeight="Bold"/>
                     <lvc:CartesianChart Name="Chart3" Series="{Binding SeriesCollections[2]}" Grid.Row="3" Grid.Column="0">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[2]}" />
@@ -173,7 +240,7 @@
                     </lvc:CartesianChart>
 
                     <!-- Chart 4 -->
-                    <Label Grid.Row="2" Grid.Column="1" Content="Distance" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <Label Grid.Row="2" Grid.Column="1" Content="Distance (Meters)" HorizontalAlignment="Center" FontWeight="Bold"/>
                     <lvc:CartesianChart Name="Chart4" Series="{Binding SeriesCollections[3]}" Grid.Row="3" Grid.Column="1">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[3]}" />

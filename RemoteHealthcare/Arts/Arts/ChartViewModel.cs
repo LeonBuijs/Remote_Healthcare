@@ -11,8 +11,8 @@ public class ChartViewModel : INotifyPropertyChanged
     public SeriesCollection[] SeriesCollections { get; set; }
     public ObservableCollection<string>[] LabelsCollections { get; set; }
     public Func<double, string> Formatter { get; set; }
-    private int amoutOffGraphs = 4;
-    private string[] firstLineLabels = ["Duration", "Average speed", "Average heart rate", "Distance"];
+    private int amoutOffGraphs = 9;
+    private string[] firstLineLabels = ["Duration", "Average speed", "Average heart rate", "Distance", "Speed", "Distance", "Power", "RPM", "HeartRate"];
     private string[] secondLineLabels = ["FillerValue","Maximum speed", "Maximum heart rate"];
     
     public ChartViewModel()
@@ -49,7 +49,7 @@ public class ChartViewModel : INotifyPropertyChanged
                 new LineSeries
                 {
                     Title = firstLineLabels[i],
-                    Values = new ChartValues<double>{1,2,3,4,5}
+                    Values = new ChartValues<double>()
                 }
             };
             if (i<3)
@@ -61,14 +61,14 @@ public class ChartViewModel : INotifyPropertyChanged
                     Values = new ChartValues<double>()
                 });
             }
-            LabelsCollections[i] = new ObservableCollection<string>{ "jan", "feb", "maart", "april", "mei" };
+            LabelsCollections[i] = new ObservableCollection<string>();
         }
 
-        Formatter = value => value.ToString("N");
+        Formatter = value => value.ToString("N0");
         
     }
     
-    public void UpdateHistoryCharts(int chartIndex, double newValue, string label, int lineIndex = 0)
+    public void UpdateCharts(int chartIndex, double newValue, string label, int lineIndex = 0)
     {
         if (chartIndex < 0 || chartIndex >= SeriesCollections.Length) return;
 
@@ -88,6 +88,16 @@ public class ChartViewModel : INotifyPropertyChanged
 
         OnPropertyChanged(nameof(SeriesCollections));
         OnPropertyChanged(nameof(LabelsCollections));
+    }
+    public void ResetCharts()
+    {
+        foreach (var seriesCollection in SeriesCollections)
+        {
+            foreach (var series in seriesCollection)
+            {
+                series.Values = new ChartValues<double>();
+            }
+        }
     }
 
     /**
