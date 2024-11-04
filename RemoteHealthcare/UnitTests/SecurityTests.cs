@@ -8,6 +8,10 @@ namespace SecurityManager.Tests
     [TestFixture]
     public class EncryptionTests
     {
+        /**
+         * Dit is een test waarmee je kunt controleren of de keys goed worden gegenereerd.
+         * Er wordt gekeken of de keys niet null zijn en of ze met <RSAKeyValue> beginnen.
+         */
         [Test]
         public void TestGenerateRsaKeyPair()
         {
@@ -21,6 +25,11 @@ namespace SecurityManager.Tests
             Assert.IsTrue(privateKey.StartsWith("<RSAKeyValue>"));
         }
 
+        /**
+         * Dit is een test waarmee je het encrypten en decrypten kunt testen.
+         * Eerst wordt de teststring geencrypt en daarna gedecrypt
+         * en tot slot wordt er gekeken of dit overeen komt met de begin string.
+         */
         [Test]
         [TestCase("Hello, World!")]
         [TestCase("")]
@@ -40,6 +49,11 @@ namespace SecurityManager.Tests
             Assert.AreEqual(text, decryptedText);
         }
 
+        /**
+         * Dit is een test waarmee je het hashen kunt testen.
+         * De teststring wordt gehashed met de hashmethode en met een eigen implementatie,
+         * deze 2 hashes worden vergeleken.
+         */
         [Test]
         [TestCase("Hello, World!")]
         [TestCase("")]
