@@ -95,9 +95,9 @@ public partial class ClientWindow : Window, IDataUpdateCallback
      * <param name="newValue">Dit is de nieuwe waarde die toegevoegd gaat worden aan de grafiek</param>
      * <param name="label">Dit is het bijpassende label wat op de X-as gezed gaat worden</param>
      */
-    public void UpdateHistoryCharts(int chartIndex, double newValue, string label, int lineIndex = 0)
+    public void UpdateCharts(int chartIndex, double newValue, string label, int lineIndex = 0)
     {
-        chartViewModel.UpdateHistoryCharts(chartIndex, newValue, label, lineIndex);
+        chartViewModel.UpdateCharts(chartIndex, newValue, label, lineIndex);
     }
     
     public string GetClientinfo()

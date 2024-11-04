@@ -161,6 +161,17 @@ public class NetworkProcessor
                     $"{argumentData[4]} {argumentData[5]} {argumentData[6]} {argumentData[7]} {argumentData[8]} {argumentData[9]}";
                 Console.WriteLine($"Got client \"{clientId}\" with data \"{data}\"");
 
+                foreach (var clientWindow in dataUpdateCallbacks)
+                {
+                    if (clientWindow.GetClientinfo().Equals(clientId))
+                    {
+                        for (int i = 4; i < 9; i++)
+                        {
+                            clientWindow.UpdateCharts(i,Int32.Parse(argumentData[i]), argumentData[9]);
+                        }
+                    }
+                }
+
                 dataUpdateCallbacks.ForEach(callbackMember => callbackMember.UpdateData(clientId, data));
                 break;
             case 2:
@@ -184,13 +195,14 @@ public class NetworkProcessor
                         string distance = argumentData[10];
                         clientWindow.UpdateHistoryTextBlock(date, duration, averageSpeed, maxSpeed, averageHeartRate, maxHeartRate, distance);
                         // {date} {duration}(0) {averageSpeed}(1) {maxSpeed}(1) {averageHeartRate}(2) {maxHeartRate}(2) {distance}(3)
-                        clientWindow.UpdateHistoryCharts(0,Int32.Parse(duration), date);
-                        clientWindow.UpdateHistoryCharts(1,Int32.Parse(averageSpeed), date);
-                        clientWindow.UpdateHistoryCharts(1,Int32.Parse(maxSpeed), date, 1);
-                        clientWindow.UpdateHistoryCharts(2,Int32.Parse(averageHeartRate), date);
-                        clientWindow.UpdateHistoryCharts(2,Int32.Parse(maxHeartRate), date, 1);
-                        clientWindow.UpdateHistoryCharts(3,Int32.Parse(distance), date);
+                        clientWindow.UpdateCharts(0,Int32.Parse(duration), date);
+                        clientWindow.UpdateCharts(1,Int32.Parse(averageSpeed), date);
+                        clientWindow.UpdateCharts(1,Int32.Parse(maxSpeed), date, 1);
+                        clientWindow.UpdateCharts(2,Int32.Parse(averageHeartRate), date);
+                        clientWindow.UpdateCharts(2,Int32.Parse(maxHeartRate), date, 1);
+                        clientWindow.UpdateCharts(3,Int32.Parse(distance), date);
                         Console.WriteLine("1 line of hsitory added");
+                        break;
                     }
                 }
                 break;

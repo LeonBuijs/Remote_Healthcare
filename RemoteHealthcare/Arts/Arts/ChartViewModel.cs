@@ -11,8 +11,8 @@ public class ChartViewModel : INotifyPropertyChanged
     public SeriesCollection[] SeriesCollections { get; set; }
     public ObservableCollection<string>[] LabelsCollections { get; set; }
     public Func<double, string> Formatter { get; set; }
-    private int amoutOffGraphs = 4;
-    private string[] firstLineLabels = ["Duration", "Average speed", "Average heart rate", "Distance"];
+    private int amoutOffGraphs = 9;
+    private string[] firstLineLabels = ["Duration", "Average speed", "Average heart rate", "Distance", "Speed", "Distance", "Power", "RPM", "HeartRate"];
     private string[] secondLineLabels = ["FillerValue","Maximum speed", "Maximum heart rate"];
     
     public ChartViewModel()
@@ -68,7 +68,7 @@ public class ChartViewModel : INotifyPropertyChanged
         
     }
     
-    public void UpdateHistoryCharts(int chartIndex, double newValue, string label, int lineIndex = 0)
+    public void UpdateCharts(int chartIndex, double newValue, string label, int lineIndex = 0)
     {
         if (chartIndex < 0 || chartIndex >= SeriesCollections.Length) return;
 

@@ -140,7 +140,7 @@
                     <ColumnDefinition Width="*"></ColumnDefinition>
                 </Grid.ColumnDefinitions>
                     
-                    <Label Grid.Row="0" Grid.Column="0" Content="Duration" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="0" Content="Speed" HorizontalAlignment="Center" FontWeight="Bold"/>
                     <lvc:CartesianChart Name="LiveChart1" Series="{Binding SeriesCollections[4]}" Grid.Row="1" Grid.Column="0">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[5]}" />
@@ -150,7 +150,7 @@
                         </lvc:CartesianChart.AxisY>
                     </lvc:CartesianChart>
                     
-                    <Label Grid.Row="0" Grid.Column="1" Content="Duration" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="1" Content="Distance" HorizontalAlignment="Center" FontWeight="Bold"/>
                     <lvc:CartesianChart Name="LiveChart2" Series="{Binding SeriesCollections[5]}" Grid.Row="1" Grid.Column="1">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[5]}" />
@@ -160,7 +160,7 @@
                         </lvc:CartesianChart.AxisY>
                     </lvc:CartesianChart>
                     
-                    <Label Grid.Row="0" Grid.Column="2" Content="Duration" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <Label Grid.Row="0" Grid.Column="2" Content="Power" HorizontalAlignment="Center" FontWeight="Bold"/>
                     <lvc:CartesianChart Name="LiveChart3" Series="{Binding SeriesCollections[6]}" Grid.Row="1" Grid.Column="2">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[6]}" />
@@ -170,7 +170,7 @@
                         </lvc:CartesianChart.AxisY>
                     </lvc:CartesianChart>
                     
-                    <Label Grid.Row="2" Grid.Column="0" Content="Duration" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <Label Grid.Row="2" Grid.Column="0" Content="RPM" HorizontalAlignment="Center" FontWeight="Bold"/>
                     <lvc:CartesianChart Name="LiveChart4" Series="{Binding SeriesCollections[7]}" Grid.Row="3" Grid.Column="0">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[7]}" />
@@ -180,7 +180,7 @@
                         </lvc:CartesianChart.AxisY>
                     </lvc:CartesianChart>
                     
-                    <Label Grid.Row="2" Grid.Column="2" Content="Duration" HorizontalAlignment="Center" FontWeight="Bold"/>
+                    <Label Grid.Row="2" Grid.Column="2" Content="HeartRate" HorizontalAlignment="Center" FontWeight="Bold"/>
                     <lvc:CartesianChart Name="LiveChart5" Series="{Binding SeriesCollections[8]}" Grid.Row="3" Grid.Column="2">
                         <lvc:CartesianChart.AxisX>
                             <lvc:Axis Labels="{Binding LabelsCollections[8]}" />
