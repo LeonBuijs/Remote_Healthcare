@@ -49,7 +49,7 @@ public class ChartViewModel : INotifyPropertyChanged
                 new LineSeries
                 {
                     Title = firstLineLabels[i],
-                    Values = new ChartValues<double>{1,2,3,4,5}
+                    Values = new ChartValues<double>()
                 }
             };
             if (i<3)
@@ -61,10 +61,10 @@ public class ChartViewModel : INotifyPropertyChanged
                     Values = new ChartValues<double>()
                 });
             }
-            LabelsCollections[i] = new ObservableCollection<string>{ "jan", "feb", "maart", "april", "mei" };
+            LabelsCollections[i] = new ObservableCollection<string>();
         }
 
-        Formatter = value => value.ToString("N");
+        Formatter = value => value.ToString("N0");
         
     }
     
