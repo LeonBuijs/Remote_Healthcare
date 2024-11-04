@@ -176,13 +176,20 @@ public class NetworkProcessor
                     if (clientWindow.GetClientinfo().Equals(historyclientId))
                     {
                         string date = argumentData[4];
+                        string duration = argumentData[5];
+                        string averageSpeed = argumentData[6];
+                        string maxSpeed = argumentData[7];
+                        string averageHeartRate = argumentData[8];
+                        string maxHeartRate = argumentData[9];
+                        string distance = argumentData[10];
+                        clientWindow.UpdateHistoryTextBlock(date, duration, averageSpeed, maxSpeed, averageHeartRate, maxHeartRate, distance);
                         // {date} {duration}(0) {averageSpeed}(1) {maxSpeed}(1) {averageHeartRate}(2) {maxHeartRate}(2) {distance}(3)
-                        clientWindow.UpdateHistory(0,Int32.Parse(argumentData[5]), date);
-                        clientWindow.UpdateHistory(1,Int32.Parse(argumentData[6]), date);
-                        clientWindow.UpdateHistory(1,Int32.Parse(argumentData[7]), date, 1);
-                        clientWindow.UpdateHistory(2,Int32.Parse(argumentData[8]), date);
-                        clientWindow.UpdateHistory(2,Int32.Parse(argumentData[9]), date, 1);
-                        clientWindow.UpdateHistory(3,Int32.Parse(argumentData[10]), date);
+                        clientWindow.UpdateHistoryCharts(0,Int32.Parse(duration), date);
+                        clientWindow.UpdateHistoryCharts(1,Int32.Parse(averageSpeed), date);
+                        clientWindow.UpdateHistoryCharts(1,Int32.Parse(maxSpeed), date, 1);
+                        clientWindow.UpdateHistoryCharts(2,Int32.Parse(averageHeartRate), date);
+                        clientWindow.UpdateHistoryCharts(2,Int32.Parse(maxHeartRate), date, 1);
+                        clientWindow.UpdateHistoryCharts(3,Int32.Parse(distance), date);
                         Console.WriteLine("1 line of hsitory added");
                     }
                 }
