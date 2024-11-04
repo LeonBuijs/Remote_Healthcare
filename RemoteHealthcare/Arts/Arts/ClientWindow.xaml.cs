@@ -97,7 +97,10 @@ public partial class ClientWindow : Window, IDataUpdateCallback
      */
     public void UpdateCharts(int chartIndex, double newValue, string label, int lineIndex = 0)
     {
-        chartViewModel.UpdateCharts(chartIndex, newValue, label, lineIndex);
+        Dispatcher.Invoke(() =>
+        {
+            chartViewModel.UpdateCharts(chartIndex, newValue, label, lineIndex);
+        });
     }
     
     public string GetClientinfo()
@@ -138,6 +141,7 @@ public partial class ClientWindow : Window, IDataUpdateCallback
         {
             networkProcessor.SendMessage(clientId, ChatInputTextBox.Text);
             ChatHistoryBox.Text += ChatInputTextBox.Text + "\n";
+            ChatInputTextBox.Clear();
         }
     }
 
@@ -151,6 +155,13 @@ public partial class ClientWindow : Window, IDataUpdateCallback
 
     private void GetHistoryClicked(object sender, RoutedEventArgs e)
     {
+        //Voordat je de geschiedenis toont. De oude geschiedenis verwijderen.
+        ResetHistoryData();
         networkProcessor.GetDataHistory(clientId);
+    }
+    public void ResetHistoryData()
+    {
+        HistoryTextBlock.Text = string.Empty;
+        chartViewModel.ResetCharts();
     }
 }

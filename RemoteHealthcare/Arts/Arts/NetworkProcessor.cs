@@ -194,17 +194,13 @@ public class NetworkProcessor
                         string averageHeartRate = argumentData[8];
                         string maxHeartRate = argumentData[9];
                         string distance = argumentData[10];
+                        
+                        //Voeg de history data toe
                         clientWindow.UpdateHistoryTextBlock(date, duration, averageSpeed, maxSpeed, averageHeartRate, maxHeartRate, distance);
                         // {date} {duration}(0) {averageSpeed}(1) {maxSpeed}(1) {averageHeartRate}(2) {maxHeartRate}(2) {distance}(3)
                         updateCharts(clientWindow, [0,1,1,2,2,3], 
                             [duration,averageSpeed,maxSpeed,averageHeartRate,maxHeartRate,distance], 
                             date, [0,0,1,0,1,0]);
-                        // clientWindow.UpdateCharts(0,Int32.Parse(duration), date);
-                        // clientWindow.UpdateCharts(1,Int32.Parse(averageSpeed), date);
-                        // clientWindow.UpdateCharts(1,Int32.Parse(maxSpeed), date, 1);
-                        // clientWindow.UpdateCharts(2,Int32.Parse(averageHeartRate), date);
-                        // clientWindow.UpdateCharts(2,Int32.Parse(maxHeartRate), date, 1);
-                        // clientWindow.UpdateCharts(3,Int32.Parse(distance), date);
                         Console.WriteLine("1 line of hsitory added");
                         break;
                     }

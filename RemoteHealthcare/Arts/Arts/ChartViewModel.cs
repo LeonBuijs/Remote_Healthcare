@@ -89,6 +89,16 @@ public class ChartViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(SeriesCollections));
         OnPropertyChanged(nameof(LabelsCollections));
     }
+    public void ResetCharts()
+    {
+        foreach (var seriesCollection in SeriesCollections)
+        {
+            foreach (var series in seriesCollection)
+            {
+                series.Values = new ChartValues<double>();
+            }
+        }
+    }
 
     /**
      * <summary>
